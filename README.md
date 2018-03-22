@@ -1,7 +1,7 @@
 # CoNet  
-[![Build Status](https://travis-ci.org/QTGate/CoNETPlatform.svg?branch=master)](https://travis-ci.org/QTGate/CoNETPlatform)
+[![Build Status](https://travis-ci.org/QTGate/CoNET.svg?branch=master)](https://travis-ci.org/QTGate/CoNETPlatform)
 [![Gitter](https://img.shields.io/badge/chat-on%20gitter-blue.svg)](https://gitter.im/QTGate/Lobby)
-[![Known Vulnerabilities](https://snyk.io/test/github/qtgate/CoNETPlatform/badge.svg)](https://snyk.io/test/github/qtgate/CoNETPlatform)
+[![Known Vulnerabilities](https://snyk.io/test/github/qtgate/CoNET/badge.svg)](https://snyk.io/test/github/qtgate/CoNETPlatform)
 
 ## Internet problems (インターネット問題) 互聯網問題
 ![http protocol](/resources/ip_address.png?raw=true)
