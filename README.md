@@ -1,7 +1,9 @@
 # CoNet
 [![Gitter](https://img.shields.io/badge/chat-on%20gitter-blue.svg)](https://gitter.im/QTGate/Lobby)
 
-## Internet problems (インターネット問題) 互聯網問題
+## Internet problems
+## インターネット問題
+## 互聯網問題
 ![http protocol](/resources/ip_address.png?raw=true)
 DDos Attack, Connecting Reset, Restrictive and Filtering, Surveillance, SSL man-in-the-middle attack, censorship, IP address Blacklists, all problems in Internet is because the IP address.
 
@@ -9,7 +11,9 @@ DDos Attack, Connecting Reset, Restrictive and Filtering, Surveillance, SSL man-
 
 在今天互聯網上存在的DDoS攻撃，連結被重置，受限制或被攔截，網絡監控，中間人攻擊，偷窺隱私及IP黑名單等，所有問題都指向一個原因：IP地址。
 
-## The CoNET is network without IP address (CoNETとはIPなしネットワークです) CoNET是一個無IP地址的網絡
+## The CoNET is network without IP address 
+## CoNETとはIPなしネットワークです
+## CoNET是一個無IP地址的網絡
 
 ![http protocol](/resources/conet.png?raw=true)
 The CoNET is ANONIMITY virtual network communication through email ( No IP Address ). It also is REFRACTION NETWORKING because all connecting through third-party mail server via IMAP protocol. CoNet provide internet traffic egress.
@@ -18,5 +22,9 @@ CoNETとはメールを通じて構築したIPなし仮想ネットワークで�
 
 CoNET提供一個以郵箱為路由，使用IMAP網路協議，所有節點都通過第三方的公眾郵箱供應商，相互連結在一起的虛擬網絡，CoNET同時提供互聯網數據出口。它的最大特徵是節點間無IP實現網絡通訊。CoNET被稱為全新的折射網絡技術，因為CoNET使用第三方郵件服務器來連結各個節點。
 
-## QTG is a platform based on CoNET (QTGはCoNET技術を運用して開発されたプラットフォームです) QTG是使用CoNET技術的平台
-[QTG](https://github.com/QTGate/QTGate-Desktop-Client)
+
+## QTG is a platform based on CoNET
+## QTGはCoNET技術を運用して開発されたプラットフォームです
+## QTG是使用CoNET技術的平台
+
+## [QTG](https://github.com/QTGate/QTGate-Desktop-Client)
