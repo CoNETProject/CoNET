@@ -9,7 +9,8 @@ DDos Attack, Connecting Reset, Restrictive and Filtering, Surveillance, SSL man-
 
 在今天互聯網上存在的DDoS攻撃，連結被重置，受限制或被攔截，網絡監控，中間人攻擊，偷窺隱私及IP黑名單等，所有問題都指向一個原因：IP地址。
 
-## The CoNET (CoNETとは) CoNET是什麼
+## The CoNET is network without IP address (CoNETとはIPなしネットワークです) CoNET是一個無IP地址的網絡
+
 ![http protocol](/resources/conet.png?raw=true)
 The CoNET is ANONIMITY virtual network communication through email ( No IP Address ). It also is REFRACTION NETWORKING because all connecting through third-party mail server via IMAP protocol. CoNet provide internet traffic egress.
 
