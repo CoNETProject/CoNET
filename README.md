@@ -20,7 +20,7 @@ CoNETとはメールを通じて構築したIPなし仮想ネットワークで�
 CoNET提供一個以郵箱為路由，使用IMAP網路協議，所有節點都通過第三方的公眾郵箱供應商，相互連結在一起的虛擬網絡，CoNET同時提供互聯網數據出口。它的最大特徵是節點間無IP實現網絡通訊。CoNET被稱為全新的折射網絡技術，因為CoNET使用第三方郵件服務器來連結各個節點。
 
 ## QTG is a platform based on CoNET (QTGはCoNET技術を運用して開発されたプラットフォームです) QTG是使用CoNET技術的平台
-QTG (https://github.com/QTGate/QTGate-Desktop-Client)
+[QTG](https://github.com/QTGate/QTGate-Desktop-Client)
 
 ## License 版權 
 
