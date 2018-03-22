@@ -1,4 +1,4 @@
-# CoNet Platform  
+# CoNet  
 [![Build Status](https://travis-ci.org/QTGate/CoNETPlatform.svg?branch=master)](https://travis-ci.org/QTGate/CoNETPlatform)
 [![Gitter](https://img.shields.io/badge/chat-on%20gitter-blue.svg)](https://gitter.im/QTGate/Lobby)
 [![Known Vulnerabilities](https://snyk.io/test/github/qtgate/CoNETPlatform/badge.svg)](https://snyk.io/test/github/qtgate/CoNETPlatform)
@@ -22,7 +22,7 @@ CoNET提供一個以郵箱為路由，使用IMAP網路協議，所有節點都�
 ## QTG is a platform based on CoNET (QTGはCoNET技術を運用して開発されたプラットフォームです) QTG是使用CoNET技術的平台
 [QTG](https://github.com/QTGate/QTGate-Desktop-Client)
 
-## License 版權 
+## License 版權
 
 Copyright (c) QTGate Systems Inc. All rights reserved.
 

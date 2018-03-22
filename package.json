@@ -1,8 +1,8 @@
 {
-  "name": "CoNETPlatform",
-  "version": "0.1.0",
+  "name": "CoNET",
+  "version": "1.0.0",
   "license": "MIT",
-  "description": "CoNET Platform",
+  "description": "CoNET",
 
   "repository": {
     "type": "git",
