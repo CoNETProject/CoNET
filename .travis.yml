@@ -1,0 +1,10 @@
+sudo: false
+language: node_js
+
+os:
+  - linux
+
+before_install:
+  - nvm install 8.7.0
+  - nvm use 8.7.0
+  - npm i electron-builder
