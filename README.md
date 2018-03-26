@@ -19,8 +19,8 @@ CoNETは公衆メールサーバーを通じて構築した、IPなしの匿名�
 ### CoNET是一個使用折射技術的匿名虛擬網絡
 CoNET提供一個以郵箱為路由，使用IMAP網路協議，所有節點都通過第三方的公眾郵箱供應商，相互連結在一起的虛擬網絡，CoNET同時提供互聯網數據出口。它的最大特徵是節點間無IP實現網絡通訊。CoNET被稱為全新的折射網絡技術，因為CoNET內的各個節點並不直接連結CoNET，而是使用第三方郵件服務器來連結。折射網絡技術是在互聯網審查屏蔽，與對抗工具開發這場貓捉老鼠遊戲中，傳統的VPN和Tor等已經不敵狀態下，扳回一局的希望。
 
-## QTG is a platform based on CoNET
-## QTGはCoNET技術を運用して開発されたプラットフォームです
-## QTG是使用CoNET技術的平台
+### QTG is a platform based on CoNET
+### QTGはCoNET技術を運用して開発されたプラットフォームです
+### QTG是使用CoNET技術的平台
 
-## [QTG](https://github.com/QTGate/QTGate-Desktop-Client)
+### [QTG](https://github.com/QTGate/QTGate-Desktop-Client)
