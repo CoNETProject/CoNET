@@ -1,9 +1,9 @@
 # CoNet
 [![Gitter](https://img.shields.io/badge/chat-on%20gitter-blue.svg)](https://gitter.im/QTGate/Lobby)
 
-## Internet problems
-## インターネット問題
-## 互聯網問題
+###Internet problems
+###インターネット問題
+###互聯網問題
 ![http protocol](/resources/ip_address.png?raw=true)
 DDos Attack, Connecting Reset, Restrictive and Filtering, Surveillance, SSL man-in-the-middle attack, censorship, IP address Blacklists, all problems in Internet is because the IP address.
 
