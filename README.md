@@ -16,13 +16,16 @@ DDos Attack, Connecting Reset, Restrictive and Filtering, Surveillance, SSL man-
 ## CoNET是一個匿名折射網絡
 
 ![http protocol](/resources/conet.png?raw=true)
-The CoNET is a anonymous refraction network that allows people to improve their security, privacy and freedom on the Internet.
+#The CoNET is a anonymous refraction network that allows people to improve their security, privacy and freedom on the Internet.
 
 CoNET’s users employ this network by connecting through the third-party public email server to establish a virtual tunnel rather than making a direct connection. CoNET is an effective censorship circumvention tool, allowing its users to reach otherwise blocked destinations or content. Along the same line, CoNET’s user leave their IP address in public email server, CoNET thus allowing both organizations and individuals to share information over public networks without compromising their privacy.
 
 
-CoNETとは公衆メールサーバーを通じて構築したIPなしの匿名仮想ネットワークです。各ノートの間はIMAPプロトコルを利用してメールアドレスをルーティングします、CoNETも屈折ネットワークと呼ばれます、ノートはCoNETに直接接続するなく、第三方メールサーバーを通じて接続を確立します。ネットでの検閲とそれを回避する方法、ネズミと猫のゲームに、VPNやTorなどのネットでの検閲を回避するツールは、弱勢になったことを逆転するチャンスの次時代的な技術です。CoNETはインターネットへルーティングは提供しています。
+#CoNETとは匿名屈折仮想ネットワークです
 
+CoNETは公衆メールサーバーを通じて構築した、IPなしの匿名仮想ネットワークです。各ノートの間はIMAPプロトコルを利用してメールアドレスをルーティングします、CoNETも屈折ネットワークと呼ばれます、ノートはCoNETに直接接続するなく、第三方メールサーバーを通じて接続を確立します。ネットでの検閲とそれを回避する方法、ネズミと猫のゲームに、VPNやTorなどのネットでの検閲を回避するツールは、弱勢になったことを逆転するチャンスの次時代的な技術です。CoNETはインターネットへルーティングは提供しています。
+
+#CoNET是一個使用折射技術的匿名虛擬網絡
 CoNET提供一個以郵箱為路由，使用IMAP網路協議，所有節點都通過第三方的公眾郵箱供應商，相互連結在一起的虛擬網絡，CoNET同時提供互聯網數據出口。它的最大特徵是節點間無IP實現網絡通訊。CoNET被稱為全新的折射網絡技術，因為CoNET內的各個節點並不直接連結CoNET，而是使用第三方郵件服務器來連結。折射網絡技術是在互聯網審查屏蔽，與對抗工具開發這場貓捉老鼠遊戲中，傳統的VPN和Tor等已經不敵狀態下，扳回一局的希望。
 
 
