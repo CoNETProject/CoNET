@@ -19,5 +19,8 @@ CoNETは公衆メールサーバーを通じて構築した、IPなしの匿名�
 ### CoNET是一個使用折射技術的匿名虛擬網絡
 CoNET是對抗網絡監控的工具。用戶通過連結第三方公眾郵件服務器，接入CoNET匿名虛擬網絡，它的技術被稱為折射網絡技術(Refraction network)，可以幫助用戶逃避被網絡監控，訪問被網絡屏蔽的服務器。是網絡監控與被監控的這場貓捉老鼠遊戲之中，VPN和其他規避工具均處於劣勢的當前形勢下，重新佔據優勢的希望。
 
+### refraction network 屈折ネットワーク 折射網絡
+![http protocol](/resources/CoNET_refraction.png?raw=true)
+
 ### CoNET Platform CoNET プラットフォーム CoNET平台
 ### [CoPlatform](https://github.com/QTGate/QTGate-Desktop-Client)
