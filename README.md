@@ -1,7 +1,7 @@
 # CoNet
 [![Gitter](https://img.shields.io/badge/chat-on%20gitter-blue.svg)](https://gitter.im/QTGate/Lobby)
 
-### Internet problems インターネットの問題 互聯網問題
+### Internet problems, インターネットの問題, 互聯網問題
 ![http protocol](/resources/ip_address.png?raw=true)
 DDos Attack, Connecting Reset, Restrictive and Filtering, Surveillance, SSL man-in-the-middle attack, censorship, IP address Blacklists, all problems in Internet is because the IP address.
 
@@ -44,7 +44,16 @@ CoNET是對抗網絡監控的工具。用戶通過連結第三方公眾郵件服
 
 CoNET核心網絡管理雲由於沒有對外服務的IP地址，從互聯網角度來說它像是一個看不見的幽靈般的存在，傳統意義上的網絡攻擊工具在CoNET面前均失去作用，而CoNET和各節點在郵件服務器的地位相同，相互窺視探測IP地址變得困難，所以CoNET具有高安全性和可靠性。CoNET目前只對應知名公眾郵箱，讓使用郵箱來攻擊CoNET行動也變得異常困難。CoNET提供接入CoNET網絡的服務器以郵箱作為訪問地址、提供匿名的服務器訪問服務，讓網絡媒體在遭受DDoS攻擊的情況下，都能夠繼續服務與CoNET客戶端。
 
-### CoNET Platform CoNETプラットフォーム CoNET平台
+![http protocol](/resources/iaas.png?raw=true)
+### CoNET IAAS BtoB service
+
+### CoNETのBtoB　IAAS　サービス
+
+###CoNET網絡提供BtoB的IAAS服務
+個人或組織可以選擇CoNET的安全匿名和穿透力，開發自定義的彈性CoNET接入方案。可以在CoNET形成自己的私有網絡，傳送任意的TCP或UDP層協議，還可以選擇比普通CoNET節點更高的傳輸能力。使用案例包括區塊鏈的匿名無障礙傳輸協議，國際企業分佈在全球各個部門之間高可用性和私密性的私有網絡數據交換等。CoNET的IAAS提供API和webhooks接口，還提供現成的平台模塊（手機系統模塊將陸續推出），讓您的後續開發變得簡單容易。
+（申請IAAS服務的個人和組織須提交目的書，CoNET對此行使審核權）
+詳細請詢問info@CoNETTech.ca
+### CoNET Platform, CoNETプラットフォーム, CoNET平台
 - [CoNET Platform for laptop, CoNETプラットフォーム for PC, CoNET計算機OS平台](https://github.com/QTGate/QTGate-Desktop-Client)
 - CoNET Platform for iOS (come soon), CoNETプラットフォーム for iOS (開発中), iOS的CoNET平台開發中
 - CoNET Platform for Android (come soon), CoNETプラットフォーム for Android (開発中), 安卓系統的CoNET平台開發中
