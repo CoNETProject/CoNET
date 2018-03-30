@@ -15,30 +15,32 @@ DDos Attack, Connecting Reset, Restrictive and Filtering, Surveillance, SSL man-
 - Security from danger or threat online
 - Access to the internet Anonymously
 - Bypass Restriction and Filtering
+- Ghost Network
 
 CoNET’s users employ this network by connecting through the third-party public email server to establish a virtual tunnel rather than making a direct connection. CoNET is an effective censorship circumvention tool, allowing its users to reach otherwise blocked destinations or content. Along the same line, CoNET’s user leave their IP address in public email server, CoNET thus allowing both organizations and individuals to share information over public networks without compromising their privacy.
+
+CoNET looks like a ghost network bucause CoNET have not public IP address for connection. Network attack tools are losing their powers. CoNET allows node to host an anonymous website or server routing use email address. 
 
 ### CoNETとは匿名屈折仮想ネットワークです
 - インターネットの検閲、監視から脱出
 - 安全とプライバシーなオンライン環境
 - 匿名
 - 知能化した現代的なファイアウォールをうまくすり抜けること
-- 幽霊のような存在
+- 幽霊ネットワーク
 
 CoNETは公衆メールサーバーを通じて構築した、IPなしの匿名仮想ネットワークです。各ノートの間はIMAPプロトコルを利用してメールアドレスをルーティングします、CoNETも屈折ネットワークと呼ばれます、ノートはCoNETに直接接続するなく、第三方メールサーバーを通じて接続を確立します。ネットでの検閲とそれを回避する方法、ネズミと猫のゲームに、VPNやTorなどのネットでの検閲を回避するツールは、弱勢になったことを逆転するチャンスの次時代的な技術です。CoNETはインターネットへルーティングは提供しています。
 
-CoNET自身には公開されたIPアドレスがないです、インターネットから見えない幽霊のような存在であります、伝統的なネットワーク攻撃ツールはCoNETに無効となります。CoNETはCoNETに接続したサーバに、IPアドレスの代わりにメールアドレスを使った匿名サーバとして、クライアントからの訪問も可能です。インターネットサーバーはDDoS攻撃を受ける間にCoNETによって引き続きサービスすることはできます。
+CoNET自身には公開されたIPアドレスがないです、インターネットから見えない幽霊のような存在であります、伝統的なネットワーク攻撃ツールはCoNETに無効となります。CoNETはCoNETに接続したサーバに、IPアドレスの代わりにメールアドレスを使った、匿名サーバとして、CoNETクライアントからの訪問は可能です。インターネットサーバーはDDoS攻撃を受ける間に、CoNETによって引き続きサービスすることができます。CoNETコアーは各ノートと同等立場ですから、お互いIPアドレスを覗くすることはできないです。
 ### CoNET是一個使用折射技術的匿名虛擬網絡
 - 對抗網絡監控和審查
 - 安全和隱私
 - 匿名
 - 穿越智能化防火牆
-- 幽靈般的存在
+- 幽靈網絡
 
 CoNET是對抗網絡監控的工具。用戶通過連結第三方公眾郵件服務器，接入CoNET匿名虛擬網絡，它的技術被稱為折射網絡技術(Refraction network)，可以幫助用戶逃避被網絡監控，訪問被網絡屏蔽的服務器。是網絡監控與被監控的這場貓捉老鼠遊戲之中，VPN和其他規避工具均處於劣勢的當前形勢下，重新佔據優勢的希望。
 
-CoNET核心網絡管理雲由於沒有對外服務的IP地址，從互聯網角度來說它像是一個看不見的幽靈般的存在，傳統意義上的網絡攻擊工具在CoNET面前均失去作用，具有高安全性和可靠性。
-由於CoNET目前只對應知名公眾郵箱，讓使用郵箱來攻擊CoNET行動變得異常困難。CoNET提供接入CoNET網絡的服務器以郵箱作為訪問地址、可以提供匿名服務器的訪問服務，讓網絡媒體在遭受DDoS攻擊的情況下，都能夠繼續服務與CoNET客戶端。
+CoNET核心網絡管理雲由於沒有對外服務的IP地址，從互聯網角度來說它像是一個看不見的幽靈般的存在，傳統意義上的網絡攻擊工具在CoNET面前均失去作用，而CoNET和各節點在郵件服務器的地位相同，相互窺視探測IP地址變得困難，所以CoNET具有高安全性和可靠性。CoNET目前只對應知名公眾郵箱，讓使用郵箱來攻擊CoNET行動也變得異常困難。CoNET提供接入CoNET網絡的服務器以郵箱作為訪問地址、提供匿名服務器的訪問服務，讓網絡媒體在遭受DDoS攻擊的情況下，都能夠繼續服務與CoNET客戶端。
 
 ### refraction network 屈折ネットワーク 折射網絡
 ![http protocol](/resources/CoNET_refraction.png?raw=true)
