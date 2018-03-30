@@ -39,3 +39,4 @@ CoNET是對抗網絡監控的工具。用戶通過連結第三方公眾郵件服
 
 ### CoNET Platform CoNET プラットフォーム CoNET平台
 ### [CoPlatform](https://github.com/QTGate/QTGate-Desktop-Client)
+![http protocol](/resources/CoPlatform.png?raw=true)
