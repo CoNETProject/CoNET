@@ -47,8 +47,8 @@ CoNET核心網絡管理雲由於沒有對外服務的IP地址，從互聯網角�
 ![http protocol](/resources/CoNET_refraction.png?raw=true)
 
 ### CoNET Platform CoNETプラットフォーム CoNET平台
-### [CoNET Platform for laptop, CoNETプラットフォーム for PC, CoNET計算機OS平台](https://github.com/QTGate/QTGate-Desktop-Client)
-### CoNET Platform for iOS (come soon), CoNETプラットフォーム for iOS (開発中), iOS的CoNET平台開發中
-### CoNET Platform for Android (come soon), CoNETプラットフォーム for Android (開発中), 安卓系統的CoNET平台開發中
+- [CoNET Platform for laptop, CoNETプラットフォーム for PC, CoNET計算機OS平台](https://github.com/QTGate/QTGate-Desktop-Client)
+- CoNET Platform for iOS (come soon), CoNETプラットフォーム for iOS (開発中), iOS的CoNET平台開發中
+- CoNET Platform for Android (come soon), CoNETプラットフォーム for Android (開発中), 安卓系統的CoNET平台開發中
 
 ![http protocol](/resources/CoPlatform.png?raw=true)
