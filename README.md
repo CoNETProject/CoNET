@@ -1,5 +1,7 @@
 # CoNet
 [![Gitter](https://img.shields.io/badge/chat-on%20gitter-blue.svg)](https://gitter.im/QTGate/Lobby)
+[![Build Status](https://travis-ci.org/QTGate/conet.svg?branch=master)](https://travis-ci.org/QTGate/conet)
+[![Known Vulnerabilities](https://snyk.io/test/github/qtgate/conet/badge.svg)](https://snyk.io/test/github/qtgate/conet)
 
 ### Internet problems, インターネットの問題, 互聯網問題
 ![http protocol](/resources/ip_address.png?raw=true)
