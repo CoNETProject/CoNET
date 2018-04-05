@@ -1,9 +1,8 @@
 {
-  "name": "CoNET",
+  "name": "conet",
   "version": "1.0.0",
   "license": "MIT",
   "description": "CoNET",
-
   "repository": {
     "type": "git",
     "url": "git+https://github.com/QTGate/CoNETPlatform.git"
@@ -12,8 +11,25 @@
     "name": "CoNET Technology Inc.",
     "email": "info@CoNETTech.ca"
   },
+  "main": "./core/main",
   "bugs": {
     "url": "https://github.com/QTGate/CoNETPlatform/issues"
   },
   "homepage": "https://www.CoNETTech.ca",
+  "dependencies": {
+    "cookie-parser": "^1.4.3",
+    "express": "^4.16.3",
+    "pug": "^2.0.3",
+    "socket.io": "^2.1.0"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.1",
+    "@types/express": "^4.11.1",
+    "@types/jcanvas": "^15.2.2",
+    "@types/jquery": "^3.3.1",
+    "@types/jquery.cookie": "^1.4.31",
+    "@types/socket.io": "^1.4.33",
+    "jquery": "^3.3.1",
+    "semantic-ui": "^2.3.1"
+  }
 }

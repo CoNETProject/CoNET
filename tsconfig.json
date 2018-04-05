@@ -1,12 +1,14 @@
 {
-    "compilerOptions": {
-        "target": "es2017",
-        "module": "commonjs",
-        "allowJs": true
-    },
-    "include": [
-        "index.ts",
-        "app/**/*.ts",
-        "typings/**/*.*"
-    ]
+	"compilerOptions": {
+		"module": "commonjs",
+		"sourceMap": false,
+		"allowJs": true,
+		"target": "es2018"
+	},
+	"include": [
+		"core/**/*.ts"
+	],
+	"exclude": [
+		
+	]
 }
