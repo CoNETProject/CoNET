@@ -1,5 +1,7 @@
 extends ../shared/coreLayout.pug
-block jumbotron
-	section#welcome
-		.container.vcenter
-			
+block jumbotron1
+	section#welcome.content
+		.welcome-bg
+			.welcome
+				h1.fade-up( data-bind = " text: infoDefine [ languageIndex() ].cover.firstTitle1, animate:{ animation: 'rubberBand', state: languageIndex() + 1 }")
+				h2.fade-up( data-bind = " text: infoDefine [ languageIndex() ].cover.firstTitle2, animate: { animation: 'rubberBand', state: languageIndex() + 1 }")

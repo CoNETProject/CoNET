@@ -13,3 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+module view_layout {
+	export class view {
+		constructor () {
+
+		}
+		public LocalLanguage = 'up'
+		public menu = Menu
+		public tLang = ko.observable ( initLanguageCookie ())
+		public languageIndex = ko.observable ( lang [ this.tLang() ])
+		public selectItem = ( that: any, site: () => number ) => {
+
+            const tindex = lang [ this.tLang ()]
+            let index =  tindex + 1
+            if ( index > 3 ) {
+                index = 0
+            }
+
+            this.languageIndex ( index )
+            this.tLang( lang [ index ])
+            $.cookie ( 'langEH', this.tLang(), { expires: 180, path: '/' })
+            const obj = $( "span[ve-data-bind]" )
+            
+            obj.each (( index, element ) => {
+                const self = this
+                const ele = $( element )
+                const data = ele.attr ( 've-data-bind' )
+                if ( data && data.length ) {
+                    ele.text ( eval ( data ))
+                }
+            })
+            
+            $('.languageText').shape (`flip ${ this.LocalLanguage }`)
+            return $('.KnockoutAnimation').transition('jiggle')
+        }
+	}
+}
+const view = new view_layout.view ()
+ko.applyBindings ( view , document.getElementById ( 'body' ))
+$(`.${view.tLang()}`).addClass('active')

@@ -28,8 +28,8 @@
     "@types/jcanvas": "^15.2.2",
     "@types/jquery": "^3.3.1",
     "@types/jquery.cookie": "^1.4.31",
-    "@types/socket.io": "^1.4.33",
-    "jquery": "^3.3.1",
-    "semantic-ui": "^2.3.1"
+    "@types/knockout": "^3.4.53",
+    "@types/semantic-ui": "^2.2.6",
+    "@types/socket.io": "^1.4.33"
   }
 }
