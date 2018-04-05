@@ -45,6 +45,7 @@ CoNET是對抗網絡監控的工具。用戶通過連結第三方公眾郵件服
 CoNET核心網絡管理雲由於沒有對外服務的IP地址，從互聯網角度來說它像是一個看不見的幽靈般的存在，傳統意義上的網絡攻擊工具在CoNET面前均失去作用，而CoNET和各節點在郵件服務器的地位相同，相互窺視探測IP地址變得困難，所以CoNET具有高安全性和可靠性。CoNET目前只對應知名公眾郵箱，讓使用郵箱來攻擊CoNET行動也變得異常困難。CoNET提供接入CoNET網絡的服務器以郵箱作為訪問地址、提供匿名的服務器訪問服務，讓網絡媒體在遭受DDoS攻擊的情況下，都能夠繼續服務與CoNET客戶端。
 ### CoNET IaaS BtoB service
 ![http protocol](/resources/coNETIaas1.png?raw=true)
+***
 ![http protocol](/resources/iaas1.png?raw=true)
 ### CoNETのBtoB　IaaS　サービス
 
