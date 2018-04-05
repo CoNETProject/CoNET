@@ -23,7 +23,7 @@
     "socket.io": "^2.1.0"
   },
   "scripts": {
-    "test": "node core/*.js"
+    "test": "node core/main.js"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.1",
