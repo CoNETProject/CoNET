@@ -2,7 +2,7 @@
 [![Gitter](https://img.shields.io/badge/chat-on%20gitter-blue.svg)](https://gitter.im/QTGate/Lobby)
 [![npm version](https://badge.fury.io/js/conet.svg)](https://badge.fury.io/js/conet)
 [![Build Status](https://travis-ci.org/QTGate/CoNET.svg?branch=master)](https://travis-ci.org/QTGate/CoNET)
-[![Coverage Status](https://coveralls.io/repos/github/QTGate/CoNET/badge.svg)](https://coveralls.io/github/QTGate/CoNET)
+[![Coverage Status](https://coveralls.io/repos/github/QTGate/CoNET/badge.svg?branch=master)](https://coveralls.io/github/QTGate/CoNET?branch=master)
 [![Known Vulnerabilities](https://snyk.io/test/github/qtgate/conet/badge.svg?targetFile=package.json)](https://snyk.io/test/github/qtgate/conet?targetFile=package.json)
 
 ### Internet problems, インターネットの問題, 互聯網問題
