@@ -23,7 +23,6 @@ const SocketIo = require("socket.io");
 const Tool = require("./tools/initSystem");
 const Async = require("async");
 const Fs = require("fs");
-const Util = require("util");
 let logFileFlag = 'w';
 const saveLog = (err) => {
     if (!err) {
@@ -52,7 +51,6 @@ class localServer {
                 return saveLog(err);
             }
             this.config = data['1'];
-            console.log(Util.inspect(this.config));
         });
         this.expressServer.set('views', Path.join(__dirname, 'views'));
         this.expressServer.set('view engine', 'pug');

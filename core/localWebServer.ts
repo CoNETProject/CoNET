@@ -70,7 +70,6 @@ export default class localServer {
 				return saveLog ( err )
 			}
 			this.config = data['1']
-			console.log ( Util.inspect ( this.config ))
 		})
 		this.expressServer.set ( 'views', Path.join ( __dirname, 'views' ))
 		this.expressServer.set ( 'view engine', 'pug' )
