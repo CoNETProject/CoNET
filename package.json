@@ -25,7 +25,7 @@
     "socket.io": "^2.1.0"
   },
   "scripts": {
-    "test": "node core/main.js test"
+    "test": "node core/main.js test && istanbul report text-summary lcov"
   },
   "devDependencies": {
     "@types/async": "^2.0.48",
@@ -38,6 +38,7 @@
     "@types/openpgp": "0.0.29",
     "@types/semantic-ui": "^2.2.6",
     "@types/socket.io": "^1.4.33",
-    "@types/socket.io-client": "^1.4.32"
+    "@types/socket.io-client": "^1.4.32",
+    "istanbul": "^0.4.5"
   }
 }
