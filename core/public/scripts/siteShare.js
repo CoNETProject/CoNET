@@ -16,7 +16,6 @@ const uuID = () => {
     return uuid_generate().replace(/-/g, '');
 };
 const isElectronRender = typeof process === 'object';
-let socketIo = null;
 const cookieName = 'langEH';
 const passwdCookieName = 'QTGate';
 const EmailRegexp = /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$/i;
@@ -347,7 +346,7 @@ const infoDefine = [
                 }]
         },
         cover: {
-            firstTitle1: 'CoNET',
+            firstTitle1: 'CoNET平台',
             firstTitle2: '安全隐私自由的互联网',
             start: '开门'
         },
@@ -484,7 +483,7 @@ const infoDefine = [
             KeypairLength: '请选择加密通讯用密钥对长度：这个数字越大，通讯越难被破解，但会增加通讯量和运算时间。',
             GenerateKeypair: '<em>系统正在生成用于通讯和签名的RSA加密密钥对，计算机需要运行产生大量的随机数字有，可能需要几分钟时间，尤其是长度为4096的密钥对，需要特别长的时间，请耐心等待。关于RSA加密算法的机制和原理，您可以访问维基百科：' +
                 `<a href='https://zh.wikipedia.org/wiki/RSA加密演算法' target="_blank" onclick="return linkClick ('https://zh.wikipedia.org/wiki/RSA加密演算法')" >https://zh.wikipedia.org/wiki/RSA加密演算法</a></em>`,
-            inputEmail: '让我们来完成设定的最后几个步骤，首先生成RSA密钥对, 它是您的系统信息加密，身份认证及和QTGate通讯使用的重要工具。 RSA密钥对的密码请妥善保存，Email地址栏应填入您的常用Email地址, 它将被用作您的QTGate账号。<em style="color:red;">需注意的是QTGate.com域名在某些网络限制地区被列入屏蔽名单，如果您使用的是网络限制地区email服务，您有可能接收不到由QTGate发回的账号确认Email，以完成QTGate设定。</em>',
+            inputEmail: '让我们来完成设定的最后几个步骤，首先生成RSA密钥对, 它是您的系统信息加密，身份认证及和CoNET网络通讯使用的重要工具。 RSA密钥对的密码请妥善保存，Email地址栏应填入您的常用邮箱地址, 它将被用作您的CoNET网络账号。 <em style="color:red;">需注意的是CoNET域名在某些网络限制地区被列入屏蔽名单，如果您使用的是网络限制地区邮箱服务，您将有可能由于接收不到CoNET发回的账号确认Email，而不能够完成CoNET的设定。</em>',
             accountEmailInfo: '由于QTGate域名在某些国家和地区被防火墙屏蔽，而不能正常收发Email，如果您是处于防火墙内的用户，建议使用防火墙外部的邮件服务商。'
         },
         Home_keyPairInfo_view: {
@@ -611,7 +610,7 @@ const infoDefine = [
         useInfoMacOS: {
             title: '<p>本地代理服务器已在后台运行，MacOS和Windows用户可以关闭本窗口。</p>您的其他电子设备，可通过设置本地Proxy伺服器，来使用CoNET连接到互联网',
             title1: 'MacOS 本地代理服务器设定',
-            proxyServerIp: '<p>代理设置选择：<span style="color: red;">自动代理设置</p>',
+            proxyServerIp: '<p>代理设置选择：<span style="color: brown;">自动代理设置</p>',
             proxyServerPort: 'HTTP和HTTPS代理设定：',
             proxyServerPassword: 'SOCKS代理设定：',
             info: [{
@@ -1037,7 +1036,7 @@ const infoDefine = [
                 }]
         },
         cover: {
-            firstTitle1: 'CoNET',
+            firstTitle1: 'CoNETプラットフォーム',
             firstTitle2: '隠れて安全自由なネットワークへ',
             start: 'オプンドア'
         },
@@ -1509,7 +1508,7 @@ const infoDefine = [
                 }]
         },
         cover: {
-            firstTitle1: 'CoNET',
+            firstTitle1: 'CoNET Platform',
             firstTitle2: 'Security Privacy And Freedom on the Internet',
             start: 'ENTER NOW'
         },
@@ -1586,7 +1585,7 @@ const infoDefine = [
                 }]
         },
         useInfoMacOS: {
-            proxyServerIp: '<p>Proxy setup: <span style="color: red;">Automatic or Auto-Config</span></p>',
+            proxyServerIp: '<p>Proxy setup: <span style="color: brown;">Automatic or Auto-Config</span></p>',
             proxyServerPort: 'HTTP & HTTPS proxy setup:',
             proxyServerPassword: 'SOCKS proxy setup:',
             title: 'Local proxy server is running at background. MacOS and windows user may close this window. All other devices can access internet via local proxy setup to use the CoNET OPN.',
@@ -1802,7 +1801,7 @@ const infoDefine = [
             GenerateKeypair: '<em>Generating RSA Key pair. Please wait, as it may take a few minutes. More time will be needed if you selected 4096 bit key length. Information about RSA keypair system can be found here:' +
                 `<a href='hhttp://en.wikipedia.org/wiki/RSA_(cryptosystem)' target="_blank" onclick="return linkClick ('https://en.wikipedia.org/wiki/RSA_(cryptosystem)')">https://en.wikipedia.org/wiki/RSA_(cryptosystem)</a></em>`,
             systemPassword: 'CoNET Client System Password',
-            inputEmail: `This RSA key is a private key used for authentication, identification and secure encryption/decryption of data transmission within CoNET’s system. The password and key are not stored by CoNET. You cannot reset your password if lost and you cannot access CoNET services without your password. Please store your password in a safe place. <em style="color: red;">CoNET’s domain may be blocked in some regions. Please use an email account with servers outside these regions,</em>`,
+            inputEmail: `This RSA key is a private key used for authentication, identification and secure encryption/decryption of data transmission within CoNET’s system. The password and key are not stored by CoNET. You cannot reset your password if lost and you cannot access CoNET services without your password. Please store your password in a safe place. <em style="color: brown;">CoNET’s domain may be blocked in some regions. Please use an email account with servers outside these regions,</em>`,
             accountEmailInfo: `Because CoNET may be on a firewall's black list in some regions. It is best to choose an email account with servers outside your region’s firewall.`
         },
         error_message: {
@@ -2149,7 +2148,7 @@ const infoDefine = [
         useInfoMacOS: {
             title: '本地代理伺服器已在後台運行，MacOS和Windows用戶可以關閉本窗口。您的其他電子設備，可通過設置本地Proxy伺服器，來使用CoNET連接到互聯網',
             title1: 'MacOS 本地代理伺服器設定',
-            proxyServerIp: '<p>代理設定選擇：<span style="color: red;">自動設定</p>',
+            proxyServerIp: '<p>代理設定選擇：<span style="color: brown;">自動設定</p>',
             proxyServerPort: 'HTTP和HTTPS代理的設定為：',
             proxyServerPassword: 'SOCKS代理的設定為：',
             info: [{
@@ -2201,7 +2200,7 @@ const infoDefine = [
                 }]
         },
         cover: {
-            firstTitle1: 'CoNET',
+            firstTitle1: 'CoNET平台',
             firstTitle2: '安全隱私自由的互聯網',
             start: '開門'
         },
@@ -2350,7 +2349,7 @@ const infoDefine = [
             systemAdministratorEmail: 'RSA密鑰生成',
             GenerateKeypair: '<em>系統正在生成用於通訊和簽名的RSA加密密鑰對，計算機需要運行產生大量的隨機數字，可能需要幾分鐘時間，尤其是長度為4096的密鑰對，需要特別長的時間，請耐心等待。關於RSA加密算法的機制和原理，您可以訪問維基百科：' +
                 `<a href='#' target="_blank" onclick="return linkClick ('https://zh.wikipedia.org/wiki/RSA加密演算法')">https://zh.wikipedia.org/wiki/RSA加密演算法</a></em>`,
-            inputEmail: '让我们来完成设定的最后几个步骤，首先生成RSA密鑰對, 它是您的系統信息加密，身份認證及和CoNET網絡通訊使用的重要工具。 RSA密鑰對的密碼請妥善保存，Email地址欄應填入您的常用Email地址, 它將被用作您的CoNET網絡賬號。<em style="color:red;">需注意的是QTGate.com域名在某些网络限制地区被列入屏蔽名单，如果您使用的是网络限制地区email服务，您將有可能接收不到由QTGate發回的賬號確認Email，以完成QTGate設定。</em>',
+            inputEmail: '让我们来完成设定的最后几个步骤，首先生成RSA密鑰對, 它是您的系統信息加密，身份認證及和CoNET網絡通訊使用的重要工具。 RSA密鑰對的密碼請妥善保存，Email地址欄應填入您的常用邮箱地址, 它將被用作您的CoNET網絡賬號。<em style="color:red;">需注意的是CoNET域名在某些网络限制地区被列入屏蔽名单，如果您使用的是网络限制地区邮箱服务，您將有可能由于接收不到CoNET發回的賬號確認Email，而不能够完成CoNET的設定。</em>',
             accountEmailInfo: `由於CoNET域名在某些國家和地區被防火牆屏蔽，而不能正常收發CoNET的Email，如果您是處於防火牆內的用戶，建議使用防火牆外部的郵件服務商。`
         },
         error_message: {

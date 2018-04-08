@@ -1,7 +1,4 @@
 sudo: false
 language: node_js
-
 os:
   - linux
-
-before_install:

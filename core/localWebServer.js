@@ -17,33 +17,67 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 const Express = require("express");
 const Path = require("path");
-const Os = require("os");
+const cookieParser = require("cookie-parser");
 const HTTP = require("http");
 const SocketIo = require("socket.io");
-/**
- * 		define
- */
-const QTGateFolder = Path.join(Os.homedir(), '.QTGate');
-const CoNET_Home = Path.join(__dirname);
-const LocalServerPortNumber = 2000;
-class default_1 {
+const Tool = require("./tools/initSystem");
+const Async = require("async");
+const Fs = require("fs");
+const Util = require("util");
+let logFileFlag = 'w';
+const saveLog = (err) => {
+    if (!err) {
+        return;
+    }
+    const data = `${new Date().toUTCString()}: ${typeof err === 'object' ? (err['message'] ? err['message'] : '') : err}\r\n`;
+    return Fs.appendFile(Tool.ErrorLogFile, data, { flag: logFileFlag }, () => {
+        return logFileFlag = 'a';
+    });
+};
+const saveServerStartup = () => {
+    saveLog(`*************************** CoNET Platform [ ${Tool.packageFile.version} ] server start up on [ ${Tool.LocalServerPortNumber} ] *****************************`);
+};
+class localServer {
     constructor() {
         this.expressServer = Express();
         this.httpServer = HTTP.createServer(this.expressServer);
         this.socketServer = SocketIo(this.httpServer);
-        this.expressServer.set('views', Path.join(CoNET_Home, 'views'));
+        this.config = null;
+        this.keyPair = null;
+        Async.series([
+            next => Tool.checkSystemFolder(next),
+            next => Tool.checkConfig(next)
+        ], (err, data) => {
+            if (err) {
+                return saveLog(err);
+            }
+            this.config = data['1'];
+            console.log(Util.inspect(this.config));
+        });
+        this.expressServer.set('views', Path.join(__dirname, 'views'));
         this.expressServer.set('view engine', 'pug');
-        this.expressServer.use(Express.static(QTGateFolder));
-        this.expressServer.use(Express.static(Path.join(CoNET_Home, 'public')));
+        this.expressServer.use(cookieParser());
+        this.expressServer.use(Express.static(Tool.QTGateFolder));
+        this.expressServer.use(Express.static(Path.join(__dirname, 'public')));
         this.expressServer.get('/', (req, res) => {
             res.render('home', { title: 'home' });
         });
         this.socketServer.on('connection', socker => {
             return this.socketServerConnected(socker);
         });
-        this.httpServer.listen(LocalServerPortNumber);
+        this.httpServer.listen(Tool.LocalServerPortNumber);
+        saveServerStartup();
     }
     socketServerConnected(socket) {
+        socket.on('init', Callback => {
+            const ret = Tool.emitConfig(this.config, false);
+            return Callback(ret);
+        });
+        socket.once('agreeClick', () => {
+            saveLog(`socket on agreeClick`);
+            this.config.firstRun = false;
+            return Tool.saveConfig(this.config, saveLog);
+        });
     }
 }
-exports.default = default_1;
+exports.default = localServer;

@@ -44,8 +44,8 @@ body {
 #languageArea {
 	z-index: 100;
 	width: 160px;
-	top: 5px;
-	left: 10px;
+	top: 15px;
+	left: 20px;
 	position: fixed;
 }
 .languageItem {
@@ -57,8 +57,9 @@ body {
 	opacity: 0.7;
 }
 .welcome {
-	width: 400px;
-	height: 400px;
+	width: 100%;
+	height: 100%;
+	margin-bottom: 10em;
 	display: -webkit-box;
 	display: -ms-flexbox;
 	display: flex;
@@ -72,16 +73,52 @@ body {
 	-webkit-box-direction: normal;
 		-ms-flex-direction: column;
 			flex-direction: column;
-  }
-  .welcome h1.fade-up {
+}
+.welcome h1.fade-up {
 	font-weight: 300;
 	font-size: 40px;
 	-webkit-animation-delay: .25s;
 			animation-delay: .25s;
-  }
-  .welcome h2.fade-up {
+}
+.welcome h2.fade-up {
 	font-weight: 400;
 	color: rgba(255, 255, 255, 0.5);
 	-webkit-animation-delay: .5s;
 			animation-delay: .5s;
-  }
+}
+#agreement{
+	background-color: #d3d9db;
+	width: 100%;
+	position: absolute;
+	transition: opacity 0.4s ease-in;
+	color: rgba(0, 0, 0, 0.6);
+	top: 0px;
+}
+#agreement .firstNodeContent {
+	margin: 0px auto;
+	margin-top: 5em;
+	max-width: 50em;
+
+}
+.detailSegment {
+	margin: 3em;
+}
+.agreementButtom {
+	margin: 3em;
+}
+#login {
+    width: 100%;
+    position: absolute;
+    transition: opacity 0.4s ease-in;
+}
+.loginCards {
+	margin: 0px auto!important;
+    margin-top: 5em!important;
+    max-width: 50em;
+}
+.background-clolr-white {
+    background-color: transparent!important;
+}
+.displayNono {
+	display: none;
+}

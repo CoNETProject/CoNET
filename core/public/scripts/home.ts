@@ -13,16 +13,58 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-module view_layout {
-	export class view {
-		constructor () {
+const InitKeyPair = () => {
+	const keyPair: keypair = {
+		publicKey: null,
+		privateKey: null,
+		keyLength: null,
+		nikeName: null,
+		createDate: null,
+		email: null,
+		passwordOK: false,
+		verified: false,
+		publicKeyID: null
+		
+	}
+	return keyPair
+}
+const socketIo = io ({ reconnectionAttempts: 5, timeout: 1000 })
 
-		}
-		public LocalLanguage = 'up'
-		public menu = Menu
+module view_layout {
+    
+	export class view {
+        public sectionLogin = ko.observable ( false )
+        public sectionAgreement = ko.observable ( false )
+        public sectionWelcome = ko.observable ( true )
+        public isFreeUser = ko.observable ( true )
+        public QTTransferData = ko.observable ( false )
+        public keyPair_delete_btn_view = ko.observable ( false )
+        public LocalLanguage = 'up'
+        public menu = Menu
+        public keyPairGenerateForm: KnockoutObservable< keyPairGenerateForm> = ko.observable ()
 		public tLang = ko.observable ( initLanguageCookie ())
-		public languageIndex = ko.observable ( lang [ this.tLang() ])
-		public selectItem = ( that: any, site: () => number ) => {
+        public languageIndex = ko.observable ( lang [ this.tLang() ])
+        public localServerConfig: KnockoutObservable < install_config > = ko.observable ()
+        public keyPair: KnockoutObservable < keypair > = ko.observable (InitKeyPair())
+		constructor () {
+            socketIo.emit ( 'init', ( config: install_config ) => {
+
+                if ( config.keypair && config.keypair.publicKeyID ) {
+                    const length = config.keypair.publicKeyID.length
+                    config.keypair.publicKeyID = config.keypair.publicKeyID.substr ( length - 8 ).toUpperCase()
+                    config.keypair.publicKeyID = `${ config.keypair.publicKeyID.substr (0, 4 ) } ${ config.keypair.publicKeyID.substr (4) }`
+                } else {
+                    config.keypair = null
+                    this.keyPairGenerateForm ( new keyPairGenerateForm())
+                }
+                this.localServerConfig ( config )
+                this.keyPair ( this.localServerConfig ().keypair )
+                return this.isFreeUser ( this.localServerConfig().freeUser )
+
+            })
+		}
+		
+		public selectItem ( that: any, site: () => number ) {
 
             const tindex = lang [ this.tLang ()]
             let index =  tindex + 1
@@ -36,7 +78,7 @@ module view_layout {
             const obj = $( "span[ve-data-bind]" )
             
             obj.each (( index, element ) => {
-                const self = this
+                
                 const ele = $( element )
                 const data = ele.attr ( 've-data-bind' )
                 if ( data && data.length ) {
@@ -47,8 +89,27 @@ module view_layout {
             $('.languageText').shape (`flip ${ this.LocalLanguage }`)
             return $('.KnockoutAnimation').transition('jiggle')
         }
+
+        public openClick () {
+            this.sectionWelcome ( false )
+            if ( this.localServerConfig().firstRun ) {
+                return this.sectionAgreement ( true )
+            }
+            return this.sectionLogin ( true )
+        }
+
+        public agreeClick () {
+            this.sectionAgreement ( false )
+            socketIo.emit ( 'agreeClick' )
+            this.localServerConfig().firstRun = false
+            return this.openClick()
+        }
+        public showUserDetail () {
+
+        }
 	}
 }
 const view = new view_layout.view ()
+
 ko.applyBindings ( view , document.getElementById ( 'body' ))
 $(`.${view.tLang()}`).addClass('active')

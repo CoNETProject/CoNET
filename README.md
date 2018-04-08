@@ -1,6 +1,7 @@
 # CoNet
 [![Gitter](https://img.shields.io/badge/chat-on%20gitter-blue.svg)](https://gitter.im/QTGate/Lobby)
 [![Build Status](https://travis-ci.org/QTGate/conet.svg?branch=master)](https://travis-ci.org/QTGate/CoNET)
+[![Coverage Status](https://img.shields.io/coveralls/qtgate/conet/master.svg)](https://coveralls.io/github/qtgate/conet?branch=master)
 [![Known Vulnerabilities](https://snyk.io/test/github/qtgate/conet/badge.svg)](https://snyk.io/test/github/qtgate/conet)
 
 ### Internet problems, インターネットの問題, 互聯網問題
