@@ -4,4 +4,4 @@ node_js:
  - "9"
 os:
   - linux
-after_script: "npm install coveralls && cat ./coverage/lcov.info | coveralls"
+after_script: "npm install coveralls@2 && cat ./coverage/lcov.info | coveralls"
