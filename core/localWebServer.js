@@ -38,7 +38,7 @@ const saveServerStartup = () => {
     saveLog(`*************************** CoNET Platform [ ${Tool.packageFile.version} ] server start up on [ ${Tool.LocalServerPortNumber} ] *****************************`);
 };
 class localServer {
-    constructor() {
+    constructor(test) {
         this.expressServer = Express();
         this.httpServer = HTTP.createServer(this.expressServer);
         this.socketServer = SocketIo(this.httpServer);
@@ -67,6 +67,9 @@ class localServer {
         });
         this.httpServer.listen(Tool.LocalServerPortNumber);
         saveServerStartup();
+        if (test) {
+            this.httpServer.close();
+        }
     }
     socketServerConnected(socket) {
         socket.on('init', Callback => {

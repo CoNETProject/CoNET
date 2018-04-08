@@ -16,4 +16,5 @@
  */
 Object.defineProperty(exports, "__esModule", { value: true });
 const localWebServer_1 = require("./localWebServer");
-const localServer = new localWebServer_1.default();
+const test = process.argv[2] ? true : false;
+const localServer = new localWebServer_1.default(test);

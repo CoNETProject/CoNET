@@ -15,4 +15,5 @@
  */
 
  import LocalServer from './localWebServer'
- const localServer = new LocalServer ()
+ const test = process.argv[2] ? true : false 
+ const localServer = new LocalServer ( test )

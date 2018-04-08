@@ -61,7 +61,7 @@ export default class localServer {
 		})
 	}
 
-	constructor() {
+	constructor( test: boolean ) {
 		Async.series ([
 			next => Tool.checkSystemFolder ( next ),
 			next => Tool.checkConfig ( next )
@@ -86,5 +86,8 @@ export default class localServer {
 		})
 		this.httpServer.listen ( Tool.LocalServerPortNumber )
 		saveServerStartup()
+		if ( test ) {
+			this.httpServer.close ()
+		}
 	}
 }
