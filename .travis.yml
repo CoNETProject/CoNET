@@ -4,3 +4,7 @@ node_js:
  - "9"
 os:
   - linux
+
+script: "sbt clean coverage test"
+
+after_success: "sbt coveralls"
