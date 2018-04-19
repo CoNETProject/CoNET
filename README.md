@@ -19,9 +19,9 @@ DDos Attack, Connecting Reset, Restrictive and Filtering, Surveillance, SSL man-
 ![http protocol](/resources/CoNET_refraction1.png?raw=true)
 - Circumventing online censorship and surveillance
 - Security from danger or threat online
-- Access to the internet Anonymously
-- Bypass Restriction and Filtering
-- Ghost Network
+- Stay anonymous online
+- Bypass restriction and filtering
+- Ghost network
 
 CoNET’s users employ this network by connecting through the third-party public email server to establish a virtual tunnel rather than making a direct connection. CoNET is an effective censorship circumvention tool, allowing its users to reach otherwise blocked destinations or content. Along the same line, CoNET’s user leave their IP address in public email server, CoNET thus allowing both organizations and individuals to share information over public networks without compromising their privacy.
 
