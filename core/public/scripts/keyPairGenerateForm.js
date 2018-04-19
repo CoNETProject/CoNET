@@ -42,7 +42,8 @@ const checkEmail = (email) => {
     return '';
 };
 class keyPairGenerateForm {
-    constructor() {
+    constructor(exit) {
+        this.exit = exit;
         this.EmailAddressError = ko.observable(false);
         this.SystemAdministratorEmailAddress = ko.observable('');
         this.showInsideFireWallEmail = ko.observable(false);
@@ -56,6 +57,12 @@ class keyPairGenerateForm {
         this.newKeyPairRunningCancelButtonShow = ko.observable(false);
         this.delete_btn_view = ko.observable(false);
         this.doingProcessBarTime = null;
+        this.keyPairGenerateFormMessage = ko.observable(false);
+        this.message_cancel = ko.observable(false);
+        this.message_keyPairGenerateError = ko.observable(false);
+        this.message_keyPairGenerateSuccess = ko.observable(false);
+        this.showKeyPairForm = ko.observable(true);
+        this.showKeyInfomation = ko.observable(false);
         this.SystemAdministratorEmailAddress.subscribe(newValue => {
             return this.checkEmailAddress(newValue);
         });
@@ -66,20 +73,23 @@ class keyPairGenerateForm {
             return this.checkPassword(newValue);
         });
     }
+    showPopUp() {
+        $('.activating.element').popup({
+            on: 'focus',
+            movePopup: false
+        });
+    }
     checkEmailAddress(email) {
         $('.ui.checkbox').checkbox();
         this.EmailAddressError(false);
         this.NickNameError(false);
         if (!email || !email.length) {
             this.EmailAddressError(true);
-            return true;
+            return this.showPopUp();
         }
         if (checkEmail(email).length) {
             this.EmailAddressError(true);
-            $('.activating.element').popup({
-                on: 'focus',
-                movePopup: false
-            });
+            return this.showPopUp();
         }
         if (!this.SystemAdministratorNickName().length) {
             this.SystemAdministratorNickName(getNickName(email));
@@ -92,6 +102,7 @@ class keyPairGenerateForm {
     checkNickname(nickname) {
         this.NickNameError(false);
         if (!nickname || !nickname.length) {
+            this.showPopUp();
             this.NickNameError(true);
         }
         return true;
@@ -100,18 +111,28 @@ class keyPairGenerateForm {
         this.passwordError(false);
         if (!password || password.length < 5) {
             this.passwordError(true);
+            this.showPopUp();
         }
         return true;
+    }
+    stopDoingProcessBar() {
+        clearTimeout(this.doingProcessBarTime);
+        this.newKeyPairRunningCancelButtonShow(false);
+        this.showKeyPairPorcess(false);
+        return $('.keyPairProcessBar').progress({
+            percent: 0
+        });
     }
     form_AdministratorEmail_submit() {
         this.checkEmailAddress(this.SystemAdministratorEmailAddress());
         this.checkNickname(this.SystemAdministratorNickName());
         this.checkPassword(this.systemSetup_systemPassword());
         if (this.passwordError() || this.EmailAddressError() || this.NickNameError()) {
-            return true;
+            return false;
         }
         this.showKeyPairPorcess(true);
         this.newKeyPairRunningCancelButtonShow(true);
+        this.showKeyPairForm(false);
         const email = this.SystemAdministratorEmailAddress();
         const sendData = {
             password: this.systemSetup_systemPassword(),
@@ -132,6 +153,19 @@ class keyPairGenerateForm {
                     return doingProcessBar();
             }, timeSet);
         };
+        /*
+        socketIo.once ( 'newKeyPairCallBack', keyPair => {
+            this.stopDoingProcessBar ()
+            this.keyPairGenerateFormMessage ( true )
+            if ( !keyPair ) {
+                return this.message_keyPairGenerateError ( true )
+            }
+            this.exit ()
+            return this.message_keyPairGenerateSuccess ( true )
+        })
+
+        socketIo.emit ( 'NewKeyPair', sendData )
+        */
         return doingProcessBar();
     }
     tileClick(data) {
@@ -139,11 +173,19 @@ class keyPairGenerateForm {
         return true;
     }
     CancelCreateKeyPair() {
-        clearTimeout(this.doingProcessBarTime);
-        this.showKeyPairPorcess(false);
+        this.stopDoingProcessBar();
+        this.message_cancel(true);
         this.newKeyPairRunningCancelButtonShow(false);
-        $('.keyPairProcessBar').progress({
-            percent: 0
-        });
+        this.delete_btn_view(false);
+        socketIo.emit('cancelNewKeyPair');
+        //this.showKeyPairForm ( true )
+        return this.keyPairGenerateFormMessage(true);
+    }
+    CloseKeyPairGenerateFormMessage() {
+        this.message_cancel(false);
+        this.message_keyPairGenerateError(false);
+        this.message_keyPairGenerateSuccess(false);
+        this.keyPairGenerateFormMessage(false);
+        return this.showKeyPairForm(true);
     }
 }

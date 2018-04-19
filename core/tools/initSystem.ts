@@ -6,6 +6,7 @@ import * as Os from 'os'
 import * as Async from 'async'
 import * as Crypto from 'crypto'
 import * as OpenPgp from 'openpgp'
+import * as Util from 'util'
 
 /**
  * 		define
@@ -161,54 +162,49 @@ export const getQTGateSign = ( user: OpenPgp.key.users ) => {
 	return Certification
 }
 
-export const getKeyPairInfo = ( keyPair: keypair ) => {
-	if ( ! keyPair || ! keyPair.publicKey || ! keyPair.privateKey ) {
-		return keyPair = null
+export const getKeyPairInfo = ( publicKey: string, privateKey: string, password: string, CallBack ) => {
+	if ( ! publicKey || ! privateKey ) {
+		return CallBack ( new Error ('no key'))
 	}
-	const _privateKey = OpenPgp.key.readArmored ( keyPair.privateKey )
-	const _publicKey = OpenPgp.key.readArmored ( keyPair.publicKey )
+	const _privateKey = OpenPgp.key.readArmored ( privateKey )
+	const _publicKey = OpenPgp.key.readArmored ( publicKey )
 	if ( _privateKey.err || _publicKey.err ) {
 		
-		return keyPair = null
+		return CallBack ( new Error ('no key'))
 	}
 	const privateKey1 = _privateKey.keys[0]
 	const publicKey1 = _publicKey.keys
 	const user = publicKey1[0].users[0]
-	const ret: keypair = {
-		publicKey: keyPair.publicKey,
-		privateKey: keyPair.privateKey,
-		keyLength: getBitLength ( privateKey1 ),
-		nikeName: getNickName ( user.userId.userid ),
-		createDate:  privateKey1.primaryKey.created.toLocaleString (),
-		email: getEmailAddress ( user.userId.userid ) ,
-		passwordOK: false,
-		verified: getQTGateSign ( user ),
-		publicKeyID: publicKey1[0].primaryKey.fingerprint
-		
+	const ret = InitKeyPair()
+	
+	ret.publicKey = publicKey
+	ret.privateKey = privateKey
+	ret.keyLength = getBitLength ( privateKey1 )
+	ret.nikeName = getNickName ( user.userId.userid )
+	ret.createDate = privateKey1.primaryKey.created.toLocaleString ()
+	ret.email = getEmailAddress ( user.userId.userid )
+	ret.verified = getQTGateSign ( user )
+	ret.publicKeyID = publicKey1[0].primaryKey.fingerprint
+	ret.passwordOK = false
+	if ( !password ) {
+		return CallBack ( null, ret )
 	}
-	return keyPair = ret
+	
+	return privateKey1.decrypt ( password ).then ( keyOK => {
+		ret.passwordOK = keyOK
+		return CallBack ( null, ret )
+	}).catch (() => {
+		return CallBack ( null, ret )
+	})
+	
 }
-export const KeyPairDeleteKeyDetail = ( keyPair: keypair, passwordOK: boolean ) => {
-	if ( !keyPair ) {
-		return null
-	}
-	const ret: keypair = {
-		nikeName: keyPair.nikeName,
-		email: keyPair.email,
-		keyLength: keyPair.keyLength,
-		createDate: keyPair.createDate,
-		passwordOK: passwordOK,
-		verified: keyPair.verified,
-		publicKeyID: keyPair.publicKeyID
-	}
-	return ret
-}
+
 export const emitConfig = ( config: install_config, passwordOK: boolean ) => {
 	if ( !config ) {
 		return null
 	}
 	const ret: install_config = {
-		keypair: KeyPairDeleteKeyDetail ( config.keypair, passwordOK ),
+		keypair: config.keypair,
 		firstRun: config.firstRun,
 		alreadyInit: config.alreadyInit,
 		newVerReady: config.newVerReady,
@@ -254,8 +250,17 @@ export const checkConfig = ( CallBack ) => {
 		config.newVersion = null
 		config.serverPort = LocalServerPortNumber
 		config.localIpAddress = getLocalInterface ()
-		config.keypair = getKeyPairInfo ( config.keypair )
-		return CallBack ( null, config )
+		if ( !config.keypair || ! config.keypair.publicKey ) {
+			return CallBack ( null, config )
+		}
+		return getKeyPairInfo ( config.keypair.publicKey, config.keypair.privateKey, null, ( err, key ) => {
+			if ( err ) {
+				CallBack ( err )
+				return console.log (`checkConfig getKeyPairInfo error`, err )
+			}
+			config.keypair = key
+			return CallBack ( null, config )			
+		})
 
 	})
 }

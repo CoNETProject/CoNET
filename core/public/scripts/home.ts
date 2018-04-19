@@ -28,7 +28,8 @@ const InitKeyPair = () => {
 	}
 	return keyPair
 }
-const socketIo = io ({ reconnectionAttempts: 5, timeout: 1000 })
+
+const socketIo = io ({ reconnectionAttempts: 5, timeout: 500 })
 
 module view_layout {
     
@@ -41,28 +42,92 @@ module view_layout {
         public keyPair_delete_btn_view = ko.observable ( false )
         public LocalLanguage = 'up'
         public menu = Menu
+        public CoNETLocalServerError = ko.observable ( false )
+        public modalContent = ko.observable ('')
         public keyPairGenerateForm: KnockoutObservable< keyPairGenerateForm> = ko.observable ()
 		public tLang = ko.observable ( initLanguageCookie ())
         public languageIndex = ko.observable ( lang [ this.tLang() ])
         public localServerConfig: KnockoutObservable < install_config > = ko.observable ()
         public keyPair: KnockoutObservable < keypair > = ko.observable (InitKeyPair())
-		constructor () {
-            socketIo.emit ( 'init', ( config: install_config ) => {
+        public hacked = ko.observable ( false )
+        private systemError () {
+            this.modalContent ( infoDefine[ this.languageIndex() ].emailConform.formatError [ 10 ] )
+            $( '#CoNETError').modal ('setting', 'closable', false ).modal ( 'show' )
+            return this.CoNETLocalServerError ( true )
+        }
 
-                if ( config.keypair && config.keypair.publicKeyID ) {
-                    const length = config.keypair.publicKeyID.length
-                    config.keypair.publicKeyID = config.keypair.publicKeyID.substr ( length - 8 ).toUpperCase()
-                    config.keypair.publicKeyID = `${ config.keypair.publicKeyID.substr (0, 4 ) } ${ config.keypair.publicKeyID.substr (4) }`
-                } else {
-                    config.keypair = null
-                    this.keyPairGenerateForm ( new keyPairGenerateForm())
+        private initConfig ( config: install_config ) {
+            if ( config.keypair && config.keypair.publicKeyID ) {
+                const keypair = config.keypair
+                const length = keypair.publicKeyID.length
+                keypair.publicKeyID = keypair.publicKeyID.substr ( length - 8 ).toUpperCase()
+                keypair.publicKeyID = `${ keypair.publicKeyID.substr (0, 4 ) } ${ keypair.publicKeyID.substr (4) }`
+                let keyPairPasswordClass = new keyPairPassword (() => {
+                    keypair.keyPairPassword ( keyPairPasswordClass = null )
+                    keypair.showLoginPasswordField ( false )
+                })
+                keypair.keyPairPassword = ko.observable( keyPairPasswordClass )
+                keypair.showLoginPasswordField = ko.observable ( false )
+                keypair.delete_btn_view = ko.observable ( true )
+                keypair.showConform = ko.observable ( false )
+                keypair.delete_btn_click = () => {
+                    keypair.delete_btn_view ( false )
+                    return keypair.showConform ( true )
                 }
-                this.localServerConfig ( config )
-                this.keyPair ( this.localServerConfig ().keypair )
-                return this.isFreeUser ( this.localServerConfig().freeUser )
 
+                keypair.showLoginPasswordFieldClick = () => {
+                    keypair.showLoginPasswordField ( !keypair.showLoginPasswordField ())
+                    return keypair.keyPairPassword().inputFocus( keypair.showLoginPasswordField ())
+                }
+                
+                keypair.deleteKeyPairNext = () => {
+                    socketIo.emit ( 'deleteKeyPairNext' )
+                    return keypair.delete_btn_view ( false )
+                }
+                socketIo.on ( 'deleteKeyPairNoite', () => {
+                    return keypair.showDeleteKeyPairNoite ( true )
+                })
+
+                keypair.showDeleteKeyPairNoite = ko.observable ( false )
+
+            } else {
+                config.keypair = null
+                let _keyPairGenerateForm =  new keyPairGenerateForm (() => {
+                    return this.keyPairGenerateForm ( _keyPairGenerateForm = null )
+                })
+                this.keyPairGenerateForm ( _keyPairGenerateForm )
+            }
+            this.localServerConfig ( config )
+            this.keyPair ( this.localServerConfig ().keypair )
+            
+            return this.isFreeUser ( this.localServerConfig().freeUser )
+        }
+
+		constructor () {
+
+            socketIo.once ( 'reconnect_failed', err => {
+                if ( this.CoNETLocalServerError ()) {
+                    return
+                }
+                return this.systemError()
             })
-		}
+
+            
+            socketIo.once ( 'CoNET_systemError', () => {
+                return this.systemError ()
+            })
+
+            socketIo.on ( 'init', ( config: install_config ) => {
+                return this.initConfig ( config )
+            })
+
+            socketIo.emit ( 'init', ( config: install_config ) => {
+                return this.initConfig ( config )
+            })
+
+            
+        }
+        
 		
 		public selectItem ( that: any, site: () => number ) {
 
@@ -95,7 +160,12 @@ module view_layout {
             if ( this.localServerConfig().firstRun ) {
                 return this.sectionAgreement ( true )
             }
-            return this.sectionLogin ( true )
+            this.sectionLogin ( true )
+            return $( '.activating.element' ).popup({
+                on: 'focus',
+                movePopup: false
+            })
+            
         }
 
         public agreeClick () {
@@ -104,8 +174,18 @@ module view_layout {
             this.localServerConfig().firstRun = false
             return this.openClick()
         }
-        public showUserDetail () {
 
+        public showUserDetail () {
+            
+        }
+
+        public exit () {
+            if ( typeof require === 'undefined' ) {
+                this.modalContent ( infoDefine[ this.languageIndex() ].emailConform.formatError [ 11 ] )
+                return this.hacked ( true )
+            }
+            const { remote } = require ('electron')
+            return remote.app.quit()
         }
 	}
 }

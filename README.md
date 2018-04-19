@@ -17,7 +17,7 @@ DDos Attack, Connecting Reset, Restrictive and Filtering, Surveillance, SSL man-
 
 ### The CoNET is a anonymous refraction network that allows people to improve their security, privacy and freedom on the Internet.
 ![http protocol](/resources/CoNET_refraction1.png?raw=true)
-- Anti - Censorship and Surveillance
+- Circumventing online censorship and surveillance
 - Security from danger or threat online
 - Access to the internet Anonymously
 - Bypass Restriction and Filtering

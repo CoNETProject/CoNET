@@ -1,12 +1,12 @@
 extends ../shared/coreLayout.pug
 block jumbotron1
-	section#welcome.content( data-bind = "visible: sectionWelcome ")
+	section#welcome.content( data-bind = "if: sectionWelcome ")
 		.welcome-bg
 			.welcome( style="color: white;")
 				h1( data-bind = " text: infoDefine [ languageIndex() ].cover.firstTitle1, animate:{ animation: ['slideInUp','slideOutUp'], state: languageIndex() + 1, delay: 0 }" )
 				h1( data-bind = " text: infoDefine [ languageIndex() ].cover.firstTitle2, animate: { animation: ['slideInUp','slideOutUp'], state: languageIndex() + 1, delay: 70 }")
 				.ui.primary.basic.button( data-bind="click: openClick, text: infoDefine [ languageIndex() ].cover.start" style="margin-top: 2em;" )
-	section#agreement.content( data-bind="visible: sectionAgreement()")
+	section#agreement.content( data-bind="if: sectionAgreement ")
 		.content.firstNodeContent
 			.ui.header( data-bind = " text: infoDefine[ languageIndex() ].firstNote.title " style = " margin-left: 30px; margin-right: 100px;")
 			.ui.divider
@@ -23,15 +23,16 @@ block jumbotron1
 					buttom.ui.button( data-bind = " text: infoDefine[ languageIndex() ].firstNote.disagree, click: () => { sectionAgreement(false); return sectionWelcome(true)} ")
 					.or
 					buttom.ui.positive.button( data-bind = " text: infoDefine[ languageIndex() ].home_index_view.agree, click: agreeClick ")
-
-	section#login.content( data-bind=" visible: sectionLogin()")
+	section#login.content( data-bind=" if: sectionLogin ")
 		.ui.cards.loginCards
-			.card.raised( data-bind = "if: keyPair(), visible: keyPair() " style = "width: 20em;" )
-				.content( data-bind = " with: keyPair() " )
-					.ui.red.right.ribbon.label( data-bind = "visible: ! passwordOK ")
+			<!-- ko if: keyPair -->
+			<!-- ko with: keyPair -->
+			.card.centered.raised( style = " width: 100%; max-width: 40em;" )
+				
+				.content
+					.ui.red.right.ribbon.label( data-bind = "visible: keyPairPassword() && !showConform(), click: showLoginPasswordFieldClick" style = "cursor: pointer;")
 						i.icon.lock
-					.ui.teal.right.ribbon.label( data-bind = "visible: passwordOK ")
-						i.icon.unlock.alternate
+					
 					.header
 						i.icon.privacy.teal
 						span( data-bind = "text: email " style=" color:#00b5ad!important;")
@@ -50,12 +51,38 @@ block jumbotron1
 						p( data-bind = " text: infoDefine[ $root.languageIndex() ].Home_keyPairInfo_view.creatDate + createDate" )
 						p( data-bind = " text: infoDefine[ $root.languageIndex() ].Home_keyPairInfo_view.keyLength + keyLength" )
 						p( data-bind = " text: infoDefine[ $root.languageIndex() ].Home_keyPairInfo_view.keyID + publicKeyID" )
-						.ui.button.positive( data-bind = "visible: $root.QTTransferData(),click: $root.showUserDetail,text: infoDefine[ $root.languageIndex() ].account.accountOptionButton")
-					.ui.bottom.right.attached.label.background-clolr-white( data-bind = " click: () => { $root.keyPair_delete_btn_view ( true ); showPasswordErrorMessage ( false ); $root.showSystemError ( false )}, visible: ! $root.keyPair_delete_btn_view()")
-						a
-							i.trash.alternate.outline.icon.large( style = " color: red;")
-			.card.raised( data-bind = "if: keyPairGenerateForm, visible: keyPairGenerateForm() && !keyPairGenerateForm().showKeyPairPorcess()" style = "width: 100%;padding: 2em;")
-				.ketPairGenerateForm( data-bind = " with: keyPairGenerateForm")
+					
+					.ui.bottom.right.attached.label.background-clolr-white( data-bind = " if: delete_btn_view && !showConform () && !showLoginPasswordField()")
+						a( data-bind = "click: () => { showConform ( true )}")
+							i.trash.alternate.outline.icon.large( style = " color: red;" )
+				.extra.content( data-bind = "if: showDeleteKeyPairNoite(), visible: showDeleteKeyPairNoite()")
+					p( data-bind = " text : infoDefine[ $root.languageIndex() ].Home_keyPairInfo_view.deleteKeyPairHaveLogin " style="color: brown;")
+				.extra.content( data-bind = "if: showConform() && delete_btn_view(), visible: showConform() && delete_btn_view()")
+					p( data-bind = " text : infoDefine[ $root.languageIndex() ].Home_keyPairInfo_view.deleteKeyPairInfo " style="color: brown;")
+					.ui.buttons
+						.ui.button( data-bind = " text: infoDefine[ $root.languageIndex() ].home_index_view.cancel, click: () => { return showConform ( false );}")
+						.or
+						.ui.negative.button( data-bind = " text: infoDefine[ $root.languageIndex() ].Home_keyPairInfo_view.delete, click: deleteKeyPairNext ")
+				<!-- ko with: keyPairPassword -->
+				.extra.content( data-bind = "visible: $parents[0].showLoginPasswordField ()" )
+					form.ui.form( data-bind=" submit: keyPair_checkPemPasswordClick")
+						.field.required( data-bind = " css: { error: showPasswordErrorMessage(), disabled: passwordChecking()}")
+							p( data-bind = " text: infoDefine [ $root.languageIndex() ].Home_keyPairInfo_view.locked")
+							.ui.input( data-bind=" css: { action: systemSetup_systemPassword().length > 4 && ! passwordChecking(), 'left loading': passwordChecking()}" )
+								i.search.icon.right( data-bind = " visible: passwordChecking()" style = " margin: 0 0 0 0!important; width: auto!important; height:auto!important;" )
+								input( data-bind = "attr: { placeholder: infoDefine[ $root.languageIndex() ].Home_keyPairInfo_view.password1, 'data-content': showPasswordErrorMessage () ? infoDefine[ $root.languageIndex() ].error_message.SystemPasswordError : null }, css: { 'activating element': showPasswordErrorMessage() }, textInput: systemSetup_systemPassword, hasFocus: inputFocus", type="password" value="" tabindex = "0")
+								button.ui.icon.button.positive( data-bind = "visible: systemSetup_systemPassword().length > 4 && ! passwordChecking ()" type="submit" )
+									i.icon.angle.right
+							
+				<!-- /ko -->
+
+			<!-- /ko -->
+			<!-- /ko -->
+			
+			<!-- ko if: keyPairGenerateForm -->
+			<!-- ko with: keyPairGenerateForm -->
+			.card.centered.raised( data-bind = "if: showKeyPairForm, visible: showKeyPairForm" style = "width: 100%;padding: 2em;")
+				.ketPairGenerateForm
 					.ui.segment.teal( data-bind = "html: infoDefine [ $root.languageIndex() ].home_index_view.inputEmail" style = "color: rgba(200,150,30,0.9)")
 					form.ui.form( data-bind="submit: form_AdministratorEmail_submit")
 						.field.required( data-bind = "css: { error: EmailAddressError() }" )
@@ -89,19 +116,31 @@ block jumbotron1
 									i.fa.fa-key
 									span 4096
 							i.icon.question.circle.outline.large.questionIcon( data-bind = "visible: ! keyLengthInfoShow (), click: () => { keyLengthInfoShow ( true )} " style = "color: rgba(200,150,30,0.9)" )
-						button.ui.green.basic.button( type="submit" data-bind = " text: infoDefine [ $root.languageIndex() ].home_index_view.creatKeyPair, click: form_AdministratorEmail_submit ")
-			.card.raised( data-bind = "if: keyPairGenerateForm, visible: keyPairGenerateForm() && keyPairGenerateForm().showKeyPairPorcess()" style = "width: 100%;padding: 2em;")
-				.detail( data-bind = "with: keyPairGenerateForm " )
+						button.ui.green.basic.button( type = "submit" data-bind = " text: infoDefine [ $root.languageIndex() ].home_index_view.creatKeyPair, click: form_AdministratorEmail_submit ")
+			.card.centered.raised( data-bind = "if: showKeyPairPorcess, visible: showKeyPairPorcess" style = "width: 100%;padding: 2em;")
+				.detail
 					p( data-bind = " html: infoDefine [ $root.languageIndex() ].home_index_view.GenerateKeypair ")
-						.keyPairProcessBar.ui.bottom.teal.attached.progress( style="margin-bottom: 1em;" data-value="1" data-total="100")
-							.bar
-						button.ui.negative.basic.button( data-bind= " text: infoDefine [ $root.languageIndex() ].home_index_view.cancel, click: () => { delete_btn_view ( ! delete_btn_view ()) }, visible: newKeyPairRunningCancelButtonShow() && ! delete_btn_view () ")
-						.ui.buttons( data-bind = " visible: newKeyPairRunningCancelButtonShow() && delete_btn_view () ")
-							button.ui.button( data-bind = "text: infoDefine [ $root.languageIndex() ].home_index_view.continueCreateKeyPair, click: () => { return delete_btn_view ( ! delete_btn_view ());} ")
-							.or
-							button.ui.button.negative( data-bind = " text: infoDefine [ $root.languageIndex() ].home_index_view.stopCreateKeyPair, click: CancelCreateKeyPair ")
+					.keyPairProcessBar.ui.bottom.teal.attached.progress( style="margin-bottom: 1em;" data-value="1" data-total="100")
+						.bar
+					button.ui.negative.basic.button( data-bind= " text: infoDefine [ $root.languageIndex() ].home_index_view.cancel, click: () => { delete_btn_view ( ! delete_btn_view ()) }, visible: newKeyPairRunningCancelButtonShow() && ! delete_btn_view () ")
+					.ui.buttons( data-bind = " visible: newKeyPairRunningCancelButtonShow() && delete_btn_view () ")
+						button.ui.button( data-bind = "text: infoDefine [ $root.languageIndex() ].home_index_view.continueCreateKeyPair, click: () => { return delete_btn_view ( ! delete_btn_view ());} ")
+						.or
+						button.ui.button.negative( data-bind = " text: infoDefine [ $root.languageIndex() ].home_index_view.stopCreateKeyPair, click: CancelCreateKeyPair ")
+			.card.centered.raised( data-bind = "if: keyPairGenerateFormMessage, visible: keyPairGenerateFormMessage " style = "width: 100%;padding: 2em;")
+				.detail
+					p( data-bind="visible: message_cancel(), text: infoDefine [ $root.languageIndex() ].home_index_view.keyPairCancel ")
+					p( data-bind="visible: message_keyPairGenerateError, text: infoDefine [ $root.languageIndex() ].home_index_view.keyPairGenerateError ")
+					p( data-bind = "visible: message_keyPairGenerateSuccess, text: infoDefine [ $root.languageIndex() ].home_index_view.keyPairGenerateSuccess ")
+					button.ui.negative.basic.button( data-bind= " click: CloseKeyPairGenerateFormMessage, text: infoDefine [ $root.languageIndex() ].error_message.Success")
+			<!-- /ko -->
+			<!-- /ko -->
 
-
-
-
-		
+	section.ui.basic.modal#CoNETError( data-bind="if: CoNETLocalServerError ")
+		.ui.icon.header
+			i.heartbeat.icon( data-bind="text: infoDefine [ languageIndex() ].error_message.title, visible: !hacked () ")
+			i.icon.spy.big( data-bind=" visible: hacked()")
+		.content
+			p( data-bind = " text: modalContent ")
+		.actions
+			.ui.red.inverted.button( data-bind=" text: infoDefine [ languageIndex() ].linuxUpdate.exit, click: exit, visible:!hacked() ")

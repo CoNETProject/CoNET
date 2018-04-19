@@ -147,52 +147,44 @@ exports.getQTGateSign = (user) => {
     });
     return Certification;
 };
-exports.getKeyPairInfo = (keyPair) => {
-    if (!keyPair || !keyPair.publicKey || !keyPair.privateKey) {
-        return keyPair = null;
+exports.getKeyPairInfo = (publicKey, privateKey, password, CallBack) => {
+    if (!publicKey || !privateKey) {
+        return CallBack(new Error('no key'));
     }
-    const _privateKey = OpenPgp.key.readArmored(keyPair.privateKey);
-    const _publicKey = OpenPgp.key.readArmored(keyPair.publicKey);
+    const _privateKey = OpenPgp.key.readArmored(privateKey);
+    const _publicKey = OpenPgp.key.readArmored(publicKey);
     if (_privateKey.err || _publicKey.err) {
-        return keyPair = null;
+        return CallBack(new Error('no key'));
     }
     const privateKey1 = _privateKey.keys[0];
     const publicKey1 = _publicKey.keys;
     const user = publicKey1[0].users[0];
-    const ret = {
-        publicKey: keyPair.publicKey,
-        privateKey: keyPair.privateKey,
-        keyLength: getBitLength(privateKey1),
-        nikeName: exports.getNickName(user.userId.userid),
-        createDate: privateKey1.primaryKey.created.toLocaleString(),
-        email: exports.getEmailAddress(user.userId.userid),
-        passwordOK: false,
-        verified: exports.getQTGateSign(user),
-        publicKeyID: publicKey1[0].primaryKey.fingerprint
-    };
-    return keyPair = ret;
-};
-exports.KeyPairDeleteKeyDetail = (keyPair, passwordOK) => {
-    if (!keyPair) {
-        return null;
+    const ret = InitKeyPair();
+    ret.publicKey = publicKey;
+    ret.privateKey = privateKey;
+    ret.keyLength = getBitLength(privateKey1);
+    ret.nikeName = exports.getNickName(user.userId.userid);
+    ret.createDate = privateKey1.primaryKey.created.toLocaleString();
+    ret.email = exports.getEmailAddress(user.userId.userid);
+    ret.verified = exports.getQTGateSign(user);
+    ret.publicKeyID = publicKey1[0].primaryKey.fingerprint;
+    ret.passwordOK = false;
+    if (!password) {
+        return CallBack(null, ret);
     }
-    const ret = {
-        nikeName: keyPair.nikeName,
-        email: keyPair.email,
-        keyLength: keyPair.keyLength,
-        createDate: keyPair.createDate,
-        passwordOK: passwordOK,
-        verified: keyPair.verified,
-        publicKeyID: keyPair.publicKeyID
-    };
-    return ret;
+    return privateKey1.decrypt(password).then(keyOK => {
+        ret.passwordOK = keyOK;
+        return CallBack(null, ret);
+    }).catch(() => {
+        return CallBack(null, ret);
+    });
 };
 exports.emitConfig = (config, passwordOK) => {
     if (!config) {
         return null;
     }
     const ret = {
-        keypair: exports.KeyPairDeleteKeyDetail(config.keypair, passwordOK),
+        keypair: config.keypair,
         firstRun: config.firstRun,
         alreadyInit: config.alreadyInit,
         newVerReady: config.newVerReady,
@@ -232,7 +224,16 @@ exports.checkConfig = (CallBack) => {
         config.newVersion = null;
         config.serverPort = exports.LocalServerPortNumber;
         config.localIpAddress = exports.getLocalInterface();
-        config.keypair = exports.getKeyPairInfo(config.keypair);
-        return CallBack(null, config);
+        if (!config.keypair || !config.keypair.publicKey) {
+            return CallBack(null, config);
+        }
+        return exports.getKeyPairInfo(config.keypair.publicKey, config.keypair.privateKey, null, (err, key) => {
+            if (err) {
+                CallBack(err);
+                return console.log(`checkConfig getKeyPairInfo error`, err);
+            }
+            config.keypair = key;
+            return CallBack(null, config);
+        });
     });
 };

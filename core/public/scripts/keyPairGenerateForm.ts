@@ -59,6 +59,18 @@ class keyPairGenerateForm {
 	public newKeyPairRunningCancelButtonShow = ko.observable ( false )
 	public delete_btn_view = ko.observable ( false )
 	public doingProcessBarTime = null
+	public keyPairGenerateFormMessage = ko.observable ( false )
+	public message_cancel = ko.observable ( false )
+	public message_keyPairGenerateError = ko.observable ( false )
+	public message_keyPairGenerateSuccess = ko.observable ( false )
+	public showKeyPairForm = ko.observable ( true )
+	public showKeyInfomation = ko.observable ( false )
+	private showPopUp () {
+		$( '.activating.element').popup({
+			on: 'focus',
+			movePopup: false
+		})
+	}
 	private checkEmailAddress ( email: string ) {
 		$ ('.ui.checkbox').checkbox()
 		
@@ -67,16 +79,13 @@ class keyPairGenerateForm {
 
 		if ( ! email || ! email.length ) {
 			this.EmailAddressError ( true )
-			return true
+			return this.showPopUp ()
 		}
 			
 		if ( checkEmail ( email ).length ) {
 
 			this.EmailAddressError ( true )
-			$( '.activating.element').popup({
-				on: 'focus',
-				movePopup: false
-			})
+			return this.showPopUp ()
 		}
 
 		
@@ -93,6 +102,7 @@ class keyPairGenerateForm {
 	private checkNickname ( nickname: string ) {
 		this.NickNameError ( false )
 		if ( !nickname || !nickname.length ) {
+			this.showPopUp ()
 			this.NickNameError ( true )
 		}
 		return true
@@ -101,11 +111,21 @@ class keyPairGenerateForm {
 		this.passwordError(false)
 		if ( !password || password.length < 5 ) {
 			this.passwordError ( true )
+			this.showPopUp ()
 		}
 		return true
 	}
 
-	constructor () {
+	private stopDoingProcessBar () {
+		clearTimeout ( this.doingProcessBarTime )
+		this.newKeyPairRunningCancelButtonShow ( false )
+		this.showKeyPairPorcess ( false )
+		return $('.keyPairProcessBar').progress ({
+			percent: 0
+		})
+	}
+
+	constructor ( private exit: () => void ) {
 		this.SystemAdministratorEmailAddress.subscribe ( newValue => {
 			return this.checkEmailAddress ( newValue )
 		})
@@ -121,10 +141,11 @@ class keyPairGenerateForm {
 		this.checkNickname ( this.SystemAdministratorNickName ())
 		this.checkPassword ( this.systemSetup_systemPassword ())
 		if ( this.passwordError() || this.EmailAddressError() || this.NickNameError()) {
-			return true
+			return false
 		}
 		this.showKeyPairPorcess ( true )
 		this.newKeyPairRunningCancelButtonShow ( true )
+		this.showKeyPairForm ( false )
 		const email = this.SystemAdministratorEmailAddress ()
 		const sendData: INewKeyPair = {
 			password: this.systemSetup_systemPassword (),
@@ -145,20 +166,43 @@ class keyPairGenerateForm {
 					return doingProcessBar ()
 			}, timeSet )
 		}
+
+		/*
+		socketIo.once ( 'newKeyPairCallBack', keyPair => {
+			this.stopDoingProcessBar ()
+			this.keyPairGenerateFormMessage ( true )
+			if ( !keyPair ) {
+				return this.message_keyPairGenerateError ( true )
+			}
+			this.exit ()
+			return this.message_keyPairGenerateSuccess ( true )
+		})
+
+		socketIo.emit ( 'NewKeyPair', sendData ) 
+		*/
 		return doingProcessBar ()
 	}
+
 	public tileClick ( data: string ) {
 		this.keyPairLengthSelect ( data )
 		return true
 	}
 
 	public CancelCreateKeyPair () {
-		
-		clearTimeout ( this.doingProcessBarTime )
-		this.showKeyPairPorcess ( false )
+		this.stopDoingProcessBar ()
+		this.message_cancel ( true )
 		this.newKeyPairRunningCancelButtonShow ( false )
-		$('.keyPairProcessBar').progress ({
-			percent: 0
-		})
+		this.delete_btn_view ( false )
+		socketIo.emit ( 'cancelNewKeyPair' )
+		//this.showKeyPairForm ( true )
+		return this.keyPairGenerateFormMessage ( true )
+	}
+
+	public CloseKeyPairGenerateFormMessage () {
+		this.message_cancel ( false )
+		this.message_keyPairGenerateError ( false )
+		this.message_keyPairGenerateSuccess ( false )
+		this.keyPairGenerateFormMessage ( false )
+		return this.showKeyPairForm ( true )
 	}
 }

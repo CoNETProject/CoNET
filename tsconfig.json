@@ -9,6 +9,9 @@
 		"core/**/*.ts"
 	],
 	"exclude": [
-		
+		"*.d.ts",
+		"core/public/css/**/",
+		"core/public/images/**/",
+		"core/views/**/"
 	]
 }

@@ -498,6 +498,9 @@ const infoDefine = [
             imapEmailAddress: '邮箱账户名',
             cancel: '放弃操作',
             stopCreateKeyPair: '停止生成密钥对',
+            keyPairCancel: '生成密钥对被中止',
+            keyPairGenerateError: '生成密钥对发生系统错误，请重试！',
+            keyPairGenerateSuccess: '完成生成密钥对',
             continueCreateKeyPair: '继续生成',
             newVersionInstallLoading:'更新中请稍候',
             KeypairLength: '请选择加密通讯用密钥对长度：这个数字越大，通讯越难被破解，但会增加通讯量和运算时间。',
@@ -518,6 +521,7 @@ const infoDefine = [
             password1: '请输入平台密码',
             keyID: '密钥对ID：',
             logout: '退出登录',
+            deleteKeyPairHaveLogin: '请使用登陆后的客户端来删除您的密钥',
             deleteKeyPairInfo: '请注意：如果您没有备份您的QTGate系统的话，删除现有的密钥将使您的QTGate设定全部丢失，您有可能需要重新设置您的QTGate系统。如果您的注册Email没有变化，您的QTGate账户支付信息不会丢失！',
             delete: '削除',
             locked: '请提供您的RSA密钥以解开密钥后才能继续操作，如果您遗忘了密码，请删除此RSA密钥。',
@@ -581,7 +585,7 @@ const infoDefine = [
                 '用来通讯的Email设定有错误，请检查IMAP设定后重试，或CoNET不支持此Email类型',
                 '您所选区域不能够连结，请稍候再试',
                 '您的IMAP邮箱发信发生错误。请退出CoNET重试。如果持续发生此故障，您的IMAP帐号有可能被锁住，需要登陆您的IMAP邮箱网站解锁操作。 ',
-                'CoNET程序发生错误，请退出后重启CoNET！',
+                'CoNET核心程序发生错误，请退出后重启CoNET！',
                 '您是高手，不用我多说了。'
             ],
             activeing: '正在通讯中'
@@ -1230,6 +1234,7 @@ const infoDefine = [
             password: '長さ5位以上のパスワードを入力してください',
             password1: '端末パスワード',
             logout: 'ログアウト',
+            deleteKeyPairHaveLogin:'ログインした端末で暗号鍵ペアを削除して下さい。',
             keyID: '暗号鍵ID：',
             deleteKeyPairInfo: '鍵ペアを削除することで、現在のCoNET設定は全部なくなって、一からCoNETの設定をやり直しが必要です。但しあなたのCoNETアカウトEmailアドレスは前回と同じであれば、CoNETアカウトを戻れます。',
             delete: '削除',
@@ -1251,6 +1256,9 @@ const infoDefine = [
             emailAddress: 'CoNETアカウトのEmailアドレス(必須), ',
             SystemAdministratorNickName: 'ニックネーム(必須)',
             creatKeyPair: '暗号鍵ペアを生成...',
+            keyPairCancel: '暗号鍵ペアの生成をキャンセルしました',
+            keyPairGenerateError: '暗号鍵ペアの生成にエラーが発生しました、後ほどもう一回してみて下さい',
+            keyPairGenerateSuccess: '暗号鍵ペアの生成は完了しました',
             systemPassword: 'CoNET端末パスワードの設定',
             stopCreateKeyPair: '暗号鍵ペア生成をキャンセル',
             cancel: '操作停止',
@@ -1320,7 +1328,7 @@ const infoDefine = [
                 '通信用IMAPの設定にエラーがあるか又はそのタープのIMAPアカンウトがCoNETサポートしません。よくチェックしてもう一回試しにしてください。',
                 '選択していたゲットウェーエリアは只今接続不能になっております、後ほどもう一度試しにしてください。',
                 'IMAPアカウトでEMAIL送信する際エラーが発生しました、一回退出し、起動して見てくださいね。重複発生した場合はIMAPアカウトのウェーブページでアカウトをアンロック操作を必要かもしれない。',
-                'CoNETエラーが発生したした。一回退出してCoNETを再起動してください。',
+                'CoNETコアーにエラーが発生したした。CoNETを退出してから再起動してください。',
                 'アララーー、あなたには負けるそ。'
             ],
             activeing: '通信中'
@@ -1856,7 +1864,7 @@ const infoDefine = [
         Home_keyPairInfo_view: {
             
             title: 'Key pair information',
-
+            deleteKeyPairHaveLogin:'Please delete the key pair use the client that is logging on.',
             emailNotVerifi: 'Key pair has not been signed by CoNET yet.',
             emailVerified: 'Key pair signed by CoNET.',
             NickName: 'Nick name：',
@@ -1886,6 +1894,9 @@ const infoDefine = [
             creatKeyPair: 'Generate key pair...',
             cancel: 'Cancel',
             clickInstall:'Install',
+            keyPairCancel: 'Generate key pair was canceled.',
+            keyPairGenerateError: 'It was system error when generate key pair. Try again please.',
+            keyPairGenerateSuccess: 'Generate key pair was success.',
             continueCreateKeyPair: 'Keep generate.',
             stopCreateKeyPair: 'Cancel generate key pair',
             KeypairLength: 'Select the bit length of your key pair. Larger bit lengths are stronger and harder for a hacker to crack but may result in slower network transfer speeds.',
@@ -1954,7 +1965,7 @@ const infoDefine = [
                         'Your transfer email account may not be working, please check the IMAP account. Or your IMAP accout may not support CoNET system.',
                         'Selected region is unavailable, try again later.',
                         'Your IMAP account recieved an error. Please restart CoNET and try again. If the error is not fixed, You may need check your IMAP account setting to enable third party IMAP applications.',
-                        'CoNET system error! Plesee restart CoNET.',
+                        'CoNET coresystem error! Plesee restart CoNET.',
                         'Oooooops! How are you today?'
                     ],
 
@@ -2434,7 +2445,7 @@ const infoDefine = [
         },
 
         Home_keyPairInfo_view: {
-            
+            deleteKeyPairHaveLogin: '請使用登陸後的客戶端來刪除您的密鑰',
             title: '密鑰信息',
             emailNotVerifi: '您的密鑰未獲CoNET簽署認證。 ',
             emailVerified: '您的密鑰已獲CoNET簽署認證。 ',
@@ -2465,6 +2476,9 @@ const infoDefine = [
             emailAddress: 'Q梯帳戶名稱(Email地址,必填)',
             stopCreateKeyPair: '停止生成密鑰對',
             creatKeyPair: '創建密鑰對..',
+            keyPairCancel: '生成密鑰對被中止',
+            keyPairGenerateError: '生成密鑰對發生系統錯誤，請重試！ ',
+            keyPairGenerateSuccess: '完成生成密鑰對',
             cancel: '放棄操作',
             systemPassword: 'Q梯客戶端密碼設置',
             continueCreateKeyPair: '繼續生成',
@@ -2533,7 +2547,7 @@ const infoDefine = [
                             '用來通訊的Email設定有錯誤，請檢查IMAP設定後重試，或CoNET網絡不支持此Email類型',
                             '您所選區域不能夠連結，請稍候再試',
                             '您的IMAP郵箱發信發生錯誤。請退出CoNET重試。如果持續發生此故障，您的IMAP帳號有可能被鎖住，需要登陸您的IMAP郵箱網站解鎖操作。',
-                            'CoNET程序發生錯誤，請退出後重新啟動CoNET。',
+                            'CoNET核心程序發生錯誤，請退出後重新啟動CoNET。',
                             '嗯，高手過招身手非凡啊！'
         
                         ],
