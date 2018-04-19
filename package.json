@@ -1,11 +1,11 @@
 {
   "name": "conet",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "license": "MIT",
   "description": "CoNET",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/QTGate/CoNETPlatform.git"
+    "url": "git+https://github.com/QTGate/CoNET.git"
   },
   "author": {
     "name": "CoNET Technology Inc.",
@@ -13,7 +13,7 @@
   },
   "main": "./core/main",
   "bugs": {
-    "url": "https://github.com/QTGate/CoNETPlatform/issues"
+    "url": "https://github.com/QTGate/CoNET/issues"
   },
   "homepage": "https://www.CoNETTech.ca",
   "dependencies": {
@@ -42,7 +42,7 @@
     "all": true
   },
   "scripts": {
-    "test": "nyc mocha"
+    "test": "node core/main test"
   },
   "devDependencies": {
     "@types/async": "^2.0.49",
