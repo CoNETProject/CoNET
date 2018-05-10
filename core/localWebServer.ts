@@ -25,7 +25,6 @@ import * as Async from 'async'
 import * as Fs from 'fs'
 import * as Util from 'util'
 import * as Crypto from 'crypto'
-import RendererProcess from './rendererProcess'
 interface localConnect {
 	socket: SocketIO.Socket
 	login: boolean
@@ -44,15 +43,16 @@ const saveLog = ( err: {} | string ) => {
 
 
 const saveServerStartup = ( localIpaddress: string ) => {
-	const info = `*************************** CoNET Platform [ ${ Tool.packageFile.version } ] server start up *****************************\n` +
-			`Access url: http://${localIpaddress}:${ Tool.LocalServerPortNumber }`
+	const info = `\n*************************** CoNET Platform [ ${ Tool.packageFile.version } ] server start up *****************************\n` +
+			`Access url: http://${localIpaddress}:${ Tool.LocalServerPortNumber }\n`
 
 	console.log ( info )
 	saveLog ( info )
 }
 const saveServerStartupError = ( err: {} ) => {
-	const info = `*************************** CoNET Platform [ ${ Tool.packageFile.version } ] server startup falied *****************************\n` +
-			`${ err['message'] }`
+	const info = `\n*************************** CoNET Platform [ ${ Tool.packageFile.version } ] server startup falied *****************************\n` +
+			`platform ${ process.platform }\n` +
+			`${ err['message'] }\n`
 	console.log ( info )
 	saveLog ( info )
 }
@@ -169,33 +169,36 @@ export default class localServer {
 				}
 				
 				preData.password = Pbkdf2Password.toString ( 'hex' )
-				let CreateKeyPairProcess: RendererProcess = null
-				const calcelFun = () => {
-					saveLog (`NewKeyPair on calcelFun!`)
-					CreateKeyPairProcess.cancel()
-				}
-				socket.once ( 'cancelNewKeyPair', calcelFun )
-				saveLog (`NewKeyPair doing CreateKeyPairProcess`)
-				return CreateKeyPairProcess = new RendererProcess ( 'newKeyPair', [ preData.email, preData.nikeName, preData.keyLength, preData.password ], false, ( err, retData )=> {
+				
+				
+				saveLog ( `NewKeyPair doing CreateKeyPairProcess`)
+				return Tool.newKeyPair( preData.email, preData.nikeName, preData.password, ( err, retData )=> {
 					if ( err ) {
+						console.log ( err )
 						this.socketServer.emit ( 'newKeyPairCallBack', null )
 						return saveLog (`CreateKeyPairProcess return err: [${ err.message }]`)
 					}
 					
-					CreateKeyPairProcess = null
-					socket.removeListener ( 'cancelNewKeyPair', calcelFun )
+				
 					if ( ! retData ) {
-						saveLog ( `CreateKeyPairProcess ON FINISHED! HAVE NO newKeyPair DATA BACK!`)
+						const info = `newKeyPair return null key!`
+						saveLog ( info )
+						console.log ( info )
 						return this.socketServer.emit ( 'newKeyPairCallBack', null )
 					}
+
 					this.listenAfterPassword ( socket )
-					const info = `RendererProcess finished [${ retData }]`
+					const info = `RendererProcess finished \n[${ retData.publicKey }] [${ retData.privateKey }]`
 					saveLog ( info )
 					console.log ( info )
 					return Tool.getKeyPairInfo ( retData.publicKey, retData.privateKey, preData.password, ( err, key ) => {
 						if ( err ) {
+							const info = `Tool.getKeyPairInfo Error [${ err.message ? err.message : 'null err message '}]`
+							saveLog ( info )
+							console.log ( info )
 							return this.CoNET_systemError ()
 						}
+						
 						this.config.keypair = key
 						this.config.account = this.config.keypair.email
 						Tool.saveConfig ( this.config, saveLog )
@@ -216,28 +219,35 @@ export default class localServer {
 		this.expressServer.use ( Express.static ( Tool.QTGateFolder ))
 		this.expressServer.use ( Express.static ( Path.join ( __dirname, 'public' )))
 		this.expressServer.get ( '/', ( req, res ) => {
+
             res.render( 'home', { title: 'home' })
 		})
 		this.socketServer.on ( 'connection', socker => {
 			return this.socketServerConnected ( socker )
 		})
 		this.httpServer.once ( 'error', err => {
+			console.log (`httpServer error`, err )
 			saveServerStartupError ( err )
 			return process.exit (1)
 		})
 		Async.series ([
 			next => Tool.checkSystemFolder ( next ),
-			next => Tool.checkConfig ( next ),
-			next => this.httpServer.listen ( Tool.LocalServerPortNumber, next )
+			next => Tool.checkConfig ( next )
+			
 		], ( err, data ) => {
-			if ( test && typeof this.httpServer.close === 'function' ) {
-				this.httpServer.close ()
-			}
 			if ( err ) {
 				return saveServerStartupError ( err )
 			}
+			
+			
 			this.config = data['1']
-			return saveServerStartup ( this.config.localIpAddress[0] )
+			if ( !test ) {
+				this.httpServer.listen ( Tool.LocalServerPortNumber, () => {
+					return saveServerStartup ( this.config.localIpAddress[0] )
+				})
+			}
+			
+			
 		})
 		
 	}

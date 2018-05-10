@@ -76,7 +76,7 @@ export default class RendererProcess {
 		testElectronSystem ( err1 => {
 			
 			if ( err1 ) {
-				console.log (`RendererProcess: running system have not electron.`)
+				console.log ( `RendererProcess: running system have not electron.`)
 				this.file += '.js'
 			} else {
 				

@@ -14,41 +14,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-const Express = require("express");
-const Path = require("path");
-const cookieParser = require("cookie-parser");
-const HTTP = require("http");
-const SocketIo = require("socket.io");
-const Tool = require("./tools/initSystem");
-const Async = require("async");
-const Fs = require("fs");
-const Crypto = require("crypto");
-const rendererProcess_1 = require("./rendererProcess");
-let logFileFlag = 'w';
-const saveLog = (err) => {
+exports.__esModule = true;
+var Express = require("express");
+var Path = require("path");
+var cookieParser = require("cookie-parser");
+var HTTP = require("http");
+var SocketIo = require("socket.io");
+var Tool = require("./tools/initSystem");
+var Async = require("async");
+var Fs = require("fs");
+var Crypto = require("crypto");
+var logFileFlag = 'w';
+var saveLog = function (err) {
     if (!err) {
         return;
     }
-    const data = `${new Date().toUTCString()}: ${typeof err === 'object' ? (err['message'] ? err['message'] : '') : err}\r\n`;
-    return Fs.appendFile(Tool.ErrorLogFile, data, { flag: logFileFlag }, () => {
+    var data = new Date().toUTCString() + ": " + (typeof err === 'object' ? (err['message'] ? err['message'] : '') : err) + "\r\n";
+    return Fs.appendFile(Tool.ErrorLogFile, data, { flag: logFileFlag }, function () {
         return logFileFlag = 'a';
     });
 };
-const saveServerStartup = (localIpaddress) => {
-    const info = `*************************** CoNET Platform [ ${Tool.packageFile.version} ] server start up *****************************\n` +
-        `Access url: http://${localIpaddress}:${Tool.LocalServerPortNumber}`;
+var saveServerStartup = function (localIpaddress) {
+    var info = "\n*************************** CoNET Platform [ " + Tool.packageFile.version + " ] server start up *****************************\n" +
+        ("Access url: http://" + localIpaddress + ":" + Tool.LocalServerPortNumber + "\n");
     console.log(info);
     saveLog(info);
 };
-const saveServerStartupError = (err) => {
-    const info = `*************************** CoNET Platform [ ${Tool.packageFile.version} ] server startup falied *****************************\n` +
-        `${err['message']}`;
+var saveServerStartupError = function (err) {
+    var info = "\n*************************** CoNET Platform [ " + Tool.packageFile.version + " ] server startup falied *****************************\n" +
+        ("platform " + process.platform + "\n") +
+        (err['message'] + "\n");
     console.log(info);
     saveLog(info);
 };
-class localServer {
-    constructor(test) {
+var localServer = /** @class */ (function () {
+    function localServer(test) {
+        var _this = this;
         this.expressServer = Express();
         this.httpServer = HTTP.createServer(this.expressServer);
         this.socketServer = SocketIo(this.httpServer);
@@ -61,151 +62,152 @@ class localServer {
         this.expressServer.use(cookieParser());
         this.expressServer.use(Express.static(Tool.QTGateFolder));
         this.expressServer.use(Express.static(Path.join(__dirname, 'public')));
-        this.expressServer.get('/', (req, res) => {
+        this.expressServer.get('/', function (req, res) {
             res.render('home', { title: 'home' });
         });
-        this.socketServer.on('connection', socker => {
-            return this.socketServerConnected(socker);
+        this.socketServer.on('connection', function (socker) {
+            return _this.socketServerConnected(socker);
         });
-        this.httpServer.once('error', err => {
+        this.httpServer.once('error', function (err) {
+            console.log("httpServer error", err);
             saveServerStartupError(err);
             return process.exit(1);
         });
         Async.series([
-            next => Tool.checkSystemFolder(next),
-            next => Tool.checkConfig(next),
-            next => this.httpServer.listen(Tool.LocalServerPortNumber, next)
-        ], (err, data) => {
-            if (test && typeof this.httpServer.close === 'function') {
-                this.httpServer.close();
-            }
+            function (next) { return Tool.checkSystemFolder(next); },
+            function (next) { return Tool.checkConfig(next); }
+        ], function (err, data) {
             if (err) {
                 return saveServerStartupError(err);
             }
-            this.config = data['1'];
-            return saveServerStartup(this.config.localIpAddress[0]);
+            _this.config = data['1'];
+            if (!test) {
+                _this.httpServer.listen(Tool.LocalServerPortNumber, function () {
+                    return saveServerStartup(_this.config.localIpAddress[0]);
+                });
+            }
         });
     }
-    getPbkdf2(passwrod, CallBack) {
+    localServer.prototype.getPbkdf2 = function (passwrod, CallBack) {
         return Crypto.pbkdf2(passwrod, this.config.salt, this.config.iterations, this.config.keylen, this.config.digest, CallBack);
-    }
-    CoNET_systemError() {
+    };
+    localServer.prototype.CoNET_systemError = function () {
         return this.socketServer.emit('CoNET_systemError');
-    }
-    listenAfterPassword(socket) {
-    }
-    socketServerConnected(socket) {
-        const client = `[${socket.id}][ ${socket.conn.remoteAddress}]`;
+    };
+    localServer.prototype.listenAfterPassword = function (socket) {
+    };
+    localServer.prototype.socketServerConnected = function (socket) {
+        var _this = this;
+        var client = "[" + socket.id + "][ " + socket.conn.remoteAddress + "]";
         this.localConnected.set(client, { socket: socket, login: false });
-        socket.once('disconnect', reason => {
-            saveLog(`socketServerConnected ${client} on disconnect`);
-            return this.localConnected.delete(client);
+        socket.once('disconnect', function (reason) {
+            saveLog("socketServerConnected " + client + " on disconnect");
+            return _this.localConnected["delete"](client);
         });
-        socket.on('init', Callback => {
-            const ret = Tool.emitConfig(this.config, false);
+        socket.on('init', function (Callback) {
+            var ret = Tool.emitConfig(_this.config, false);
             return Callback(ret);
         });
-        socket.once('agreeClick', () => {
-            saveLog(`socket on agreeClick`);
-            this.config.firstRun = false;
-            return Tool.saveConfig(this.config, saveLog);
+        socket.once('agreeClick', function () {
+            saveLog("socket on agreeClick");
+            _this.config.firstRun = false;
+            return Tool.saveConfig(_this.config, saveLog);
         });
-        socket.on('checkPemPassword', (password, CallBack) => {
-            if (!this.config.keypair || !this.config.keypair.publicKey) {
-                console.log(`checkPemPassword !this.config.keypair`);
+        socket.on('checkPemPassword', function (password, CallBack) {
+            if (!_this.config.keypair || !_this.config.keypair.publicKey) {
+                console.log("checkPemPassword !this.config.keypair");
                 return CallBack(true);
             }
             if (!password || password.length < 5) {
-                console.log(`! password `);
+                console.log("! password ");
                 return CallBack(true);
             }
-            if (this.savedPasswrod && this.savedPasswrod.length) {
-                if (this.savedPasswrod !== password) {
-                    console.log(`savedPasswrod !== password `);
+            if (_this.savedPasswrod && _this.savedPasswrod.length) {
+                if (_this.savedPasswrod !== password) {
+                    console.log("savedPasswrod !== password ");
                     return CallBack(true);
                 }
             }
-            return this.getPbkdf2(password, (err, Pbkdf2Password) => {
+            return _this.getPbkdf2(password, function (err, Pbkdf2Password) {
                 if (err) {
-                    saveLog(`on checkPemPassword getPbkdf2 error:[${err.message}]`);
-                    return this.CoNET_systemError();
+                    saveLog("on checkPemPassword getPbkdf2 error:[" + err.message + "]");
+                    return _this.CoNET_systemError();
                 }
-                return Tool.getKeyPairInfo(this.config.keypair.publicKey, this.config.keypair.privateKey, Pbkdf2Password.toString('hex'), (err, key) => {
+                return Tool.getKeyPairInfo(_this.config.keypair.publicKey, _this.config.keypair.privateKey, Pbkdf2Password.toString('hex'), function (err, key) {
                     if (err) {
-                        return this.CoNET_systemError();
+                        return _this.CoNET_systemError();
                     }
                     if (!key.passwordOK) {
-                        const info = `[${client}] on checkPemPassword had try password! [${password}]`;
+                        var info = "[" + client + "] on checkPemPassword had try password! [" + password + "]";
                         console.log(info);
                         saveLog(info);
                         return CallBack(true);
                     }
-                    this.savedPasswrod = password;
-                    this.localConnected.set(client, { socket: socket, login: true });
+                    _this.savedPasswrod = password;
+                    _this.localConnected.set(client, { socket: socket, login: true });
                     return CallBack();
                 });
             });
         });
-        socket.on('deleteKeyPairNext', () => {
-            console.log(`on deleteKeyPairNext`);
-            const thisConnect = this.localConnected.get(client);
-            if (this.localConnected.size > 1 && !thisConnect.login) {
-                return this.socketServer.emit('deleteKeyPairNoite');
+        socket.on('deleteKeyPairNext', function () {
+            console.log("on deleteKeyPairNext");
+            var thisConnect = _this.localConnected.get(client);
+            if (_this.localConnected.size > 1 && !thisConnect.login) {
+                return _this.socketServer.emit('deleteKeyPairNoite');
             }
-            const info = `socket on deleteKeyPairNext, delete key pair now.`;
+            var info = "socket on deleteKeyPairNext, delete key pair now.";
             console.log(info);
             saveLog(info);
-            this.config = Tool.InitConfig();
-            Tool.saveConfig(this.config, saveLog);
-            return this.socketServer.emit('init', this.config);
+            _this.config = Tool.InitConfig();
+            Tool.saveConfig(_this.config, saveLog);
+            return _this.socketServer.emit('init', _this.config);
         });
-        socket.on('NewKeyPair', (preData) => {
+        socket.on('NewKeyPair', function (preData) {
             //		already have key pair
-            if (this.config.keypair && this.config.keypair.createDate) {
-                return saveLog(`[${client}] on NewKeyPair but system already have keypair: ${this.config.keypair.publicKeyID} stop and return keypair.`);
+            if (_this.config.keypair && _this.config.keypair.createDate) {
+                return saveLog("[" + client + "] on NewKeyPair but system already have keypair: " + _this.config.keypair.publicKeyID + " stop and return keypair.");
             }
-            this.savedPasswrod = preData.password;
-            saveLog(`on NewKeyPair!`);
-            return this.getPbkdf2(this.savedPasswrod, (err, Pbkdf2Password) => {
+            _this.savedPasswrod = preData.password;
+            saveLog("on NewKeyPair!");
+            return _this.getPbkdf2(_this.savedPasswrod, function (err, Pbkdf2Password) {
                 if (err) {
-                    saveLog(`NewKeyPair getPbkdf2 Error: [${err.message}]`);
-                    return this.CoNET_systemError();
+                    saveLog("NewKeyPair getPbkdf2 Error: [" + err.message + "]");
+                    return _this.CoNET_systemError();
                 }
                 preData.password = Pbkdf2Password.toString('hex');
-                let CreateKeyPairProcess = null;
-                const calcelFun = () => {
-                    saveLog(`NewKeyPair on calcelFun!`);
-                    CreateKeyPairProcess.cancel();
-                };
-                socket.once('cancelNewKeyPair', calcelFun);
-                saveLog(`NewKeyPair doing CreateKeyPairProcess`);
-                return CreateKeyPairProcess = new rendererProcess_1.default('newKeyPair', [preData.email, preData.nikeName, preData.keyLength, preData.password], false, (err, retData) => {
+                saveLog("NewKeyPair doing CreateKeyPairProcess");
+                return Tool.newKeyPair(preData.email, preData.nikeName, preData.password, function (err, retData) {
                     if (err) {
-                        this.socketServer.emit('newKeyPairCallBack', null);
-                        return saveLog(`CreateKeyPairProcess return err: [${err.message}]`);
+                        console.log(err);
+                        _this.socketServer.emit('newKeyPairCallBack', null);
+                        return saveLog("CreateKeyPairProcess return err: [" + err.message + "]");
                     }
-                    CreateKeyPairProcess = null;
-                    socket.removeListener('cancelNewKeyPair', calcelFun);
                     if (!retData) {
-                        saveLog(`CreateKeyPairProcess ON FINISHED! HAVE NO newKeyPair DATA BACK!`);
-                        return this.socketServer.emit('newKeyPairCallBack', null);
+                        var info_1 = "newKeyPair return null key!";
+                        saveLog(info_1);
+                        console.log(info_1);
+                        return _this.socketServer.emit('newKeyPairCallBack', null);
                     }
-                    this.listenAfterPassword(socket);
-                    const info = `RendererProcess finished [${retData}]`;
+                    _this.listenAfterPassword(socket);
+                    var info = "RendererProcess finished \n[" + retData.publicKey + "] [" + retData.privateKey + "]";
                     saveLog(info);
                     console.log(info);
-                    return Tool.getKeyPairInfo(retData.publicKey, retData.privateKey, preData.password, (err, key) => {
+                    return Tool.getKeyPairInfo(retData.publicKey, retData.privateKey, preData.password, function (err, key) {
                         if (err) {
-                            return this.CoNET_systemError();
+                            var info_2 = "Tool.getKeyPairInfo Error [" + (err.message ? err.message : 'null err message ') + "]";
+                            saveLog(info_2);
+                            console.log(info_2);
+                            return _this.CoNET_systemError();
                         }
-                        this.config.keypair = key;
-                        this.config.account = this.config.keypair.email;
-                        Tool.saveConfig(this.config, saveLog);
-                        return this.socketServer.emit('newKeyPairCallBack', this.config.keypair);
+                        _this.config.keypair = key;
+                        _this.config.account = _this.config.keypair.email;
+                        Tool.saveConfig(_this.config, saveLog);
+                        return _this.socketServer.emit('newKeyPairCallBack', _this.config.keypair);
                     });
                 });
             });
         });
-    }
-}
-exports.default = localServer;
+    };
+    return localServer;
+}());
+exports["default"] = localServer;

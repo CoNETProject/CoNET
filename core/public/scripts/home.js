@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-const InitKeyPair = () => {
-    const keyPair = {
+var InitKeyPair = function () {
+    var keyPair = {
         publicKey: null,
         privateKey: null,
         keyLength: null,
@@ -27,11 +27,49 @@ const InitKeyPair = () => {
     };
     return keyPair;
 };
-const socketIo = io({ reconnectionAttempts: 5, timeout: 500 });
+var socketIo = io({ reconnectionAttempts: 5, timeout: 500 });
+var makeKeyPairData = function (keypair) {
+    var length = keypair.publicKeyID.length;
+    keypair.publicKeyID = keypair.publicKeyID.substr(length - 8).toUpperCase();
+    keypair.publicKeyID = keypair.publicKeyID.substr(0, 4) + " " + keypair.publicKeyID.substr(4);
+    var keyPairPasswordClass = new keyPairPassword(function () {
+        keypair.keyPairPassword(keyPairPasswordClass = null);
+        keypair.showLoginPasswordField(false);
+    });
+    keypair.keyPairPassword = ko.observable(keyPairPasswordClass);
+    keypair.showLoginPasswordField = ko.observable(false);
+    keypair.delete_btn_view = ko.observable(true);
+    keypair.showConform = ko.observable(false);
+    keypair.delete_btn_click = function () {
+        keypair.delete_btn_view(false);
+        return keypair.showConform(true);
+    };
+    keypair.showLoginPasswordFieldClick = function () {
+        keypair.showLoginPasswordField(!keypair.showLoginPasswordField());
+        return keypair.keyPairPassword().inputFocus(keypair.showLoginPasswordField());
+    };
+    keypair.deleteKeyPairNext = function () {
+        socketIo.emit('deleteKeyPairNext');
+        return keypair.delete_btn_view(false);
+    };
+    socketIo.on('deleteKeyPairNoite', function () {
+        return keypair.showDeleteKeyPairNoite(true);
+    });
+    keypair.showDeleteKeyPairNoite = ko.observable(false);
+};
+var initPopupArea = function () {
+    var popItem = $('.activating.element').popup('hide');
+    return popItem.popup({
+        on: 'focus',
+        movePopup: false,
+        position: 'right center',
+        inline: true
+    });
+};
 var view_layout;
 (function (view_layout) {
-    class view {
-        constructor() {
+    var view = /** @class */ (function () {
+        function view() {
             this.sectionLogin = ko.observable(false);
             this.sectionAgreement = ko.observable(false);
             this.sectionWelcome = ko.observable(true);
@@ -48,119 +86,102 @@ var view_layout;
             this.localServerConfig = ko.observable();
             this.keyPair = ko.observable(InitKeyPair());
             this.hacked = ko.observable(false);
-            socketIo.once('reconnect_failed', err => {
-                if (this.CoNETLocalServerError()) {
-                    return;
-                }
-                return this.systemError();
-            });
-            socketIo.once('CoNET_systemError', () => {
-                return this.systemError();
-            });
-            socketIo.on('init', (config) => {
-                return this.initConfig(config);
-            });
-            socketIo.emit('init', (config) => {
-                return this.initConfig(config);
-            });
+            this.socketListen();
         }
-        systemError() {
+        view.prototype.systemError = function () {
             this.modalContent(infoDefine[this.languageIndex()].emailConform.formatError[10]);
             $('#CoNETError').modal('setting', 'closable', false).modal('show');
             return this.CoNETLocalServerError(true);
-        }
-        initConfig(config) {
+        };
+        view.prototype.initConfig = function (self, config) {
             if (config.keypair && config.keypair.publicKeyID) {
-                const keypair = config.keypair;
-                const length = keypair.publicKeyID.length;
-                keypair.publicKeyID = keypair.publicKeyID.substr(length - 8).toUpperCase();
-                keypair.publicKeyID = `${keypair.publicKeyID.substr(0, 4)} ${keypair.publicKeyID.substr(4)}`;
-                let keyPairPasswordClass = new keyPairPassword(() => {
-                    keypair.keyPairPassword(keyPairPasswordClass = null);
-                    keypair.showLoginPasswordField(false);
-                });
-                keypair.keyPairPassword = ko.observable(keyPairPasswordClass);
-                keypair.showLoginPasswordField = ko.observable(false);
-                keypair.delete_btn_view = ko.observable(true);
-                keypair.showConform = ko.observable(false);
-                keypair.delete_btn_click = () => {
-                    keypair.delete_btn_view(false);
-                    return keypair.showConform(true);
-                };
-                keypair.showLoginPasswordFieldClick = () => {
-                    keypair.showLoginPasswordField(!keypair.showLoginPasswordField());
-                    return keypair.keyPairPassword().inputFocus(keypair.showLoginPasswordField());
-                };
-                keypair.deleteKeyPairNext = () => {
-                    socketIo.emit('deleteKeyPairNext');
-                    return keypair.delete_btn_view(false);
-                };
-                socketIo.on('deleteKeyPairNoite', () => {
-                    return keypair.showDeleteKeyPairNoite(true);
-                });
-                keypair.showDeleteKeyPairNoite = ko.observable(false);
+                var keypair = config.keypair;
+                makeKeyPairData(keypair);
             }
             else {
                 config.keypair = null;
-                let _keyPairGenerateForm = new keyPairGenerateForm(() => {
-                    return this.keyPairGenerateForm(_keyPairGenerateForm = null);
+                var _keyPairGenerateForm_1 = new keyPairGenerateForm(function (_keyPair) {
+                    makeKeyPairData(_keyPair);
+                    _keyPair.passwordOK = true;
+                    var keyPairPassword = _keyPair.keyPairPassword();
+                    _keyPair.keyPairPassword(keyPairPassword = null);
+                    config.keypair = _keyPair;
+                    self.localServerConfig(config);
+                    self.keyPair(_keyPair);
+                    initPopupArea();
+                    return self.keyPairGenerateForm(_keyPairGenerateForm_1 = null);
                 });
-                this.keyPairGenerateForm(_keyPairGenerateForm);
+                self.keyPairGenerateForm(_keyPairGenerateForm_1);
             }
-            this.localServerConfig(config);
-            this.keyPair(this.localServerConfig().keypair);
-            return this.isFreeUser(this.localServerConfig().freeUser);
-        }
-        selectItem(that, site) {
-            const tindex = lang[this.tLang()];
-            let index = tindex + 1;
+            self.localServerConfig(config);
+            self.keyPair(self.localServerConfig().keypair);
+            return self.isFreeUser(self.localServerConfig().freeUser);
+        };
+        view.prototype.socketListen = function () {
+            var self = this;
+            socketIo.once('reconnect_failed', function (err) {
+                if (self.CoNETLocalServerError()) {
+                    return;
+                }
+                return self.systemError();
+            });
+            socketIo.once('CoNET_systemError', function () {
+                return self.systemError();
+            });
+            socketIo.on('init', function (config) {
+                return self.initConfig(self, config);
+            });
+            socketIo.emit('init', function (config) {
+                return self.initConfig(self, config);
+            });
+        };
+        view.prototype.selectItem = function (that, site) {
+            var tindex = lang[this.tLang()];
+            var index = tindex + 1;
             if (index > 3) {
                 index = 0;
             }
             this.languageIndex(index);
             this.tLang(lang[index]);
             $.cookie('langEH', this.tLang(), { expires: 180, path: '/' });
-            const obj = $("span[ve-data-bind]");
-            obj.each((index, element) => {
-                const ele = $(element);
-                const data = ele.attr('ve-data-bind');
+            var obj = $("span[ve-data-bind]");
+            obj.each(function (index, element) {
+                var ele = $(element);
+                var data = ele.attr('ve-data-bind');
                 if (data && data.length) {
                     ele.text(eval(data));
                 }
             });
-            $('.languageText').shape(`flip ${this.LocalLanguage}`);
-            return $('.KnockoutAnimation').transition('jiggle');
-        }
-        openClick() {
+            $('.languageText').shape("flip " + this.LocalLanguage);
+            $('.KnockoutAnimation').transition('jiggle');
+            return initPopupArea();
+        };
+        view.prototype.openClick = function () {
             this.sectionWelcome(false);
             if (this.localServerConfig().firstRun) {
                 return this.sectionAgreement(true);
             }
             this.sectionLogin(true);
-            return $('.activating.element').popup({
-                on: 'focus',
-                movePopup: false
-            });
-        }
-        agreeClick() {
+            return initPopupArea();
+        };
+        view.prototype.agreeClick = function () {
             this.sectionAgreement(false);
             socketIo.emit('agreeClick');
             this.localServerConfig().firstRun = false;
             return this.openClick();
-        }
-        showUserDetail() {
-        }
-        exit() {
+        };
+        view.prototype.exit = function () {
             if (typeof require === 'undefined') {
                 this.modalContent(infoDefine[this.languageIndex()].emailConform.formatError[11]);
                 return this.hacked(true);
             }
-            const { remote } = require('electron');
+            var remote = require('electron').remote;
             return remote.app.quit();
-        }
-    }
+        };
+        return view;
+    }());
     view_layout.view = view;
 })(view_layout || (view_layout = {}));
-const view = new view_layout.view();
-ko.applyBindings(view, document.getElementById('body'));
-$(`.${view.tLang()}`).addClass('active');
+var _view = new view_layout.view();
+ko.applyBindings(_view, document.getElementById('body'));
+$("." + _view.tLang()).addClass('active');

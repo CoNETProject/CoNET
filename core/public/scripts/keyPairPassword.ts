@@ -4,11 +4,12 @@ class keyPairPassword {
 	public passwordChecking = ko.observable ( false )
 	public inputFocus = ko.observable ( false )
 	constructor ( private exit: () => void ) {
-		this.systemSetup_systemPassword.subscribe ( newValue => {
+		const self = this
+		this.systemSetup_systemPassword.subscribe ( function newValue() {
 			if ( !newValue || !newValue.length ) {
-				return 
+				return
 			}
-			this.showPasswordErrorMessage ( false )
+			self.showPasswordErrorMessage ( false )
 		})
 	}
 	private showPasswordError() {
@@ -19,18 +20,19 @@ class keyPairPassword {
 			movePopup: false
 		})
 	}
-	public keyPair_checkPemPasswordClick = () => {
+	public keyPair_checkPemPasswordClick = function () {
+		const self = this
 		this.showPasswordErrorMessage ( false )
 		if ( !this.systemSetup_systemPassword() || this.systemSetup_systemPassword().length < 5 ) {
 			return this.showPasswordError ()
 		}
 		this.passwordChecking ( true )
-		return socketIo.emit ( 'checkPemPassword', this.systemSetup_systemPassword(), err => {
-			this.passwordChecking ( false )
+		return socketIo.emit ( 'checkPemPassword', this.systemSetup_systemPassword(), function (err) {
+			self.passwordChecking ( false )
 			if ( err ) {
-				return this.showPasswordError()
+				return self.showPasswordError()
 			}
-			return this.exit()
+			return self.exit()
 		})
 	}
 }

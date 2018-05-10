@@ -150,7 +150,6 @@ interface StringValidator {
 }
 interface INewKeyPair {
     email: string
-    keyLength: string
     nikeName: string
     password: string
 }

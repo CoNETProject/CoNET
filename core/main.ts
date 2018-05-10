@@ -14,6 +14,12 @@
  * limitations under the License.
  */
 
- import LocalServer from './localWebServer'
- const test = process.argv[2] ? true : false 
- const localServer = new LocalServer ( test )
+import LocalServer from './localWebServer'
+const test = /^true$/.test ( process.argv[2] ) ? true : false
+const _start = process.argv[3] || false
+ export const start = () => {
+	const localServer = new LocalServer ( test )
+ }
+if ( _start ) {
+	start ()
+}

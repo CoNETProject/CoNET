@@ -1,17 +1,18 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 /// <reference path="../CoNET.d.ts" />
-const Fs = require("fs");
-const Path = require("path");
-const Os = require("os");
-const Async = require("async");
-const Crypto = require("crypto");
-const OpenPgp = require("openpgp");
+var Fs = require("fs");
+var Path = require("path");
+var Os = require("os");
+var Async = require("async");
+var Crypto = require("crypto");
+var OpenPgp = require("openpgp");
+var Util = require("util");
 /**
  * 		define
  */
-const InitKeyPair = () => {
-    const keyPair = {
+var InitKeyPair = function () {
+    var keyPair = {
         publicKey: null,
         privateKey: null,
         keyLength: null,
@@ -24,21 +25,21 @@ const InitKeyPair = () => {
     };
     return keyPair;
 };
-exports.QTGateFolder = Path.join(Os.homedir(), '.QTGate');
+exports.QTGateFolder = Path.join(!/^android$/i.test(process.platform) ? Os.homedir() : Path.join(__dirname, "../../../../.."), '.CoNET');
 exports.QTGateLatest = Path.join(exports.QTGateFolder, 'latest');
 exports.QTGateTemp = Path.join(exports.QTGateFolder, 'tempfile');
 exports.QTGateVideo = Path.join(exports.QTGateTemp, 'videoTemp');
 exports.ErrorLogFile = Path.join(exports.QTGateFolder, 'systemError.log');
 exports.CoNET_Home = Path.join(__dirname);
-exports.LocalServerPortNumber = 2000;
+exports.LocalServerPortNumber = 3000;
 exports.configPath = Path.join(exports.QTGateFolder, 'config.json');
-const packageFilePath = Path.join('..', '..', 'package.json');
+var packageFilePath = Path.join('..', '..', 'package.json');
 exports.packageFile = require(packageFilePath);
 exports.QTGateSignKeyID = /3acbe3cbd3c1caa9/i;
-exports.checkFolder = (folder, CallBack) => {
-    Fs.access(folder, err => {
+exports.checkFolder = function (folder, CallBack) {
+    Fs.access(folder, function (err) {
         if (err) {
-            return Fs.mkdir(folder, err1 => {
+            return Fs.mkdir(folder, function (err1) {
                 if (err1) {
                     return CallBack(err1);
                 }
@@ -48,44 +49,46 @@ exports.checkFolder = (folder, CallBack) => {
         return CallBack();
     });
 };
-exports.convertByte = (byte) => {
+exports.convertByte = function (byte) {
     if (byte < 1000) {
-        return `${byte} B`;
+        return byte + " B";
     }
-    const kbyte = Math.round(byte / 10.24) / 100;
+    var kbyte = Math.round(byte / 10.24) / 100;
     if (kbyte < 1000) {
-        return `${kbyte} KB`;
+        return kbyte + " KB";
     }
-    const mbyte = Math.round(kbyte / 10) / 100;
+    var mbyte = Math.round(kbyte / 10) / 100;
     if (mbyte < 1000) {
-        return `${mbyte} MB`;
+        return mbyte + " MB";
     }
-    const gbyte = Math.round(mbyte / 10) / 100;
+    var gbyte = Math.round(mbyte / 10) / 100;
     if (gbyte < 1000) {
-        return `${gbyte} GB`;
+        return gbyte + " GB";
     }
-    const tbyte = Math.round(mbyte / 10) / 100;
-    return `${tbyte} TB`;
+    var tbyte = Math.round(mbyte / 10) / 100;
+    return tbyte + " TB";
 };
-exports.checkSystemFolder = (CallBack) => {
-    return Async.series([
-        next => exports.checkFolder(exports.QTGateFolder, next),
-        next => exports.checkFolder(exports.QTGateLatest, next),
-        next => exports.checkFolder(exports.QTGateTemp, next),
-        next => exports.checkFolder(exports.QTGateVideo, next)
-    ], (err, kkk) => {
+exports.checkSystemFolder = function (CallBack) {
+    var callback = function (err, kkk) {
         if (err) {
-            console.log(`checkSystemFolder return error`, err);
+            console.log("checkSystemFolder return error", err);
             return CallBack(err);
         }
+        console.log("checkSystemFolder QTGateFolder = [" + exports.QTGateFolder + "]");
         return CallBack();
-    });
+    };
+    return Async.series([
+        function (next) { return exports.checkFolder(exports.QTGateFolder, next); },
+        function (next) { return exports.checkFolder(exports.QTGateLatest, next); },
+        function (next) { return exports.checkFolder(exports.QTGateTemp, next); },
+        function (next) { return exports.checkFolder(exports.QTGateVideo, next); }
+    ], callback);
 };
-exports.getLocalInterface = () => {
-    const ifaces = Os.networkInterfaces();
-    const ret = [];
-    Object.keys(ifaces).forEach(n => {
-        ifaces[n].forEach(iface => {
+exports.getLocalInterface = function () {
+    var ifaces = Os.networkInterfaces();
+    var ret = [];
+    Object.keys(ifaces).forEach(function (n) {
+        ifaces[n].forEach(function (iface) {
             if ('IPv4' !== iface.family || iface.internal !== false) {
                 // skip over internal (i.e. 127.0.0.1) and non-ipv4 addresses
                 return;
@@ -95,8 +98,8 @@ exports.getLocalInterface = () => {
     });
     return ret;
 };
-exports.InitConfig = () => {
-    const ret = {
+exports.InitConfig = function () {
+    var ret = {
         firstRun: true,
         alreadyInit: false,
         multiLogin: false,
@@ -119,47 +122,47 @@ exports.InitConfig = () => {
     };
     return ret;
 };
-const getBitLength = (key) => {
-    const algorithm = key.primaryKey.getAlgorithmInfo();
+var getBitLength = function (key) {
+    var algorithm = key.primaryKey.getAlgorithmInfo();
     return algorithm.bits;
 };
-const getKeyId = (key) => {
-    const algorithm = key.primaryKey.getAlgorithmInfo();
+var getKeyId = function (key) {
+    var algorithm = key.primaryKey.getAlgorithmInfo();
     return algorithm.algorithm;
 };
-exports.getNickName = (str) => {
-    const uu = str.split('<');
+exports.getNickName = function (str) {
+    var uu = str.split('<');
     return uu[0];
 };
-exports.getEmailAddress = (str) => {
-    const uu = str.split('<');
+exports.getEmailAddress = function (str) {
+    var uu = str.split('<');
     return uu[1].substr(0, uu[1].length - 1);
 };
-exports.getQTGateSign = (user) => {
+exports.getQTGateSign = function (user) {
     if (!user.otherCertifications || !user.otherCertifications.length) {
         return null;
     }
-    let Certification = false;
-    user.otherCertifications.forEach(n => {
+    var Certification = false;
+    user.otherCertifications.forEach(function (n) {
         if (exports.QTGateSignKeyID.test(n.issuerKeyId.toHex().toLowerCase())) {
             return Certification = true;
         }
     });
     return Certification;
 };
-exports.getKeyPairInfo = (publicKey, privateKey, password, CallBack) => {
+exports.getKeyPairInfo = function (publicKey, privateKey, password, CallBack) {
     if (!publicKey || !privateKey) {
         return CallBack(new Error('no key'));
     }
-    const _privateKey = OpenPgp.key.readArmored(privateKey);
-    const _publicKey = OpenPgp.key.readArmored(publicKey);
+    var _privateKey = OpenPgp.key.readArmored(privateKey);
+    var _publicKey = OpenPgp.key.readArmored(publicKey);
     if (_privateKey.err || _publicKey.err) {
         return CallBack(new Error('no key'));
     }
-    const privateKey1 = _privateKey.keys[0];
-    const publicKey1 = _publicKey.keys;
-    const user = publicKey1[0].users[0];
-    const ret = InitKeyPair();
+    var privateKey1 = _privateKey.keys[0];
+    var publicKey1 = _publicKey.keys;
+    var user = publicKey1[0].users[0];
+    var ret = InitKeyPair();
     ret.publicKey = publicKey;
     ret.privateKey = privateKey;
     ret.keyLength = getBitLength(privateKey1);
@@ -167,23 +170,23 @@ exports.getKeyPairInfo = (publicKey, privateKey, password, CallBack) => {
     ret.createDate = privateKey1.primaryKey.created.toLocaleString();
     ret.email = exports.getEmailAddress(user.userId.userid);
     ret.verified = exports.getQTGateSign(user);
-    ret.publicKeyID = publicKey1[0].primaryKey.fingerprint;
+    ret.publicKeyID = publicKey1[0].primaryKey.fingerprint.toString('hex').toLocaleUpperCase();
     ret.passwordOK = false;
     if (!password) {
         return CallBack(null, ret);
     }
-    return privateKey1.decrypt(password).then(keyOK => {
+    return privateKey1.decrypt(password).then(function (keyOK) {
         ret.passwordOK = keyOK;
         return CallBack(null, ret);
-    }).catch(() => {
+    })["catch"](function () {
         return CallBack(null, ret);
     });
 };
-exports.emitConfig = (config, passwordOK) => {
+exports.emitConfig = function (config, passwordOK) {
     if (!config) {
         return null;
     }
-    const ret = {
+    var ret = {
         keypair: config.keypair,
         firstRun: config.firstRun,
         alreadyInit: config.alreadyInit,
@@ -202,15 +205,15 @@ exports.emitConfig = (config, passwordOK) => {
     };
     return ret;
 };
-exports.saveConfig = (config, CallBack) => {
+exports.saveConfig = function (config, CallBack) {
     return Fs.writeFile(exports.configPath, JSON.stringify(config), CallBack);
 };
-exports.checkConfig = (CallBack) => {
-    Fs.access(exports.configPath, err => {
+exports.checkConfig = function (CallBack) {
+    Fs.access(exports.configPath, function (err) {
         if (err) {
             return CallBack(null, exports.InitConfig());
         }
-        let config = null;
+        var config = null;
         try {
             config = require(exports.configPath);
         }
@@ -227,13 +230,36 @@ exports.checkConfig = (CallBack) => {
         if (!config.keypair || !config.keypair.publicKey) {
             return CallBack(null, config);
         }
-        return exports.getKeyPairInfo(config.keypair.publicKey, config.keypair.privateKey, null, (err, key) => {
+        return exports.getKeyPairInfo(config.keypair.publicKey, config.keypair.privateKey, null, function (err, key) {
             if (err) {
                 CallBack(err);
-                return console.log(`checkConfig getKeyPairInfo error`, err);
+                return console.log("checkConfig getKeyPairInfo error", err);
             }
+            console.log("getKeyPairInfo = [" + Util.inspect(key) + "]");
             config.keypair = key;
             return CallBack(null, config);
         });
+    });
+};
+exports.newKeyPair = function (emailAddress, nickname, password, CallBack) {
+    var userId = {
+        name: nickname,
+        email: emailAddress
+    };
+    var option = {
+        passphrase: password,
+        userIds: [userId],
+        curve: "ed25519"
+    };
+    console.log(Util.inspect(option));
+    return OpenPgp.generateKey(option).then(function (keypair) {
+        var ret = {
+            publicKey: keypair.publicKeyArmored,
+            privateKey: keypair.privateKeyArmored
+        };
+        return CallBack(null, ret);
+    })["catch"](function (err) {
+        // ERROR
+        return CallBack(err);
     });
 };

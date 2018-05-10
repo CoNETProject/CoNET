@@ -1,4 +1,4 @@
-const uuid_generate = () => {
+const uuid_generate = function () {
     let lut: Array < string > = [];
     for ( let i = 0; i < 256; i++ ) {
         lut [i] = ( i < 16 ? '0' : '') + ( i ).toString ( 16 );
@@ -12,7 +12,8 @@ const uuid_generate = () => {
         lut [ d2 & 0x3f | 0x80 ]+ lut [ d2 >> 8 & 0xff ] + '-' + lut [ d2 >> 16 & 0xff]+ lut [ d2 >> 24 & 0xff ] +
         lut [ d3 & 0xff ]+ lut [ d3 >> 8 & 0xff ] + lut [ d3 >> 16 & 0xff] + lut [ d3 >> 24 & 0xff ];
 }
-const uuID = () => {
+
+const uuID = function () {
     return uuid_generate().replace( /-/g,'')
 }
 
@@ -104,7 +105,7 @@ const Menu = {
 
 enum lang { 'zh', 'ja', 'en', 'tw' }
 
-const initLanguageCookie = () => {
+const initLanguageCookie = function () {
     var cc: string = $.cookie( cookieName )
     
     if ( !cc ) {
@@ -133,7 +134,8 @@ const initLanguageCookie = () => {
 const DayTime = 1000 * 60 * 60 * 24
 const monthTime = 30 * DayTime
 const yearTime = 12 * monthTime
-const getPlanPrice = ( plan: string, isAnnualPlan: boolean ) => {
+
+const getPlanPrice = function ( plan: string, isAnnualPlan: boolean ) {
 	switch ( plan ) {
 		//		1GB/month 100MB/day
 		case 'free': {
@@ -167,7 +169,7 @@ const getPlanPrice = ( plan: string, isAnnualPlan: boolean ) => {
 	}
 }
 
-const nextExpirDate = ( expire: string ) => {
+const nextExpirDate = function ( expire: string ) {
     const now = new Date ()
     const _expire = new Date ( expire )
     _expire.setHours ( 0,0,0,0 )
@@ -186,13 +188,13 @@ const nextExpirDate = ( expire: string ) => {
     return _expire
 }
 
-const getRemainingMonth = ( expire: string ) => {
+const getRemainingMonth = function ( expire: string ) {
     const _expire = new Date ( expire )
     const _nextExpirDate = nextExpirDate ( expire )
     return _expire.getFullYear () === _nextExpirDate.getFullYear () ? _expire.getMonth() - _nextExpirDate.getMonth() : ( 12 - _nextExpirDate.getMonth() + _expire.getMonth() )
 }
 
-const getAmount = ( amount ) => {
+const getAmount = function ( amount ) {
     if ( !amount )
         return null
     if ( typeof amount === 'number' ) {
@@ -201,7 +203,8 @@ const getAmount = ( amount ) => {
     const ret = amount.split('.')
     return ret.length === 1 ? amount + '.00' : amount 
 }
-const getCurrentPlanCancelBalance = ( expiration: string, planName: string ) => {
+
+const getCurrentPlanCancelBalance = function ( expiration: string, planName: string ) {
 	
     const price = getPlanPrice ( planName, true )
     const normalPrice = getPlanPrice ( planName, false )
@@ -210,7 +213,7 @@ const getCurrentPlanCancelBalance = ( expiration: string, planName: string ) => 
 	return passedCost > 0 ? passedCost : 0
 }
 
-const getExpire = ( startDate: string, isAnnual: boolean ) => {
+const getExpire = function ( startDate: string, isAnnual: boolean ) {
 	const start = new Date( startDate )
 	const now = new Date ()
 	const passedMonth = Math.round (( now.getTime () - start.getTime () ) / monthTime - 0.5 )
@@ -218,7 +221,7 @@ const getExpire = ( startDate: string, isAnnual: boolean ) => {
 	return start
 }
 
-const getCurrentPlanUpgradelBalance = ( expiration: string, planName: string, isAnnual: boolean ) => {
+const getCurrentPlanUpgradelBalance = function ( expiration: string, planName: string, isAnnual: boolean ) {
 	if ( !isAnnual ) {
         return getPlanPrice ( planName, false )
     }
@@ -267,7 +270,7 @@ const infoDefine = [
             paymentProblem1: '支付遇到问题',
             paymentProblem:'您的当前所在区域看上去银行网关被和谐，您可以使用CoNET网关支付来完成支付',
             QTGatePayRisk: '使用CoNET安全网关支付，如果您有安全疑虑，请使用Stript安全网关支付。',
-            CancelSuccess: ( PlanExpire: string, isAnnual: boolean, returnAmount: number ) => {
+            CancelSuccess: function ( PlanExpire: string, isAnnual: boolean, returnAmount: number ) {
                 return `中止订阅成功。您可以一直使用您的原订阅到${ new Date( PlanExpire) .toLocaleDateString() }为止。以后您将会自动成为CoNET免费用户，可以继续使用CoNET的各项免费功能。${ isAnnual ? `退款金额us$${ returnAmount }会在5个工作日内退还到您的支付卡。`: '下月起CoNET系统不再自动扣款。'} 祝您网络冲浪愉快。`
             },
             currentPlan:'当前订阅: ',
@@ -299,8 +302,8 @@ const infoDefine = [
             paymentSuccessTitile: '謝謝您',
             paymentSuccess:'您的订阅已经完成，数据流量限制已经被更新。祝您网络冲浪愉快。',
             qtgateTeam: 'CoNET开发团队敬上',
-            monthlyAutoPay:( monthCost: number ) => { return `<span>每月自动扣款</span><span class="usDollar">@ us$</span><span class="amount">${ monthCost }</span>/月<span>` },
-            annualPay: ( annual_monthlyCost: string ) => { return `<span>年付款每月只需</span><span class="usDollar">@ us$</span><span class="amount" >${ getAmount (( Math.round ( parseInt( annual_monthlyCost ) / 0.12 ) / 100 ).toString()) }</span>/月<span>`},
+            monthlyAutoPay: function ( monthCost: number ) { return `<span>每月自动扣款</span><span class="usDollar">@ us$</span><span class="amount">${ monthCost }</span>/月<span>` },
+            annualPay: function ( annual_monthlyCost: string ) { return `<span>年付款每月只需</span><span class="usDollar">@ us$</span><span class="amount" >${ getAmount (( Math.round ( parseInt( annual_monthlyCost ) / 0.12 ) / 100 ).toString()) }</span>/月<span>`},
             monthlyPay:'月收费',
             expirationYear: '信用卡期限',
             payAmountTitile:'合计支付金额',
@@ -317,7 +320,7 @@ const infoDefine = [
             multiRegion:['单一代理区域并发代理','多代理区域混合并发代理','多代理区域混合并发代理','多代理区域混合并发代理'],
             downGradeMessage:'您正在操作降级您的订阅，如果操作成功您将从下月您的订阅之日起，实行新的订阅，如果您是。',
             cancelPlanMessage:'CoNET的订阅是以月为基本的单位。您的月订阅将在下月您的订阅起始日前被终止，您可以继续使用您的本月订阅计划，您将自动回到免费用户。如果您是每月自动扣款，则下月将不再扣款。如果您是年度订阅计划，您的退款将按普通每月订阅费，扣除您已经使用的月份后计算的差额，将自动返还您所支付的信用卡账号，如果您是使用促销码，或您是测试用户，您的终止订阅将不能被接受。',
-            cancelPlanMessage1: ( planName: string, isAnnual: boolean, expire: string ) => {
+            cancelPlanMessage1: function ( planName: string, isAnnual: boolean, expire: string ) {
                 return `<span>您的订阅计划是${ isAnnual ? `年度订阅，退还金额将按照您已付年订阅费 </span><span class="usDollar">us$</span><span class="amount">${ getPlanPrice ( planName, true )}</span> - 该订阅原价 <span class="usDollar">us$</span><span class="amount">${ getPlanPrice( planName, false )}</span><span> X 已使用月数(包括本月) </span><span class="amount">${ 12 - getRemainingMonth ( expire )}</span> = 应该退还的金额 <span class="usDollar">us$</span><span class="amount">${ getCurrentPlanCancelBalance ( expire, planName )}</span><span>，将在7个工作日内，退还到您原来支付的信用卡账户。</span>`: `月订阅，您的订阅将下次更新日</span><span class="amount">${ nextExpirDate( expire ).toLocaleDateString() }</span><span>时不再被自动扣款和更新。</span>`}`
             }
         },
@@ -506,7 +509,7 @@ const infoDefine = [
             KeypairLength: '请选择加密通讯用密钥对长度：这个数字越大，通讯越难被破解，但会增加通讯量和运算时间。',
             GenerateKeypair: '<em>系统正在生成用于通讯和签名的RSA加密密钥对，计算机需要运行产生大量的随机数字有，可能需要几分钟时间，尤其是长度为4096的密钥对，需要特别长的时间，请耐心等待。关于RSA加密算法的机制和原理，您可以访问维基百科：' +
                 `<a href='https://zh.wikipedia.org/wiki/RSA加密演算法' target="_blank" onclick="return linkClick ('https://zh.wikipedia.org/wiki/RSA加密演算法')" >https://zh.wikipedia.org/wiki/RSA加密演算法</a></em>`,
-            inputEmail: '让我们来完成设定的最后几个步骤，首先生成RSA密钥对, 它是您的系统信息加密，身份认证及和CoNET网络通讯使用的重要工具。 RSA密钥对的密码请妥善保存，Email地址栏应填入您的常用邮箱地址, 它将被用作您的CoNET网络账号。 <em style="color:red;">需注意的是CoNET域名在某些网络限制地区被列入屏蔽名单，如果您使用的是网络限制地区邮箱服务，您将有可能由于接收不到CoNET发回的账号确认Email，而不能够完成CoNET的设定。</em>',
+            inputEmail: '让我们来完成设定的最后几个步骤，首先生成RSA密钥对, 它是您的系统信息加密，身份认证及和CoNET网络通讯使用的重要工具。 RSA密钥对的密码请妥善保存，Email地址栏应填入您的常用邮箱地址, 它将被用作您的CoNET网络账号。 <em style="color:brown;">需注意的是CoNET域名在某些网络限制地区可能被列入黑名单，请使用网络自由地区邮箱。</em>',
             accountEmailInfo: '由于QTGate域名在某些国家和地区被防火墙屏蔽，而不能正常收发Email，如果您是处于防火墙内的用户，建议使用防火墙外部的邮件服务商。'
         },
 
@@ -544,19 +547,19 @@ const infoDefine = [
             offlineError: '您的电脑未连接到互联网，请检查网络后再次尝试！',
             imapErrorMessage: [
                 '未能链接CoNET网络。 CoNET网络可能存在问题，请稍后再次尝试。或联系CoNET服务。 ',
-                '数据格式错误，请重试',
-                '您的电脑未连接到互联网，请检查网络后再次尝试！ ',
-                'Email服务器提示IMAP用户名或密码错！这个错误通常是由于您使用的密码是普通密码，或者您的APP密码已失效，请到您的Email帐户检查您的APP密码，然后再试一次。 ',
-                'Email服务器的指定连接埠连结失败，请检查您的IMAP连接埠设定，如果您在一个防火墙内部，则有可能该端口被防火墙所屏蔽，您可以尝试使用该IMAP伺服器的其他连接埠！ <a href="data-html"></a>',
-                '服务器证书错误！您可能正在连接到一个仿冒的Email服务器，如果您肯定这是您希望连接的服务器，请在IMAP详细设定中选择忽略证书错误。 ',
-                '无法获得Email服务器域名信息，请检查您的Email服务器设定！或者您的电脑没有互联网，请检查您的互联网状态。 ',
-                '此Email服务器看来可能不能使用CoNET网络通讯技术，请再测试一次或选择其他email服务供应商！ ',
-                'Email服务器提示SMTP用户名或密码错！ ',
-                '服务器证书错误！您可能正在连接到一个仿冒的Email服务器，如果您肯定这是您希望连接的服务器，请在SMTP详细设定中选择忽略证书错误。 ',
-                'SMTP连结提示未知错误',
-                '存在相同Email账号',
-                '您的系统还未连接到CoNET网络！ ',
-                '您的邮箱提示您账号已无可使用容量，请清理邮箱后再试'
+                '数据格式错误，请重试',
+                '您的电脑未连接到互联网，请检查网络后再次尝试！ ',
+                'Email服务器提示IMAP用户名或密码错！这个错误通常是由于您使用的密码是普通密码，或者您的APP密码已失效，请到您的Email帐户检查您的APP密码，然后再试一次。 ',
+                'Email服务器的指定连接埠连结失败，请检查您的IMAP连接埠设定，如果您在一个防火墙内部，则有可能该端口被防火墙所屏蔽，您可以尝试使用该IMAP伺服器的其他连接埠！ <a href="data-html"></a>',
+                '服务器证书错误！您可能正在连接到一个仿冒的Email服务器，如果您肯定这是您希望连接的服务器，请在IMAP详细设定中选择忽略证书错误。 ',
+                '无法获得Email服务器域名信息，请检查您的Email服务器设定！或者您的电脑没有互联网，请检查您的互联网状态。 ',
+                '此Email服务器看来可能不能使用CoNET网络通讯技术，请再测试一次或选择其他email服务供应商！ ',
+                'Email服务器提示SMTP用户名或密码错！ ',
+                '服务器证书错误！您可能正在连接到一个仿冒的Email服务器，如果您肯定这是您希望连接的服务器，请在SMTP详细设定中选择忽略证书错误。 ',
+                'SMTP连结提示未知错误',
+                '存在相同Email账号',
+                '您的系统还未连接到CoNET网络！ ',
+                '您的邮箱提示您账号已无可使用容量，请清理邮箱后再试'
             ]
         },
 
@@ -665,17 +668,17 @@ const infoDefine = [
             comesoon:'即将推出',
             information: 'CoNET应用程序',
             app:['CoVPN','Co','Co雲存儲','Co郵箱','Co新聞頻道','CoNet業務訂製','Co谷歌','Co推特'],
-            qtgateGateway: 'CoNET提供的高質量上網技術iOPN和@OPN，在CoNET全球16個區域，當場定制您專屬的代理服務器，變換您的IP地址隱身無障礙的訪問互聯網',
-            dimmer: [
-                '高質量定制代理服務器，讓您隱身安全不受注意的網上沖浪。 ',
-                '推特風格隱身匿名去中心化不被封鎖的社交媒體',
-                '安全隱私文件存儲系統',
-                '隱身匿名郵件客戶端，免VPN訪問Gmail',
-                '提供免翻牆接受每日世界新聞',
-                'QTG承接定制各類公眾服務類及跨國企業私有APP業務',
-                '免代理匿名谷歌檢索客戶端',
-                '免代理匿名推特客戶端'
-            ]
+            qtgateGateway: 'CoNET提供的高質量上網技術iOPN和@OPN，在CoNET全球16個區域，當場定制您專屬的代理服務器，變換您的IP地址隱身無障礙的訪問互聯網',
+            dimmer: [
+                '高質量定制代理服務器，讓您隱身安全不受注意的網上沖浪。 ',
+                '推特風格隱身匿名去中心化不被封鎖的社交媒體',
+                '安全隱私文件存儲系統',
+                '隱身匿名郵件客戶端，免VPN訪問Gmail',
+                '提供免翻牆接受每日世界新聞',
+                'QTG承接定制各類公眾服務類及跨國企業私有APP業務',
+                '免代理匿名谷歌檢索客戶端',
+                '免代理匿名推特客戶端'
+            ]
         }, 
 
         useInfoAndroid: {
@@ -871,7 +874,7 @@ const infoDefine = [
             QTGatePayRisk: 'CoNETセキュリティ経由でお支払いです。遠慮の場合はStripeセキュリティでのお支払いをしてください。',
             paymentProblem1:'支払い支障がある',
             paymentProblem:'あなた現在いる所在地ではバンク支払いがブラックされている模様です。CoNET経由でのお支払いをしてください。',
-            CancelSuccess:( PlanExpire: string, isAnnual: boolean, returnAmount: number ) => {
+            CancelSuccess: function ( PlanExpire: string, isAnnual: boolean, returnAmount: number ) {
                 return `プランキャンセルしました。${ new Date (PlanExpire).toLocaleDateString() }まで、元プランのままCoNETサービスが使えます。そのあとはCoNETのフリーユーザーと戻ります。${ isAnnual? `元プラン残りus$ ${ returnAmount }は５日ウォキンデイ内お支払い使ったカードに戻ります`:`プラン代自動落しは中止されます`}。これからもよろしくお願い申し上げます。`
             },
             paymentSuccess:'あなたのプランをアップグレードしました。これからもよろしくお願い申し上げます。',
@@ -908,12 +911,12 @@ const infoDefine = [
             payAmountTitile:'お支払い金額合計',
             cardNumber: 'クレジットカード番号',
             multiOpn:'OPN並列ゲットウェイ技術',
-            monthlyAutoPay:( monthCost: number ) => { return `<span>口座振替</span><span class="usDollar" >@ us$</span><span class="amount" >${ monthCost }</span>/月<span>` },
+            monthlyAutoPay: function ( monthCost: number ) { return `<span>口座振替</span><span class="usDollar" >@ us$</span><span class="amount" >${ monthCost }</span>/月<span>` },
             cvcNumber: 'セキュリティコード',
             calcelPayment:'キャンセル',
             doPayment:'お支払いにします',
             postcodeTitle: 'カード所有者郵便番号',
-            annualPay:( annual_monthlyCost: string ) => { return `<span>年払いと月換算</span><span class="usDollar">@ us$</span><span class="amount" >${ getAmount (( Math.round ( parseInt( annual_monthlyCost ) / 0.12 ) / 100 ).toString()) }</span>/月<span>`},
+            annualPay: function ( annual_monthlyCost: string ) { return `<span>年払いと月換算</span><span class="usDollar">@ us$</span><span class="amount" >${ getAmount (( Math.round ( parseInt( annual_monthlyCost ) / 0.12 ) / 100 ).toString()) }</span>/月<span>`},
             aboutCancel: 'プランをキャンセルについて',
             expirationYear: 'カード期限',
             canadaCard:'*おカード所有者はカナダ所在者とGST(BC)5.0% 自動加算されます',
@@ -925,7 +928,7 @@ const infoDefine = [
             serverShareData1:'並列ゲットウェイ技術を使う際に、同時使う数が独占数を超える場合には、独占リソースを他人と割合にチェアする場合もあります。',
             maxmultigateway: ['最大二つ並列ゲットウェイ','最大四つ並列ゲットウェイ*','最大四つ並列ゲットウェイ'],
             cancelPlanMessage:'CoNETプランは月毎に計算し、来月のあなたの最初加入した日まで、今のプランのままご利用ですます。キャンセルした日から自動的にCoNETの無料ユーザーになります。おアカウトは(月)払いの場合は、来月の自動払いは中止となります。年払いの場合は、ご使った分に月普通料金と計算し控除してから、お支払いを使ったクレジットカードに戻ります。販促コードまたはテストユーザーにはキャンセルすることができません。',
-            cancelPlanMessage1: ( planName: string, isAnnual: boolean, expire: string ) => {
+            cancelPlanMessage1: function ( planName: string, isAnnual: boolean, expire: string ) {
                 return `<span>あなたのプランは${ isAnnual ? `一年契約です。キャンセルをした場合は、ご利用して頂いた月に普通料金と請求を計算されます。お返し金額は，お支払って頂いたプラン年契約料金 </span><span class="usDollar">us$</span><span class="amount">${ getPlanPrice ( planName, true )}</span><span> - そのプランの普通月料金 </span><span class="usDollar">us$</span><span class="amount">${ getPlanPrice( planName, false )}</span><span> X ご利用して頂いた月(本月も含めて)：</span><span class="amount">${ 12 - getRemainingMonth ( expire )}</span><span> = 戻る金額 </span><span class="usDollar">us$</span><span class="amount">${ getCurrentPlanCancelBalance ( expire, planName )}</span><span>とまります。７日内お支払って頂いたクレジットカードへ返金とします。</span>`: `月プランです。キャンセルにすると次の更新日</span><span class="amount">${ nextExpirDate( expire ).toLocaleDateString() }</span><span>に自動更新はしませんです。</span>`}`
             }
         },
@@ -1267,7 +1270,7 @@ const infoDefine = [
             systemAdministratorEmail: 'RSA暗号鍵ペア生成',
             GenerateKeypair: '<em>強秘匿性通信するのために、RSA暗号鍵ペアを生成中、大量なランダム数字が発生し、数分かかる場合もあります、4096ビットの場合、特に時間がかかります、しばらくお待ち下さい。RSA暗号技術について、ウィキペディア百科辞典を参考してください：' +
                 `<a href='https://ja.wikipedia.org/wiki/RSA暗号' target="_blank" onclick="return linkClick ('https://ja.wikipedia.org/wiki/RSA暗号')">https://ja.wikipedia.org/wiki/RSA暗号</a></em>`,
-            inputEmail: 'お疲れ様です、最後の設定をしましょう。このRSA暗号鍵ペアは本システムに重要な存在です、ユーザーのCoNETへ身元証明、本システムデータを秘密化、CoNETシステムとデータ通信時この暗号鍵ペアを使います。パースワードはCoNETへ保存しませんですから、大事にメモしてください。<em style="color:red;">CoNETはネットワークの制限があるエリアにブラックリスト入っております、あなたはCoNETからのemailは受信不能になりますから、CoNETユーザへ登録完了することができない恐れがございます。</em>',
+            inputEmail: 'お疲れ様です、最後の設定をしましょう。このRSA暗号鍵ペアは本システムに重要な存在です、ユーザーのCoNETへ身元証明、本システムデータを秘密化、CoNETシステムとデータ通信時この暗号鍵ペアを使います。パースワードはCoNETへ保存しませんですから、大事にメモしてください。<em style="color:brown;">CoNETはネットワークの制限があるエリアにブラックリスト入って恐れがあります、ここに制限があるエリアのメールサービスを入れるとCoNETからのメールが受信不能になる可能性もあります、CoNETへ登録完了することができない場合もあります。</em>',
             accountEmailInfo:'CoNETドメイン名は、ファイヤウォールがある場合はブラックリストに入っている可能性がありますから、CoNETシステムへ登録完了することができません。その場合はファイヤウォール外側のEmailシステムを利用してください。'
         },
 
@@ -1473,7 +1476,7 @@ const infoDefine = [
             paymentSuccess:'Your plan has beed upgraded.',
             qtgateTeam: 'The CoNET Team',
             networkShareTitle:'Bandwidth',
-            CancelSuccess: ( PlanExpire: string, isAnnual: boolean, returnAmount: number ) => {
+            CancelSuccess: function ( PlanExpire: string, isAnnual: boolean, returnAmount: number ) {
                 return `Your subscriptions was cancelled. You may keep use CoNET service with this plan until ${ new Date( PlanExpire ).toLocaleDateString() }. Restrictions apply to free accounts and accounts using promotions. ${ isAnnual ? `Refund amount us$${ returnAmount } will return to your paid card account in 5 working day.` : `Automatically canceled.` } `
             },
             currentPlanExpire: ['Plan expires on: ','Renews at','monthly reset day '],
@@ -1502,7 +1505,7 @@ const infoDefine = [
             multiOpn:'OPN multi-gateway technology',
             MonthBandwidthTitle1:'Bandwidth',
             serverShare:'Gateway',
-            monthlyAutoPay: ( monthCost: number ) => { return `<span>Billed Monthly</span><span class="usDollar" >@ us$</span><span class="amount" >${ monthCost }</span>/mo<span>` },
+            monthlyAutoPay: function ( monthCost: number ) { return `<span>Billed Monthly</span><span class="usDollar" >@ us$</span><span class="amount" >${ monthCost }</span>/mo<span>` },
             cardNumber: 'Card number',
             paymentProcessing:'Connecting...',
             calcelPayment:'Cancel',
@@ -1511,7 +1514,7 @@ const infoDefine = [
             postcodeTitle: 'Card owner postcode',
             payAmountTitile:'Amount',
             cvcNumber: 'Card Security Code',
-            annualPay:( annual_monthlyCost: string ) => { return `<span>Billed Annually</span><span class="usDollar">@ us$</span><span class="amount" >${ getAmount (( Math.round ( parseInt( annual_monthlyCost ) / 0.12 ) / 100 ).toString()) }</span>/mo<span>`},
+            annualPay: function ( annual_monthlyCost: string ) { return `<span>Billed Annually</span><span class="usDollar">@ us$</span><span class="amount" >${ getAmount (( Math.round ( parseInt( annual_monthlyCost ) / 0.12 ) / 100 ).toString()) }</span>/mo<span>`},
             canadaCard:'*For Canadian residents, GST (5%) will be applied automatically.',
             multiRegion:['multi-gateway in single region','multi-gateway in multi-regions*','multi-gateway in multi-regions*','multi-gateway in multi-regions'],
             continue:'Next step',
@@ -1522,7 +1525,7 @@ const infoDefine = [
             aboutCancel: '*About Subscription cancellation',
             cancelPlanMessage: '<span>You may cancel your CoNET subscription at any time from within the this app. You will continue to have access to the CoNET services through the end of your paid period until all remaining subscription time in your account is used up. Please refer to the </span><a class="ui olive tiny label">Terms of Service</a> for cancellation and refund policy. Restrictions may apply to free plans and promotional accounts.',
             serverShareData1:'Your dedicated server will be share ratio when you connected over your dedicated count via use Multi-gateway technology.',
-            cancelPlanMessage1: ( planName: string, isAnnual: boolean, expire: string ) => {
+            cancelPlanMessage1: function ( planName: string, isAnnual: boolean, expire: string ) {
                 return `<span>Your are on ${ isAnnual ? `annual payment plan</span><span class="usDollar">us$</span><span class="amount">${ getPlanPrice ( planName, true )}</span><span>. ${ getRemainingMonth ( expire )} month${ getRemainingMonth ( expire ) > 1 ? 's': '' } are available on your account. Your refund amount will be </span><span class="usDollar">us$</span><span class="amount">${ getCurrentPlanCancelBalance ( expire, planName )}</span>.`: `monthly, it will not be renew at </span><span class="amount">${ nextExpirDate ( expire ).toLocaleDateString() }</span><span> if you cancel this plan.</span>`}`
             }
         },
@@ -2057,7 +2060,7 @@ const infoDefine = [
             okTitle:'Send to CoNET'
         },
 
-	}, {
+	},{
         perment:{
             serverTitle:'伺服器'
         },
@@ -2112,7 +2115,7 @@ const infoDefine = [
             paymentProblem:'您目前的所在區域看上去銀行網關被和諧，您可以使用CoNET網關支付來完成支付',
             title: '賬戶管理',
             currentPlanExpire: ['訂閱截止日期：','下一次自動續訂日','每月數據重置日'],
-            CancelSuccess: ( PlanExpire: string, isAnnual: boolean, returnAmount: number ) => {
+            CancelSuccess: function ( PlanExpire: string, isAnnual: boolean, returnAmount: number ) {
                 return `中止訂閱成功。您可以一直使用您的原訂閱到${ new Date (PlanExpire).toLocaleDateString() }為止。以後您將會自動成為CoNET免費用戶，可以繼續使用CoNET的各項免費功能。 ${ isAnnual ? `退款金額us$${ returnAmount }會在5個工作日內退還到您的支付卡。 `: '下月起CoNET系統不再自動扣款。 '} 祝您網絡衝浪愉快。`
             },
             currentAnnualPlan: ['月度訂閱','年度訂閱'],
@@ -2140,8 +2143,8 @@ const infoDefine = [
             cancelPlan:'終止當前訂閱',
             cantCancelInformation: '您的賬戶可能是CoNET測試用戶，或使用優惠碼產生的訂閱用戶，此類賬戶可以升級但不能被中止',
             MonthBandwidthTitle1:'傳送限額',
-            monthlyAutoPay: (monthCost: number ) => { return `<span>每月自動扣款</span><span class="usDollar">@ us$</span><span class="amount" >${ monthCost }</span>/月<span>`},
-            annualPay: ( annual_monthlyCost: string ) => { return `<span>年付款每月只需</span><span class="usDollar">@ us$</span><span class="amount" >${ getAmount (( Math.round ( parseInt( annual_monthlyCost ) / 0.12 ) / 100 ).toString()) }</span>/月<span>`},
+            monthlyAutoPay: function (monthCost: number ) { return `<span>每月自動扣款</span><span class="usDollar">@ us$</span><span class="amount" >${ monthCost }</span>/月<span>`},
+            annualPay: function ( annual_monthlyCost: string ) { return `<span>年付款每月只需</span><span class="usDollar">@ us$</span><span class="amount" >${ getAmount (( Math.round ( parseInt( annual_monthlyCost ) / 0.12 ) / 100 ).toString()) }</span>/月<span>`},
             expirationYear: '信用卡期限',
             serverShare:'代理伺服器',
             cardNumber: '信用卡號',
@@ -2160,7 +2163,7 @@ const infoDefine = [
             internetShareData:['共享高速帶寬','獨享高速帶寬*','獨享雙線高速帶寬*','獨享四線高速帶寬'],
             serverShareData1:'OPN併發多代理技術，同時使用數大於獨占數時，會相應分享您所獨占的資源',
             cancelPlanMessage:'可隨時終止您的訂閱，CoNET的訂閱是以月為基本的單位。您的月訂閱將在下月您的訂閱起始日前被終止，您可以繼續使用您的本月訂閱計劃，您將自動回到免費用戶。如果您是每月自動扣款，則下月將不再扣款。如果您是年度訂閱計劃，您的退款將按普通每月訂閱費，扣除您已經使用的月份後計算的差額，將自動返還您所支付的信用卡賬號，如果您是使用促銷碼，或您是測試用戶，您的終止訂閱將不能被接受。 ',
-            cancelPlanMessage1: ( planName: string, isAnnual: boolean, expire: string ) => {
+            cancelPlanMessage1: function ( planName: string, isAnnual: boolean, expire: string ) {
                 return `<span>您的訂閱計劃是${ isAnnual ? `年度訂閱，退還金額將按照您已付年訂閱費</span><span class="usDollar">us$</span><span class="amount">${ getPlanPrice ( planName, true )}</span><span> - 該訂閱原價 </span><span class="usDollar">us$</span><span class="amount">${ getPlanPrice( planName, false )}</span><span> X 已使用月數(包括本月) </span><span class="amount">${ 12 - getRemainingMonth ( expire )}</span><span> = 餘額 </span><span class="usDollar">us$</span><span class="amount">${ getCurrentPlanCancelBalance ( expire, planName )}</span><span>，將在7個工作日內，退還到您用來支付的信用卡帳戶。</span>`: `月訂閱，您的訂閱將下次更新日</span><span class="amount">${ nextExpirDate (expire).toLocaleDateString() }</span><span>時不再被自動扣款和更新。</span>`}`
             }
         
@@ -2477,8 +2480,8 @@ const infoDefine = [
             stopCreateKeyPair: '停止生成密鑰對',
             creatKeyPair: '創建密鑰對..',
             keyPairCancel: '生成密鑰對被中止',
-            keyPairGenerateError: '生成密鑰對發生系統錯誤，請重試！ ',
-            keyPairGenerateSuccess: '完成生成密鑰對',
+            keyPairGenerateError: '生成密鑰對發生系統錯誤，請重試！ ',
+            keyPairGenerateSuccess: '完成生成密鑰對',
             cancel: '放棄操作',
             systemPassword: 'Q梯客戶端密碼設置',
             continueCreateKeyPair: '繼續生成',
@@ -2487,7 +2490,7 @@ const infoDefine = [
             systemAdministratorEmail:'RSA密鑰生成',
             GenerateKeypair: '<em>系統正在生成用於通訊和簽名的RSA加密密鑰對，計算機需要運行產生大量的隨機數字，可能需要幾分鐘時間，尤其是長度為4096的密鑰對，需要特別長的時間，請耐心等待。關於RSA加密算法的機制和原理，您可以訪問維基百科：' +
                 `<a href='#' target="_blank" onclick="return linkClick ('https://zh.wikipedia.org/wiki/RSA加密演算法')">https://zh.wikipedia.org/wiki/RSA加密演算法</a></em>`,
-            inputEmail: '让我们来完成设定的最后几个步骤，首先生成RSA密鑰對, 它是您的系統信息加密，身份認證及和CoNET網絡通訊使用的重要工具。 RSA密鑰對的密碼請妥善保存，Email地址欄應填入您的常用邮箱地址, 它將被用作您的CoNET網絡賬號。<em style="color:red;">需注意的是CoNET域名在某些网络限制地区被列入屏蔽名单，如果您使用的是网络限制地区邮箱服务，您將有可能由于接收不到CoNET發回的賬號確認Email，而不能够完成CoNET的設定。</em>',
+            inputEmail: '让我们来完成设定的最后几个步骤，首先生成RSA密鑰對, 它是您的系統信息加密，身份認證及和CoNET網絡通訊使用的重要組成部分。 RSA密鑰對的密碼請妥善保存，Email地址欄請填入您的常用邮箱地址, 它將被用作您的CoNET網絡賬號。<em style="color:brown;">需注意的是CoNET域名在某些网络限制地区可能被列入黑名单，推薦使用網絡自由地區郵箱。</em>',
             accountEmailInfo: `由於CoNET域名在某些國家和地區被防火牆屏蔽，而不能正常收發CoNET的Email，如果您是處於防火牆內的用戶，建議使用防火牆外部的郵件服務商。`
         },
         
@@ -2639,6 +2642,6 @@ const infoDefine = [
 	}
 ]
 
-const linkClick = ( url: string ) => {
+const linkClick = function ( url: string ) {
     return window.open ( url, '_blank')
 }

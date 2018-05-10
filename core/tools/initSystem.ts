@@ -28,14 +28,14 @@ const InitKeyPair = () => {
 	return keyPair
 }
 
-export const QTGateFolder = Path.join ( Os.homedir(), '.QTGate' )
-export const QTGateLatest = Path.join ( QTGateFolder, 'latest' )
-export const QTGateTemp = Path.join ( QTGateFolder, 'tempfile' )
-export const QTGateVideo = Path.join ( QTGateTemp, 'videoTemp')
-export const ErrorLogFile = Path.join ( QTGateFolder, 'systemError.log' )
+export let QTGateFolder = Path.join (  !/^android$/i.test ( process.platform ) ? Os.homedir() : Path.join(__dirname,"../../../../.."), '.CoNET' )
+export let QTGateLatest = Path.join ( QTGateFolder, 'latest' )
+export let QTGateTemp = Path.join ( QTGateFolder, 'tempfile' )
+export let QTGateVideo = Path.join ( QTGateTemp, 'videoTemp')
+export let ErrorLogFile = Path.join ( QTGateFolder, 'systemError.log' )
 export const CoNET_Home = Path.join ( __dirname )
 
-export const LocalServerPortNumber = 2000
+export const LocalServerPortNumber = 3000
 export const configPath = Path.join ( QTGateFolder, 'config.json' )
 const packageFilePath = Path.join ( '..', '..','package.json')
 export const packageFile = require ( packageFilePath )
@@ -75,20 +75,24 @@ export const convertByte = ( byte: number ) => {
 	return `${ tbyte } TB`
 }
 
-export const checkSystemFolder = ( CallBack ) => {
+export const checkSystemFolder = CallBack => {
+	
+	const callback = ( err, kkk ) => {
+		if ( err ) {
+			console.log ( `checkSystemFolder return error`, err )
+			return CallBack ( err )
+		}
+		console.log (`checkSystemFolder QTGateFolder = [${ QTGateFolder }]`)
+		return CallBack ()
+	}
 	return Async.series ([
 		next => checkFolder ( QTGateFolder, next ),
         next => checkFolder ( QTGateLatest, next ),
         next => checkFolder ( QTGateTemp, next ),
         next => checkFolder ( QTGateVideo, next )
-	], ( err, kkk ) => {
-		if ( err ) {
-			console.log ( `checkSystemFolder return error`, err )
-			return CallBack ( err )
-		}
-		return CallBack ()
-	})
+	], callback )
 }
+
 export const getLocalInterface = () => {
 	const ifaces = Os.networkInterfaces()
 	const ret = []
@@ -149,6 +153,7 @@ export const getEmailAddress = ( str: string ) => {
 	const uu = str.split ('<')
 	return uu[1].substr( 0, uu[1].length -1 )
 }
+
 export const getQTGateSign = ( user: OpenPgp.key.users ) => {
     if ( !user.otherCertifications || !user.otherCertifications.length ) {
 		return null
@@ -184,7 +189,8 @@ export const getKeyPairInfo = ( publicKey: string, privateKey: string, password:
 	ret.createDate = privateKey1.primaryKey.created.toLocaleString ()
 	ret.email = getEmailAddress ( user.userId.userid )
 	ret.verified = getQTGateSign ( user )
-	ret.publicKeyID = publicKey1[0].primaryKey.fingerprint
+	
+	ret.publicKeyID = publicKey1[0].primaryKey.fingerprint.toString('hex').toLocaleUpperCase()
 	ret.passwordOK = false
 	if ( !password ) {
 		return CallBack ( null, ret )
@@ -227,8 +233,7 @@ export const saveConfig = ( config: install_config, CallBack ) =>{
 	return Fs.writeFile ( configPath, JSON.stringify ( config ), CallBack )
 }
 
-export const checkConfig = ( CallBack ) => {
-
+export const checkConfig = CallBack => {
 	Fs.access ( configPath, err => {
 		
 		if ( err ) {
@@ -253,14 +258,40 @@ export const checkConfig = ( CallBack ) => {
 		if ( !config.keypair || ! config.keypair.publicKey ) {
 			return CallBack ( null, config )
 		}
-		return getKeyPairInfo ( config.keypair.publicKey, config.keypair.privateKey, null, ( err, key ) => {
+		return getKeyPairInfo ( config.keypair.publicKey, config.keypair.privateKey, null, ( err, key: keypair ) => {
 			if ( err ) {
 				CallBack ( err )
 				return console.log (`checkConfig getKeyPairInfo error`, err )
 			}
+			console.log ( `getKeyPairInfo = [${ Util.inspect ( key) }]` )
 			config.keypair = key
 			return CallBack ( null, config )			
 		})
 
+	})
+}
+
+export const newKeyPair = ( emailAddress: string, nickname: string, password: string, CallBack ) => {
+	const userId = {
+		name: nickname,
+		email: emailAddress
+	}
+	const option: openpgp.KeyOptions = {
+		passphrase: password,
+		userIds: [userId],
+		curve: "ed25519"
+	}
+
+	console.log ( Util.inspect ( option ))
+	return OpenPgp.generateKey ( option ).then (( keypair: { publicKeyArmored: string, privateKeyArmored: string }) => {
+		
+		const ret: keyPair = {
+			publicKey: keypair.publicKeyArmored,
+			privateKey: keypair.privateKeyArmored
+		}
+		return CallBack ( null, ret )
+	}).catch ( err => {
+		// ERROR
+		return CallBack ( err )
 	})
 }

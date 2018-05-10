@@ -21,6 +21,7 @@ body {
 	background: -ms-linear-gradient(left, rgba(101,226,245,1) 0%, rgba(125,175,250,1) 100%);
 	background: linear-gradient(to right, rgba(101,226,245,1) 0%, rgba(125,175,250,1) 100%);
 	filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#65e2f5', endColorstr='#7daffa', GradientType=1 );
+	height: unset!important;
 }
 .welcome-bg {
 	position: fixed;

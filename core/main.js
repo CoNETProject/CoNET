@@ -14,7 +14,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
-const localWebServer_1 = require("./localWebServer");
-const test = process.argv[2] ? true : false;
-const localServer = new localWebServer_1.default(test);
+exports.__esModule = true;
+var localWebServer_1 = require("./localWebServer");
+var test = /^true$/.test(process.argv[2]) ? true : false;
+var _start = process.argv[3] || false;
+exports.start = function () {
+    var localServer = new localWebServer_1["default"](test);
+};
+if (_start) {
+    exports.start();
+}

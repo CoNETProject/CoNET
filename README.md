@@ -23,6 +23,7 @@ DDos Attack, Connecting Reset, Restrictive and Filtering, Surveillance, SSL man-
 - Bypass restriction and filtering
 - Ghost network
 
+
 CoNET’s users employ this network by connecting through the third-party public email server to establish a virtual tunnel rather than making a direct connection. CoNET is an effective censorship circumvention tool, allowing its users to reach otherwise blocked destinations or content. Along the same line, CoNET’s user leave their IP address in public email server, CoNET thus allowing both organizations and individuals to share information over public networks without compromising their privacy.
 
 CoNET looks like a ghost network because CoNET have not public IP address for connection. Network attack tools are losing their powers. CoNET allows node to host an anonymous website or server routing use email address.

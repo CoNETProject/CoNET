@@ -42,14 +42,10 @@ block jumbotron1
 								i.icon.tiny.warning( data-bind = " visible: ! verified " style = " color: white; margin-top: -4px;margin-left: -1px;")
 								i.icon.tiny.checkmark( data-bind = " visible: verified " style = " color: white; margin-top: -4px;margin-left: -1px;")
 					.meta
-						//-a( href="#" data-bind="click: () => { if ( !keyPair().passwordOK || !getCurrentPlan() ) return; UserPerment ( true );}" )
-						a( href="#" data-bind="click: $root.showUserDetail " )
-							i.icon.user
-							span( data-bind = " text: nikeName " )
-							span( data-bind = "visible: passwordOK ,text: infoDefine[ $root.languageIndex() ].QTGateGateway.userType[ $root.isFreeUser() ? 0 : 1]")
+						i.icon.user
+						span( data-bind = " text: nikeName " )
 					.description
 						p( data-bind = " text: infoDefine[ $root.languageIndex() ].Home_keyPairInfo_view.creatDate + createDate" )
-						p( data-bind = " text: infoDefine[ $root.languageIndex() ].Home_keyPairInfo_view.keyLength + keyLength" )
 						p( data-bind = " text: infoDefine[ $root.languageIndex() ].Home_keyPairInfo_view.keyID + publicKeyID" )
 					
 					.ui.bottom.right.attached.label.background-clolr-white( data-bind = " if: delete_btn_view && !showConform () && !showLoginPasswordField()")
@@ -101,32 +97,14 @@ block jumbotron1
 							.ui.input.focus.left.icon
 								i.icon.privacy
 								input( type = "password" z-index = "3" data-bind = " value: systemSetup_systemPassword, attr: { placeholder: infoDefine[ $root.languageIndex() ].Home_keyPairInfo_view.password, 'data-content' : passwordError() ? infoDefine[ $root.languageIndex() ].error_message.PasswordLengthError : null }, css: { 'activating element': passwordError() }" )
-						.field.required
-							.ui.info.message.displayNono( data-bind = " animate:{ animation: ['bounceIn','bounceOut'], state: keyLengthInfoShow, delay: 0 }, attr: { 'data-bind-show-name': keyLengthInfoShow ( false )}" )
-								i.icon.close( data-bind=" click: () => { return keyLengthInfoShow(false)}")
-								p.fg-grayLight( data-bind = "text: infoDefine [ $root.languageIndex() ].home_index_view.KeypairLength" )
-							.ui.compact.menu.green
-								a.item( data-bind = " css: { active: keyPairLengthSelect() === '2048' }, click: () => { tileClick( '2048' )}" style = "color: rgba(0,0,0,0.5)")
-									i.fa.fa-key
-									span 2048
-								a.item( data-bind = " css: { active: keyPairLengthSelect() === '3072' }, click: () => { tileClick( '3072' )}" style = "color: rgba(0,0,0,0.5)")
-									i.fa.fa-key
-									span 3072
-								a.item( data-bind = " css: { active: keyPairLengthSelect() === '4096' }, click: () => { tileClick( '4096' )}" style = "color: rgba(0,0,0,0.5)")
-									i.fa.fa-key
-									span 4096
-							i.icon.question.circle.outline.large.questionIcon( data-bind = "visible: ! keyLengthInfoShow (), click: () => { keyLengthInfoShow ( true )} " style = "color: rgba(200,150,30,0.9)" )
+						
 						button.ui.green.basic.button( type = "submit" data-bind = " text: infoDefine [ $root.languageIndex() ].home_index_view.creatKeyPair, click: form_AdministratorEmail_submit ")
 			.card.centered.raised( data-bind = "if: showKeyPairPorcess, visible: showKeyPairPorcess" style = "width: 100%;padding: 2em;")
 				.detail
 					p( data-bind = " html: infoDefine [ $root.languageIndex() ].home_index_view.GenerateKeypair ")
 					.keyPairProcessBar.ui.bottom.teal.attached.progress( style="margin-bottom: 1em;" data-value="1" data-total="100")
 						.bar
-					button.ui.negative.basic.button( data-bind= " text: infoDefine [ $root.languageIndex() ].home_index_view.cancel, click: () => { delete_btn_view ( ! delete_btn_view ()) }, visible: newKeyPairRunningCancelButtonShow() && ! delete_btn_view () ")
-					.ui.buttons( data-bind = " visible: newKeyPairRunningCancelButtonShow() && delete_btn_view () ")
-						button.ui.button( data-bind = "text: infoDefine [ $root.languageIndex() ].home_index_view.continueCreateKeyPair, click: () => { return delete_btn_view ( ! delete_btn_view ());} ")
-						.or
-						button.ui.button.negative( data-bind = " text: infoDefine [ $root.languageIndex() ].home_index_view.stopCreateKeyPair, click: CancelCreateKeyPair ")
+					
 			.card.centered.raised( data-bind = "if: keyPairGenerateFormMessage, visible: keyPairGenerateFormMessage " style = "width: 100%;padding: 2em;")
 				.detail
 					p( data-bind="visible: message_cancel(), text: infoDefine [ $root.languageIndex() ].home_index_view.keyPairCancel ")

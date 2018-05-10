@@ -57,12 +57,12 @@
                 return ;
             } 
         }
-		setTimeout (() => {
+		setTimeout ( function() {
             
 			addClass(element, baseAnimateClass);
             addClass(element, animation);
             removeClass(element, 'displayNono');
-			const EventFun = ( event ) => {
+			const EventFun = function ( event ) {
 				removePrefixedEvent(element, "AnimationEnd", EventFun );
 	
 				removeClass(element, baseAnimateClass);

@@ -53,10 +53,7 @@ class keyPairGenerateForm {
 	public passwordError = ko.observable ( false )
 	public SystemAdministratorNickName = ko.observable ('')
 	public systemSetup_systemPassword = ko.observable ('')
-	public keyLengthInfoShow = ko.observable ( true )
-	public keyPairLengthSelect = ko.observable ('2048')
 	public showKeyPairPorcess = ko.observable ( false )
-	public newKeyPairRunningCancelButtonShow = ko.observable ( false )
 	public delete_btn_view = ko.observable ( false )
 	public doingProcessBarTime = null
 	public keyPairGenerateFormMessage = ko.observable ( false )
@@ -118,14 +115,13 @@ class keyPairGenerateForm {
 
 	private stopDoingProcessBar () {
 		clearTimeout ( this.doingProcessBarTime )
-		this.newKeyPairRunningCancelButtonShow ( false )
 		this.showKeyPairPorcess ( false )
 		return $('.keyPairProcessBar').progress ({
 			percent: 0
 		})
 	}
 
-	constructor ( private exit: () => void ) {
+	constructor ( private exit: ( keyPair ) => void ) {
 		this.SystemAdministratorEmailAddress.subscribe ( newValue => {
 			return this.checkEmailAddress ( newValue )
 		})
@@ -137,6 +133,7 @@ class keyPairGenerateForm {
 		})
 	}
 	public form_AdministratorEmail_submit () {
+		const self = this
 		this.checkEmailAddress ( this.SystemAdministratorEmailAddress ())
 		this.checkNickname ( this.SystemAdministratorNickName ())
 		this.checkPassword ( this.systemSetup_systemPassword ())
@@ -144,18 +141,16 @@ class keyPairGenerateForm {
 			return false
 		}
 		this.showKeyPairPorcess ( true )
-		this.newKeyPairRunningCancelButtonShow ( true )
 		this.showKeyPairForm ( false )
 		const email = this.SystemAdministratorEmailAddress ()
 		const sendData: INewKeyPair = {
 			password: this.systemSetup_systemPassword (),
-			keyLength: this.keyPairLengthSelect (),
 			nikeName: this.SystemAdministratorNickName (),
 			email: email
 		}
 		let percent = 1
 		$('.keyPairProcessBar').progress ('reset')
-		const timeSet = parseInt ( sendData.keyLength ) * 0.2
+		const timeSet = 10000
 		const doingProcessBar = () => {
 			clearTimeout ( this.doingProcessBarTime )
 			this.doingProcessBarTime = setTimeout (() => {
@@ -167,35 +162,20 @@ class keyPairGenerateForm {
 			}, timeSet )
 		}
 
-		/*
+		
 		socketIo.once ( 'newKeyPairCallBack', keyPair => {
-			this.stopDoingProcessBar ()
-			this.keyPairGenerateFormMessage ( true )
+			self.stopDoingProcessBar ()
+			self.keyPairGenerateFormMessage ( true )
 			if ( !keyPair ) {
-				return this.message_keyPairGenerateError ( true )
+				return self.message_keyPairGenerateError ( true )
 			}
-			this.exit ()
-			return this.message_keyPairGenerateSuccess ( true )
+			self.exit ( keyPair )
+			return self.message_keyPairGenerateSuccess ( true )
 		})
 
 		socketIo.emit ( 'NewKeyPair', sendData ) 
-		*/
+		
 		return doingProcessBar ()
-	}
-
-	public tileClick ( data: string ) {
-		this.keyPairLengthSelect ( data )
-		return true
-	}
-
-	public CancelCreateKeyPair () {
-		this.stopDoingProcessBar ()
-		this.message_cancel ( true )
-		this.newKeyPairRunningCancelButtonShow ( false )
-		this.delete_btn_view ( false )
-		socketIo.emit ( 'cancelNewKeyPair' )
-		//this.showKeyPairForm ( true )
-		return this.keyPairGenerateFormMessage ( true )
 	}
 
 	public CloseKeyPairGenerateFormMessage () {
