@@ -14,13 +14,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-exports.__esModule = true;
-var localWebServer_1 = require("./localWebServer");
-var test = /^true$/.test(process.argv[2]) ? true : false;
-var _start = process.argv[3] || false;
-exports.start = function () {
-    var localServer = new localWebServer_1["default"](test);
+Object.defineProperty(exports, "__esModule", { value: true });
+const localWebServer_1 = require("./localWebServer");
+const test = /^true$/.test(process.argv[2]) ? true : false;
+const _start = process.argv[3] || false;
+exports.start = (cmd, _test) => {
+    const localServer = new localWebServer_1.default(cmd, _test);
 };
 if (_start) {
-    exports.start();
+    exports.start(() => {
+    }, false);
 }

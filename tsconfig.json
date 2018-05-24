@@ -3,7 +3,7 @@
 		"module": "commonjs",
 		"sourceMap": false,
 		"allowJs": true,
-		"target": "es3"
+		"target": "es2017"
 	},
 	"include": [
 		"core/**/*.ts"

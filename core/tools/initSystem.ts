@@ -1,4 +1,19 @@
-/// <reference path="../CoNET.d.ts" />
+/*!
+ * Copyright 2018 CoNET Technology Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 import * as Fs from 'fs'
 import localServer from '../localWebServer'
 import * as Path from 'path'
@@ -7,7 +22,11 @@ import * as Async from 'async'
 import * as Crypto from 'crypto'
 import * as OpenPgp from 'openpgp'
 import * as Util from 'util'
-
+import * as Http from 'http'
+import * as Https from 'https'
+import * as Net from 'net'
+import * as Nodemailer from 'nodemailer'
+import { StringDecoder } from 'string_decoder'
 /**
  * 		define
  */
@@ -28,12 +47,16 @@ const InitKeyPair = () => {
 	return keyPair
 }
 
-export let QTGateFolder = Path.join (  !/^android$/i.test ( process.platform ) ? Os.homedir() : Path.join(__dirname,"../../../../.."), '.CoNET' )
-export let QTGateLatest = Path.join ( QTGateFolder, 'latest' )
-export let QTGateTemp = Path.join ( QTGateFolder, 'tempfile' )
-export let QTGateVideo = Path.join ( QTGateTemp, 'videoTemp')
-export let ErrorLogFile = Path.join ( QTGateFolder, 'systemError.log' )
+export const QTGateFolder = Path.join (  !/^android$/i.test ( process.platform ) ? Os.homedir() : Path.join(__dirname,"../../../../.."), '.CoNET' )
+export const QTGateLatest = Path.join ( QTGateFolder, 'latest' )
+export const QTGateTemp = Path.join ( QTGateFolder, 'tempfile' )
+export const QTGateVideo = Path.join ( QTGateTemp, 'videoTemp')
+export const ErrorLogFile = Path.join ( QTGateFolder, 'systemError.log' )
+export const CoNETConnectLog = Path.join ( QTGateFolder, 'CoNETConnect.log' )
+export const imapDataFileName = Path.join ( QTGateFolder, 'imapData.pem' )
+
 export const CoNET_Home = Path.join ( __dirname )
+export const CoNET_PublicKey = Path.join ( CoNET_Home, '3C272D2E.pem')
 
 export const LocalServerPortNumber = 3000
 export const configPath = Path.join ( QTGateFolder, 'config.json' )
@@ -53,6 +76,10 @@ export const checkFolder = ( folder: string, CallBack: ( err?: Error ) => void )
         }
         return CallBack ()
     })
+}
+
+const readQTGatePublicKey = ( CallBack ) => {
+	return Fs.readFile ( CoNET_PublicKey, 'utf8', CallBack )
 }
 
 export const convertByte = ( byte: number ) => {
@@ -167,7 +194,7 @@ export const getQTGateSign = ( user: OpenPgp.key.users ) => {
 	return Certification
 }
 
-export const getKeyPairInfo = ( publicKey: string, privateKey: string, password: string, CallBack ) => {
+export const getKeyPairInfo = ( publicKey: string, privateKey: string, password: string, CallBack: ( err?: Error, keyPair?: keypair ) => void ) => {
 	if ( ! publicKey || ! privateKey ) {
 		return CallBack ( new Error ('no key'))
 	}
@@ -186,11 +213,11 @@ export const getKeyPairInfo = ( publicKey: string, privateKey: string, password:
 	ret.privateKey = privateKey
 	ret.keyLength = getBitLength ( privateKey1 )
 	ret.nikeName = getNickName ( user.userId.userid )
-	ret.createDate = privateKey1.primaryKey.created.toLocaleString ()
+	ret.createDate = privateKey1.primaryKey.created.toDateString ()
 	ret.email = getEmailAddress ( user.userId.userid )
 	ret.verified = getQTGateSign ( user )
+	ret.publicKeyID = publicKey1[0].primaryKey.getFingerprint().toUpperCase()
 	
-	ret.publicKeyID = publicKey1[0].primaryKey.fingerprint.toString('hex').toLocaleUpperCase()
 	ret.passwordOK = false
 	if ( !password ) {
 		return CallBack ( null, ret )
@@ -255,6 +282,7 @@ export const checkConfig = CallBack => {
 		config.newVersion = null
 		config.serverPort = LocalServerPortNumber
 		config.localIpAddress = getLocalInterface ()
+		config.firstRun = packageFile.firstRun || false
 		if ( !config.keypair || ! config.keypair.publicKey ) {
 			return CallBack ( null, config )
 		}
@@ -263,7 +291,7 @@ export const checkConfig = CallBack => {
 				CallBack ( err )
 				return console.log (`checkConfig getKeyPairInfo error`, err )
 			}
-			console.log ( `getKeyPairInfo = [${ Util.inspect ( key) }]` )
+			
 			config.keypair = key
 			return CallBack ( null, config )			
 		})
@@ -279,7 +307,9 @@ export const newKeyPair = ( emailAddress: string, nickname: string, password: st
 	const option: openpgp.KeyOptions = {
 		passphrase: password,
 		userIds: [userId],
-		curve: "ed25519"
+		curve: "ed25519",
+		aead_protect: true,
+		aead_protect_version: 4
 	}
 
 	console.log ( Util.inspect ( option ))
@@ -294,4 +324,474 @@ export const newKeyPair = ( emailAddress: string, nickname: string, password: st
 		// ERROR
 		return CallBack ( err )
 	})
+}
+
+export const getImapSmtpHost = function ( _email: string ) {
+	const email = _email.toLowerCase()
+	const yahoo = ( domain: string ) => {
+		
+		if ( /yahoo.co.jp$/i.test ( domain ))
+			return 'yahoo.co.jp';
+			
+		if ( /((.*\.){0,1}yahoo|yahoogroups|yahooxtra|yahoogruppi|yahoogrupper)(\..{2,3}){1,2}$/.test ( domain ))
+			return 'yahoo.com';
+		
+		if ( /(^hotmail|^outlook|^live|^msn)(\..{2,3}){1,2}$/.test ( domain ))
+			return 'hotmail.com';
+			
+		if ( /^(me|^icould|^mac)\.com/.test ( domain ))
+			return 'me.com'
+
+		return domain
+	}
+
+	const emailSplit = email.split ( '@' )
+	
+	if ( emailSplit.length !== 2 ) 
+		return null
+		
+	const domain = yahoo ( emailSplit [1] )
+	
+	const ret = {
+		imap: 'imap.' + domain,
+		smtp: 'smtp.' + domain,
+		SmtpPort: [465,587,994],
+		ImapPort: 993,
+		imapSsl: true,
+		smtpSsl: true,
+		haveAppPassword: false,
+		ApplicationPasswordInformationUrl: ['']
+	}
+	
+	switch ( domain ) {
+		//		yahoo domain have two different 
+		//		the yahoo.co.jp is different other yahoo.*
+		case 'yahoo.co.jp': {
+			ret.imap = 'imap.mail.yahoo.co.jp';
+			ret.smtp = 'smtp.mail.yahoo.co.jp'
+		}
+		break;
+
+		//			gmail
+		case 'google.com':
+		case 'googlemail.com':
+		case 'gmail': {
+			ret.haveAppPassword = true;
+			ret.ApplicationPasswordInformationUrl = [
+				'https://support.google.com/accounts/answer/185833?hl=zh-Hans',
+				'https://support.google.com/accounts/answer/185833?hl=ja',
+				'https://support.google.com/accounts/answer/185833?hl=en'
+			]
+		}
+		break;
+
+        case 'gandi.net':
+            ret.imap = ret.smtp = 'mail.gandi.net'
+        break
+		
+		//				yahoo.com
+		case 'rocketmail.com':
+		case 'y7mail.com':
+		case 'ymail.com':
+		case 'yahoo.com': {
+			ret.imap = 'imap.mail.yahoo.com'
+			ret.smtp = (/^bizmail.yahoo.com$/.test(emailSplit[1]))
+				? 'smtp.bizmail.yahoo.com'
+				: 'smtp.mail.yahoo.com'
+			ret.haveAppPassword = true;
+			ret.ApplicationPasswordInformationUrl = [
+				'https://help.yahoo.com/kb/SLN15241.html',
+				'https://help.yahoo.com/kb/SLN15241.html',
+				'https://help.yahoo.com/kb/SLN15241.html'
+			]
+		}
+		break;
+
+        case 'mail.ee':
+            ret.smtp = 'mail.ee'
+            ret.imap = 'mail.inbox.ee'
+        break
+
+		
+        //		gmx.com
+        case 'gmx.co.uk':
+        case 'gmx.de':
+		case 'gmx.us':
+		case 'gmx.com' : {
+            ret.smtp = 'mail.gmx.com'
+            ret.imap = 'imap.gmx.com'
+        }
+        
+		break;
+		
+		//		aim.com
+		case 'aim.com': {
+			ret.imap = 'imap.aol.com'
+		}
+		break;
+		
+		//	outlook.com
+		case 'windowslive.com':
+		case 'hotmail.com': 
+		case 'outlook.com': {
+			ret.imap = 'imap-mail.outlook.com'
+            ret.smtp = 'smtp-mail.outlook.com'
+		}
+		break;
+		
+		//			apple mail
+        case 'icloud.com':
+        case 'mac.com':
+		case 'me.com': {
+			ret.imap = 'imap.mail.me.com'
+            ret.smtp = 'smtp.mail.me.com'
+		}
+		break;
+		
+		//			163.com
+		case '126.com':
+		case '163.com': {
+			ret.imap = 'appleimap.' + domain
+			ret.smtp = 'applesmtp.' + domain
+		}
+		break;
+		
+		case 'sina.com':
+		case 'yeah.net': {
+			ret.smtpSsl = false
+		}
+		break;
+		
+	}
+	
+	return ret
+	
+}
+
+export const availableImapServer = /imap\-mail\.outlook\.com$|imap\.mail\.yahoo\.(com|co\.jp|co\.uk|au)$|imap\.mail\.me\.com$|imap\.gmail\.com$|gmx\.(com|us|net)$|imap\.zoho\.com$/i
+
+const doUrl = ( url: string, CallBack) => {
+	let ret = ''
+	const res = res => {
+		res.on( 'data', (data: Buffer) => {
+			ret += data.toString('utf8')
+		})
+		res.once ( 'end', () => {
+			return CallBack( null, ret )
+		})
+	}
+	if ( /^https/.test( url ))
+		return Https.get ( url, res )
+			.once ( 'error', err => {
+				console.log( 'on err ', err  )
+				return CallBack ( err )
+			})
+	return Http.get ( url, res )
+		.once ( 'error', err => {
+		console.log( 'on err ', err  )
+		return CallBack ( err )
+	})
+}
+const myIpServerUrl = [ 'https://ipinfo.io/ip', 'https://icanhazip.com/', 'https://diagnostic.opendns.com/myip', 'http://ipecho.net/plain', 'https://www.trackip.net/ip' ]
+export const myIpServer = ( CallBack ) => {
+	let ret = false
+	Async.each ( myIpServerUrl, ( n, next ) => {
+		return doUrl( n, ( err, data ) => {
+			if ( err || ! Net.isIPv4 ( data )) {
+				return next ()
+			}
+			if ( !ret ) {
+				ret = true
+				return CallBack ( null, data )
+			}
+		})
+	}, () => {
+		if ( !ret )
+			return CallBack ( new Error ('no data'))
+	})
+}
+
+const _smtpVerify = ( imapData: IinputData, CallBack: ( err?: Error ) => void ) => {
+	const option = {
+		host:  Net.isIP ( imapData.smtpServer ) ? null : imapData.smtpServer,
+		hostname:  Net.isIP ( imapData.smtpServer ) ? imapData.smtpServer : null,
+		port: imapData.smtpPortNumber,
+		secure: imapData.smtpSsl,
+		auth: {
+			user: imapData.smtpUserName,
+			pass: imapData.smtpUserPassword
+		},
+		connectionTimeout: ( 1000 * 15 ).toString (),
+		tls: {
+			rejectUnauthorized: imapData.smtpIgnoreCertificate,
+			ciphers: imapData.ciphers
+		},
+		debug: true
+	}
+	
+	const transporter = Nodemailer.createTransport ( option )
+	return transporter.verify ( CallBack )
+		//DEBUG ? saveLog ( `transporter.verify callback [${ JSON.stringify ( err )}] success[${ success }]` ) : null
+		/*
+		if ( err ) {
+			const _err = JSON.stringify ( err )
+			if ( /Invalid login|AUTH/i.test ( _err ))
+				return CallBack ( 8 )
+			if ( /certificate/i.test ( _err ))
+				return CallBack ( 9 )
+			return CallBack ( 10 )
+		}
+
+		return CallBack()
+		*/
+}
+
+export const smtpVerify = ( imapData: IinputData, CallBack: ( err? ) => void ) => {
+	
+	let testArray: IinputData[] = null
+	let _ret = false
+	let err1 = null
+	if ( typeof imapData.smtpPortNumber === 'object' ) {
+		testArray = imapData.smtpPortNumber.map ( n => { 
+			const ret: IinputData = JSON.parse ( JSON.stringify ( imapData ))
+			ret.smtpPortNumber = n
+			ret.ciphers = null
+			return ret
+		})
+		
+	} else {
+		testArray = [ imapData ]
+	}
+	testArray = testArray.concat ( testArray.map ( n => {
+		const ret: IinputData = JSON.parse ( JSON.stringify ( n ))
+		ret.ciphers = 'SSLv3'
+		ret.smtpSsl = false
+		return ret
+	}))
+	
+	return Async.each ( testArray, ( n, next ) => {
+		return _smtpVerify ( n, ( err: Error ) => {
+
+			if ( err && err.message ) {
+				if ( /Invalid login|AUTH/i.test ( err.message )) {
+					return next ( err )
+				}
+				return next ()
+			}
+			if ( ! _ret ) {
+				_ret = true
+				imapData.smtpPortNumber = n.smtpPortNumber
+				imapData.smtpSsl = n.smtpSsl
+				imapData.ciphers = n.ciphers
+				return CallBack ()
+			}
+			
+		})
+	}, ( err: Error ) => {
+		if ( err ) {
+			console.log ( `smtpVerify ERROR = [${ err.message }]`)
+			return CallBack ( err )
+		}
+		if ( ! _ret ) {
+			console.log ( `smtpVerify success Async!`)
+			return CallBack ()
+		}
+		console.log (`smtpVerify already did CallBack!`)
+	})
+	
+}
+
+export const getPbkdf2 = ( config: install_config, passwrod: string, CallBack ) => {
+	return Crypto.pbkdf2 ( passwrod, config.salt, config.iterations, config.keylen, config.digest, CallBack )
+}
+
+export const makeGpgKeyOption = ( config: install_config, passwrod: string, CallBack ) => {
+	const option: OpenPgp.option_KeyOption = {
+		privateKeys: OpenPgp.key.readArmored ( config.keypair.privateKey ).keys,
+		publicKeys: null
+	}
+	return Async.waterfall ([
+		next => Fs.readFile ( CoNET_PublicKey, 'utf8', next ),
+		( data, next ) => {
+			option.publicKeys = OpenPgp.key.readArmored ( data ).keys
+			return getPbkdf2 ( config, passwrod, next )
+		}
+	], ( err, data: Buffer ) => {
+		if ( err ) {
+			return CallBack ( err )
+		}
+		return option.privateKeys[0].decrypt ( data.toString( 'hex' )).then ( keyOK => {
+			if ( keyOK ) {
+				return CallBack ( null, option )
+			}
+			return CallBack ( new Error ('password!'))
+		}).catch ( CallBack )
+	})
+}
+
+export const saveImapData = ( imapConnectData: IinputData, config: install_config, password: string, CallBack ) => {
+		
+	if ( ! imapConnectData ) {
+		return Fs.unlink ( imapDataFileName, CallBack )
+	}
+	const _data = JSON.stringify ( imapConnectData )
+	const options: OpenPgp.encrypto_option = {
+		data: _data,
+		publicKeys: OpenPgp.key.readArmored ( config.keypair.publicKey ).keys,
+		privateKeys: OpenPgp.key.readArmored ( config.keypair.privateKey ).keys
+	}
+	return getPbkdf2 ( config, password, ( err, data: Buffer ) => {
+		if ( err ) {
+			return CallBack ( err )
+		}
+		return options.privateKeys[0].decrypt ( data.toString( 'hex' )).then ( keyOK => {
+			return OpenPgp.encrypt ( options ).then ( ciphertext => {
+				return Fs.writeFile ( imapDataFileName, ciphertext.data, { encoding: 'utf8' }, CallBack )
+			}).catch ( CallBack )
+		}).catch ( CallBack )
+		
+		
+	})
+
+}
+
+export const readImapData = ( savedPasswrod, config: install_config, CallBack ) => {
+	if ( ! savedPasswrod || ! savedPasswrod.length || ! config || ! config.keypair || ! config.keypair.createDate ) {
+		return CallBack ( new Error ('readImapData no password or keypair data error!'))
+	}
+	const options: OpenPgp.decrypto_option = {
+		message: null,
+		publicKeys: OpenPgp.key.readArmored ( config.keypair.publicKey ).keys,
+		privateKeys: OpenPgp.key.readArmored ( config.keypair.privateKey ).keys
+	}
+	return Async.waterfall ([
+		next => Fs.access ( imapDataFileName, next ),
+		( acc, next ) => getPbkdf2 ( config, savedPasswrod, next ),
+		( data: Buffer, next ) => {
+			return options.privateKeys[0].decrypt ( data.toString( 'hex' )).then ( keyOk => {
+				console.log (`options.privateKey.decrypt success!`, keyOk )
+				if ( !keyOk ) {
+					return next ( new Error ('key password not OK!'))
+				}
+				return next ()
+			}).catch ( err => {
+				console.log (`options.privateKey.decrypt err`, err )
+				next ( err )
+			})
+		},
+		next => {
+			Fs.readFile ( imapDataFileName, 'utf8', next )
+		}], ( err, data ) => {
+			if ( err ) {
+				return CallBack ( err )
+			}
+			options.message = OpenPgp.message.readArmored ( data.toString ())
+			return OpenPgp.decrypt ( options ).then ( data => {
+				if ( data.signatures && data.signatures[0] && data.signatures[0].valid ) {
+					return CallBack ( null, data.data )
+				}
+				return CallBack ( new Error ('signatures error!'))
+			}).catch ( ex => {
+				return CallBack ( ex )
+			})
+		})
+	
+}
+
+export const encryptMessage = ( openKeyOption: OpenPgp.option_KeyOption, message: string, CallBack ) => {
+	const option: OpenPgp.encrypto_option = {
+		privateKeys: openKeyOption.privateKeys,
+		publicKeys: openKeyOption.publicKeys,
+		data: message
+	}
+	console.log (`encryptMessage `, message )
+	return OpenPgp.encrypt ( option ).then ( ciphertext => {
+		return CallBack ( null, ciphertext.data )
+	}).catch ( CallBack )
+}
+
+export const decryptoMessage = ( openKeyOption: OpenPgp.option_KeyOption, message: string, CallBack ) => {
+	const option: OpenPgp.decrypto_option = {
+		privateKeys: openKeyOption.privateKeys,
+		publicKeys: openKeyOption.publicKeys,
+		message: OpenPgp.message.readArmored ( message )
+	}
+	return OpenPgp.decrypt ( option ).then ( data => {
+		
+		if ( data.signatures && data.signatures.length && data.signatures.findIndex ( n => { return n.valid }) > -1 ) {
+			return CallBack ( null, data.data )
+			
+		}
+		console.log ( Util.inspect ( data ))
+		return CallBack ( new Error ('signatures error!'))
+	}).catch ( err =>{
+		console.log ( err )
+		console.log ( JSON.stringify ( message ))
+		return CallBack ( err )
+	})
+}
+
+const testSmtpAndSendMail = ( imapData: IinputData, CallBack ) => {
+	let first = false
+	if ( typeof imapData === 'object' ) {
+		first = true
+	}
+	return smtpVerify ( imapData, err => {
+		if ( err ) {
+			if ( first ) {
+				imapData.imapPortNumber = [25,465,587,994,2525]
+				return smtpVerify ( imapData, CallBack )
+			}
+			return CallBack ( err )
+		}
+		return CallBack ()
+	})
+}
+
+export const sendCoNETConnectRequestEmail = ( imapData: IinputData, openKeyOption: OpenPgp.option_KeyOption, ver: string, publicKey: string, CallBack ) => {
+
+	const qtgateCommand: QTGateCommand = {
+		account: imapData.account,
+		QTGateVersion: ver,
+		imapData: imapData,
+		command: 'connect',
+		error: null,
+		callback: null,
+		language: imapData.language,
+		publicKey: publicKey
+	}
+	return Async.waterfall ([
+		next => testSmtpAndSendMail ( imapData, next ),
+		next => encryptMessage ( openKeyOption, JSON.stringify ( qtgateCommand ), next ),
+		( _data, next ) => {
+			const option = {
+				host:  Net.isIP ( imapData.smtpServer ) ? null : imapData.smtpServer,
+				hostname:  Net.isIP ( imapData.smtpServer ) ? imapData.smtpServer : null,
+				port: imapData.smtpPortNumber,
+				secure: imapData.smtpSsl,
+				auth: {
+					user: imapData.smtpUserName,
+					pass: imapData.smtpUserPassword
+				},
+				connectionTimeout: ( 1000 * 15 ).toString (),
+				tls: !imapData.smtpSsl ? {
+					rejectUnauthorized: imapData.smtpIgnoreCertificate,
+					ciphers: imapData.ciphers
+				} : null,
+				debug: true
+			}
+			const transporter = Nodemailer.createTransport ( option )
+			console.log ( Util.inspect ( option ))
+			const mailOptions = {
+				from: imapData.smtpUserName,
+				to: 'QTGate@CoNETTech.ca',
+				subject:'CoNET',
+				attachments: [{
+					content: _data
+				}]
+			}
+			return transporter.sendMail ( mailOptions, next )
+		}
+	], CallBack )
+
 }

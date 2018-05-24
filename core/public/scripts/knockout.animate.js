@@ -81,7 +81,7 @@
         
         
     }
-    let _status = new Map ()
+    
     ko.bindingHandlers.animate = {
         init: function(element, valueAccessor){
             var data = ko.unwrap(valueAccessor()),
@@ -121,17 +121,16 @@
             }
             */
             animation = ko.unwrap(data.animation);
-            state = ko.unwrap(data.state);
-            const status = _status.get ( element );
+            state = ko.unwrap( data.state );
             const _element = $(element);
             animationOn = typeof animation === 'object' ? animation[0] : animation;
 			animationOff = typeof animation === 'object' ? animation[1] : animation;
-            if ( typeof status === 'undefined' || status === state || !state && _element.hasClass ( hideClass )) {
-                return _status.set ( element, state );
+            if ( _element.hasClass ( hideClass )) {
+                return 
             }
             
             
-            _status.set ( element, state );
+            
             
 			delay = data.delay || 0;
             toggle = animationOn !== animationOff;

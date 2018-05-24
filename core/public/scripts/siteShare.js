@@ -1,25 +1,25 @@
-var uuid_generate = function () {
-    var lut = [];
-    for (var i = 0; i < 256; i++) {
+const uuid_generate = function () {
+    let lut = [];
+    for (let i = 0; i < 256; i++) {
         lut[i] = (i < 16 ? '0' : '') + (i).toString(16);
     }
-    var d0 = Math.random() * 0xffffffff | 0;
-    var d1 = Math.random() * 0xffffffff | 0;
-    var d2 = Math.random() * 0xffffffff | 0;
-    var d3 = Math.random() * 0xffffffff | 0;
+    let d0 = Math.random() * 0xffffffff | 0;
+    let d1 = Math.random() * 0xffffffff | 0;
+    let d2 = Math.random() * 0xffffffff | 0;
+    let d3 = Math.random() * 0xffffffff | 0;
     return lut[d0 & 0xff] + lut[d0 >> 8 & 0xff] + lut[d0 >> 16 & 0xff] + lut[d0 >> 24 & 0xff] + '-' +
         lut[d1 & 0xff] + lut[d1 >> 8 & 0xff] + '-' + lut[d1 >> 16 & 0x0f | 0x40] + lut[d1 >> 24 & 0xff] + '-' +
         lut[d2 & 0x3f | 0x80] + lut[d2 >> 8 & 0xff] + '-' + lut[d2 >> 16 & 0xff] + lut[d2 >> 24 & 0xff] +
         lut[d3 & 0xff] + lut[d3 >> 8 & 0xff] + lut[d3 >> 16 & 0xff] + lut[d3 >> 24 & 0xff];
 };
-var uuID = function () {
+const uuID = function () {
     return uuid_generate().replace(/-/g, '');
 };
-var isElectronRender = typeof process === 'object';
-var cookieName = 'langEH';
-var passwdCookieName = 'QTGate';
-var EmailRegexp = /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$/i;
-var Menu = {
+const isElectronRender = typeof process === 'object';
+const cookieName = 'langEH';
+const passwdCookieName = 'CoNET';
+const EmailRegexp = /^((([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+(\.([a-z]|\d|[!#\$%&'\*\+\-\/=\?\^_`{\|}~]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])+)*)|((\x22)((((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(([\x01-\x08\x0b\x0c\x0e-\x1f\x7f]|\x21|[\x23-\x5b]|[\x5d-\x7e]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(\\([\x01-\x09\x0b\x0c\x0d-\x7f]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF]))))*(((\x20|\x09)*(\x0d\x0a))?(\x20|\x09)+)?(\x22)))@((([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|\d|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))\.)+(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])|(([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])([a-z]|\d|-|\.|_|~|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])*([a-z]|[\u00A0-\uD7FF\uF900-\uFDCF\uFDF0-\uFFEF])))$/i;
+const Menu = {
     'zh': [{
             LanguageJsonName: 'zh',
             showName: '简体中文',
@@ -107,7 +107,7 @@ var lang;
     lang[lang["en"] = 2] = "en";
     lang[lang["tw"] = 3] = "tw";
 })(lang || (lang = {}));
-var initLanguageCookie = function () {
+const initLanguageCookie = function () {
     var cc = $.cookie(cookieName);
     if (!cc) {
         cc = window.navigator.language;
@@ -131,10 +131,10 @@ var initLanguageCookie = function () {
     $("html").trigger('languageMenu', cc);
     return cc;
 };
-var DayTime = 1000 * 60 * 60 * 24;
-var monthTime = 30 * DayTime;
-var yearTime = 12 * monthTime;
-var getPlanPrice = function (plan, isAnnualPlan) {
+const DayTime = 1000 * 60 * 60 * 24;
+const monthTime = 30 * DayTime;
+const yearTime = 12 * monthTime;
+const getPlanPrice = function (plan, isAnnualPlan) {
     switch (plan) {
         //		1GB/month 100MB/day
         case 'free': {
@@ -166,14 +166,14 @@ var getPlanPrice = function (plan, isAnnualPlan) {
         }
     }
 };
-var nextExpirDate = function (expire) {
-    var now = new Date();
-    var _expire = new Date(expire);
+const nextExpirDate = function (expire) {
+    const now = new Date();
+    const _expire = new Date(expire);
     _expire.setHours(0, 0, 0, 0);
     if (now.getTime() > _expire.getTime()) {
         return _expire;
     }
-    var nextExpirDate = new Date(expire);
+    const nextExpirDate = new Date(expire);
     nextExpirDate.setMonth(now.getMonth());
     nextExpirDate.setFullYear(now.getFullYear());
     if (nextExpirDate.getTime() < now.getTime()) {
@@ -182,52 +182,52 @@ var nextExpirDate = function (expire) {
     }
     return _expire;
 };
-var getRemainingMonth = function (expire) {
-    var _expire = new Date(expire);
-    var _nextExpirDate = nextExpirDate(expire);
+const getRemainingMonth = function (expire) {
+    const _expire = new Date(expire);
+    const _nextExpirDate = nextExpirDate(expire);
     return _expire.getFullYear() === _nextExpirDate.getFullYear() ? _expire.getMonth() - _nextExpirDate.getMonth() : (12 - _nextExpirDate.getMonth() + _expire.getMonth());
 };
-var getAmount = function (amount) {
+const getAmount = function (amount) {
     if (!amount)
         return null;
     if (typeof amount === 'number') {
         amount = amount.toString();
     }
-    var ret = amount.split('.');
+    const ret = amount.split('.');
     return ret.length === 1 ? amount + '.00' : amount;
 };
-var getCurrentPlanCancelBalance = function (expiration, planName) {
-    var price = getPlanPrice(planName, true);
-    var normalPrice = getPlanPrice(planName, false);
-    var usedMonth = 12 - getRemainingMonth(expiration);
-    var passedCost = Math.round((price - normalPrice * usedMonth) * 100) / 100;
+const getCurrentPlanCancelBalance = function (expiration, planName) {
+    const price = getPlanPrice(planName, true);
+    const normalPrice = getPlanPrice(planName, false);
+    const usedMonth = 12 - getRemainingMonth(expiration);
+    const passedCost = Math.round((price - normalPrice * usedMonth) * 100) / 100;
     return passedCost > 0 ? passedCost : 0;
 };
-var getExpire = function (startDate, isAnnual) {
-    var start = new Date(startDate);
-    var now = new Date();
-    var passedMonth = Math.round((now.getTime() - start.getTime()) / monthTime - 0.5);
+const getExpire = function (startDate, isAnnual) {
+    const start = new Date(startDate);
+    const now = new Date();
+    const passedMonth = Math.round((now.getTime() - start.getTime()) / monthTime - 0.5);
     isAnnual ? start.setFullYear(start.getFullYear() + 1) : start.setMonth(passedMonth + 1);
     return start;
 };
-var getCurrentPlanUpgradelBalance = function (expiration, planName, isAnnual) {
+const getCurrentPlanUpgradelBalance = function (expiration, planName, isAnnual) {
     if (!isAnnual) {
         return getPlanPrice(planName, false);
     }
-    var price = getPlanPrice(planName, true);
+    const price = getPlanPrice(planName, true);
     if (!price)
         return null;
-    var usedMonth = 12 - getRemainingMonth(expiration) + 1;
-    var passedCost = Math.round((price - price * usedMonth / 12) * 100) / 100;
+    const usedMonth = 12 - getRemainingMonth(expiration) + 1;
+    const passedCost = Math.round((price - price * usedMonth / 12) * 100) / 100;
     return passedCost;
 };
-var infoDefine = [
+const infoDefine = [
     {
         perment: {
             serverTitle: '服务器'
         },
         twitter: {
-            newTwitterAccount: "\u8BF7\u8F93\u5165\u60A8\u7684\u63A8\u7279APP\u4FE1\u606F\uFF0C\u5982\u4F55\u83B7\u5F97\u548C\u8BBE\u7F6E\u63A8\u7279\u8D26\u53F7APP\u4FE1\u606F\uFF0C\u8BF7\u70B9\u51FB<a target=\"_blank\" href='https://github.com/QTGate/QTGate-Desktop-Client/wiki/%E5%89%B5%E5%BB%BA%E6%82%A8%E7%9A%84QTGate%E6%8E%A8%E7%89%B9%E6%87%89%E7%94%A8')\">\u8FD9\u91CC</a>",
+            newTwitterAccount: `请输入您的推特APP信息，如何获得和设置推特账号APP信息，请点击<a target="_blank" href='https://github.com/QTGate/QTGate-Desktop-Client/wiki/%E5%89%B5%E5%BB%BA%E6%82%A8%E7%9A%84QTGate%E6%8E%A8%E7%89%B9%E6%87%89%E7%94%A8')">这里</a>`,
             addAccount: '添加推特账户',
             following: '正在关注',
             followers: '关注者',
@@ -257,7 +257,7 @@ var infoDefine = [
             paymentProblem: '您的当前所在区域看上去银行网关被和谐，您可以使用CoNET网关支付来完成支付',
             QTGatePayRisk: '使用CoNET安全网关支付，如果您有安全疑虑，请使用Stript安全网关支付。',
             CancelSuccess: function (PlanExpire, isAnnual, returnAmount) {
-                return "\u4E2D\u6B62\u8BA2\u9605\u6210\u529F\u3002\u60A8\u53EF\u4EE5\u4E00\u76F4\u4F7F\u7528\u60A8\u7684\u539F\u8BA2\u9605\u5230" + new Date(PlanExpire).toLocaleDateString() + "\u4E3A\u6B62\u3002\u4EE5\u540E\u60A8\u5C06\u4F1A\u81EA\u52A8\u6210\u4E3ACoNET\u514D\u8D39\u7528\u6237\uFF0C\u53EF\u4EE5\u7EE7\u7EED\u4F7F\u7528CoNET\u7684\u5404\u9879\u514D\u8D39\u529F\u80FD\u3002" + (isAnnual ? "\u9000\u6B3E\u91D1\u989Dus$" + returnAmount + "\u4F1A\u57285\u4E2A\u5DE5\u4F5C\u65E5\u5185\u9000\u8FD8\u5230\u60A8\u7684\u652F\u4ED8\u5361\u3002" : '下月起CoNET系统不再自动扣款。') + " \u795D\u60A8\u7F51\u7EDC\u51B2\u6D6A\u6109\u5FEB\u3002";
+                return `中止订阅成功。您可以一直使用您的原订阅到${new Date(PlanExpire).toLocaleDateString()}为止。以后您将会自动成为CoNET免费用户，可以继续使用CoNET的各项免费功能。${isAnnual ? `退款金额us$${returnAmount}会在5个工作日内退还到您的支付卡。` : '下月起CoNET系统不再自动扣款。'} 祝您网络冲浪愉快。`;
             },
             currentPlan: '当前订阅: ',
             cardPaymentErrorMessage: ['输入的信用卡号有误，或支付系统不支持您的信用卡！', '输入的信用卡期限有误！', '输入的信用卡安全码有误！', '输入的信用卡持有人邮编有误！', '支付失败，支付无法完成请稍后再试', '支付数据存在错误', '您的付款被发卡行所拒绝'],
@@ -283,12 +283,12 @@ var infoDefine = [
             serverShareData: ['共享服务器', '一台独占服务器*', '二台独占服务器*', '四台独占服务器'],
             networkShareTitle: '代理服务器网络',
             multiOpn: 'OPN并发多代理技术',
-            "continue": '下一步',
+            continue: '下一步',
             paymentSuccessTitile: '謝謝您',
             paymentSuccess: '您的订阅已经完成，数据流量限制已经被更新。祝您网络冲浪愉快。',
             qtgateTeam: 'CoNET开发团队敬上',
-            monthlyAutoPay: function (monthCost) { return "<span>\u6BCF\u6708\u81EA\u52A8\u6263\u6B3E</span><span class=\"usDollar\">@ us$</span><span class=\"amount\">" + monthCost + "</span>/\u6708<span>"; },
-            annualPay: function (annual_monthlyCost) { return "<span>\u5E74\u4ED8\u6B3E\u6BCF\u6708\u53EA\u9700</span><span class=\"usDollar\">@ us$</span><span class=\"amount\" >" + getAmount((Math.round(parseInt(annual_monthlyCost) / 0.12) / 100).toString()) + "</span>/\u6708<span>"; },
+            monthlyAutoPay: function (monthCost) { return `<span>每月自动扣款</span><span class="usDollar">@ us$</span><span class="amount">${monthCost}</span>/月<span>`; },
+            annualPay: function (annual_monthlyCost) { return `<span>年付款每月只需</span><span class="usDollar">@ us$</span><span class="amount" >${getAmount((Math.round(parseInt(annual_monthlyCost) / 0.12) / 100).toString())}</span>/月<span>`; },
             monthlyPay: '月收费',
             expirationYear: '信用卡期限',
             payAmountTitile: '合计支付金额',
@@ -306,7 +306,7 @@ var infoDefine = [
             downGradeMessage: '您正在操作降级您的订阅，如果操作成功您将从下月您的订阅之日起，实行新的订阅，如果您是。',
             cancelPlanMessage: 'CoNET的订阅是以月为基本的单位。您的月订阅将在下月您的订阅起始日前被终止，您可以继续使用您的本月订阅计划，您将自动回到免费用户。如果您是每月自动扣款，则下月将不再扣款。如果您是年度订阅计划，您的退款将按普通每月订阅费，扣除您已经使用的月份后计算的差额，将自动返还您所支付的信用卡账号，如果您是使用促销码，或您是测试用户，您的终止订阅将不能被接受。',
             cancelPlanMessage1: function (planName, isAnnual, expire) {
-                return "<span>\u60A8\u7684\u8BA2\u9605\u8BA1\u5212\u662F" + (isAnnual ? "\u5E74\u5EA6\u8BA2\u9605\uFF0C\u9000\u8FD8\u91D1\u989D\u5C06\u6309\u7167\u60A8\u5DF2\u4ED8\u5E74\u8BA2\u9605\u8D39 </span><span class=\"usDollar\">us$</span><span class=\"amount\">" + getPlanPrice(planName, true) + "</span> - \u8BE5\u8BA2\u9605\u539F\u4EF7 <span class=\"usDollar\">us$</span><span class=\"amount\">" + getPlanPrice(planName, false) + "</span><span> X \u5DF2\u4F7F\u7528\u6708\u6570(\u5305\u62EC\u672C\u6708) </span><span class=\"amount\">" + (12 - getRemainingMonth(expire)) + "</span> = \u5E94\u8BE5\u9000\u8FD8\u7684\u91D1\u989D <span class=\"usDollar\">us$</span><span class=\"amount\">" + getCurrentPlanCancelBalance(expire, planName) + "</span><span>\uFF0C\u5C06\u57287\u4E2A\u5DE5\u4F5C\u65E5\u5185\uFF0C\u9000\u8FD8\u5230\u60A8\u539F\u6765\u652F\u4ED8\u7684\u4FE1\u7528\u5361\u8D26\u6237\u3002</span>" : "\u6708\u8BA2\u9605\uFF0C\u60A8\u7684\u8BA2\u9605\u5C06\u4E0B\u6B21\u66F4\u65B0\u65E5</span><span class=\"amount\">" + nextExpirDate(expire).toLocaleDateString() + "</span><span>\u65F6\u4E0D\u518D\u88AB\u81EA\u52A8\u6263\u6B3E\u548C\u66F4\u65B0\u3002</span>");
+                return `<span>您的订阅计划是${isAnnual ? `年度订阅，退还金额将按照您已付年订阅费 </span><span class="usDollar">us$</span><span class="amount">${getPlanPrice(planName, true)}</span> - 该订阅原价 <span class="usDollar">us$</span><span class="amount">${getPlanPrice(planName, false)}</span><span> X 已使用月数(包括本月) </span><span class="amount">${12 - getRemainingMonth(expire)}</span> = 应该退还的金额 <span class="usDollar">us$</span><span class="amount">${getCurrentPlanCancelBalance(expire, planName)}</span><span>，将在7个工作日内，退还到您原来支付的信用卡账户。</span>` : `月订阅，您的订阅将下次更新日</span><span class="amount">${nextExpirDate(expire).toLocaleDateString()}</span><span>时不再被自动扣款和更新。</span>`}`;
             }
         },
         QTGateDonate: {
@@ -321,28 +321,28 @@ var infoDefine = [
                     header: '隐身匿名自由上网OPN',
                     color: '#a333c8',
                     icon: 'exchange',
-                    detail: 'QTGate通过使用<a onclick="return linkClick (`https://zh.wikipedia.org/wiki/%E9%AB%98%E7%BA%A7%E5%8A%A0%E5%AF%86%E6%A0%87%E5%87%86`)" href="#" target="_blank">AES256-GCM</a>和<a onclick="return linkClick (`https://zh.wikipedia.org/wiki/PGP`)" href="#" target="_blank">OpenPGP</a>加密Email通讯，创造了OPN匿名网络通讯技术，QTGate公司首创的@OPN技术，它全程使用加密Email通讯，客户端和代理服务器彼此不用交换IP地址来实现高速通讯。iOPN通讯技术是利用普通HTTP协议下的混淆流量加密技术，能够隐藏变换您的IP地址高速通讯。二种通讯方式都能够让您，隐身和安全及不被检出的上网，保护您的隐私，具有超强对抗网络监控,网络限制和网络阻断。'
+                    detail: 'CoNET通过使用<a onclick="return linkClick (`https://zh.wikipedia.org/wiki/%E9%AB%98%E7%BA%A7%E5%8A%A0%E5%AF%86%E6%A0%87%E5%87%86`)" href="#" target="_blank">AES256-GCM</a>和<a onclick="return linkClick (`https://zh.wikipedia.org/wiki/PGP`)" href="#" target="_blank">OpenPGP</a>加密Email通讯，创造了OPN匿名网络通讯技术，CoNET公司首创的@OPN技术，它全程使用加密Email通讯，客户端和代理服务器彼此不用交换IP地址来实现高速通讯。iOPN通讯技术是利用普通HTTP协议下的混淆流量加密技术，能够隐藏变换您的IP地址高速通讯。二种通讯方式都能够让您，隐身和安全及不被检出的上网，保护您的隐私，具有超强对抗网络监控,网络限制和网络阻断。'
                 }, {
                     color: '#e03997',
                     icon: 'talk outline',
                     header: '无IP点对点即时加密通讯服务QTChat',
-                    detail: 'QTGate用户之间通过email的点对点即时通讯服务，它具有传统即时通讯服务所不具有的，匿名无IP和用户之保持秘密通讯的功能。QTChat加密通讯服务可以传送文字，图片和视频文件信息，QTGate系统只负责传送信息，不拥有信息，也无法检查信息本身，所以QTGate不承担信息所有的法律责任。QTChat支持群即时通讯，将支持视频流直播服务。'
+                    detail: 'CoNET用户之间通过email的点对点即时通讯服务，它具有传统即时通讯服务所不具有的，匿名无IP和用户之保持秘密通讯的功能。QTChat加密通讯服务可以传送文字，图片和视频文件信息，CoNET系统只负责传送信息，不拥有信息，也无法检查信息本身，所以CoNET不承担信息所有的法律责任。QTChat支持群即时通讯，将支持视频流直播服务。'
                 }, {
                     color: '#6435c9',
                     icon: 'cloud upload',
                     header: '加密文件匿名网络云储存及分享功能QTStorage',
-                    detail: '用户通过申请多个和不同的免费email服务商账号，可以把一个文件加密拆分成多个部分，分别存储在不同的email账号下，可以保密安全和无限量的使用网络储存。用户还可以通过QTGate系统在QTGate用户之间分享秘密文件。'
+                    detail: '用户通过申请多个和不同的免费email服务商账号，可以把一个文件加密拆分成多个部分，分别存储在不同的email账号下，可以保密安全和无限量的使用网络储存。用户还可以通过CoNET系统在CoNET用户之间分享秘密文件。'
                 },
                 {
                     color: 'darkcyan',
                     icon: 'spy',
                     header: '阻断间谍软件向外送信功能',
-                    detail: 'QTGate系统连接全球DNSBL联盟数据库，用户通过订阅QTGate系统黑名单列表，并使用QTGate客户端上网，让潜伏在您电子设备内的间谍软件，它每时每刻收集的信息，不能够被送信到其信息收集服务器，能够最大限的保障您的个人隐私。'
+                    detail: 'CoNET系统连接全球DNSBL联盟数据库，用户通过订阅CoNET系统黑名单列表，并使用CoNET客户端上网，让潜伏在您电子设备内的间谍软件，它每时每刻收集的信息，不能够被送信到其信息收集服务器，能够最大限的保障您的个人隐私。'
                 }, {
                     color: '#6435c9',
                     icon: 'external share',
                     header: '本地VPN服务器',
-                    detail: 'QTGate用户在户外时可以通过连接自己家里的VPN，来使用QTGate客户端隐身安全上网。'
+                    detail: 'CoNET用户在户外时可以通过连接自己家里的VPN，来使用CoNET客户端隐身安全上网。'
                 }]
         },
         cover: {
@@ -351,7 +351,7 @@ var infoDefine = [
             start: '开门'
         },
         firstNote: {
-            title: '欢迎使用QTGate，感谢您使用我们的产品和服务(下称“服务”)。本服务由总部设在加拿大的CoNET技术有限公司.下称“CoNET”提供。',
+            title: '欢迎使用CoNET，感谢您使用我们的产品和服务(下称“服务”)。本服务由总部设在加拿大的CoNET技术有限公司.下称“CoNET”提供。',
             firstPart: '您使用我们的服务即表示您已同意本条款。请仔细阅读。使用我们的服务，您必须遵守服务中提供的所有政策。',
             detail: [
                 {
@@ -362,74 +362,74 @@ var infoDefine = [
                     detail: '使用我们的服务并不让您拥有我们的服务或您所访问的内容的任何知识产权。除非您获得相关内容所有者的许可或通过其他方式获得法律的许可，否则您不得使用服务中的任何内容。本条款并未授予您使用我们服务中所用的任何商标或标志的权利。请勿删除、隐藏或更改我们服务上显示的或随服务一同显示的任何法律声明。'
                 }, {
                     header: '关于OPN无IP通讯技术和隐私保护的局限性',
-                    detail: 'OPN是QTGate世界首创的使用Email的IMAP协议建造一个无IP通讯环境，在您利用QTGate进行通讯过程中，QTGate无法获得您目前所使用的IP地址（使用iOPN来连结QTGate代理服务器时，您需要向QTGate系统提供您当前的IP地址），可以最大限度的保障您的个人隐私。但是这项技术并不能够保证您的信息绝对的不被泄露，因为您的IP地址有可能被记录在您所使用的Email服务供应商，如果持有加拿大法院令寻求QTGate的Log公开，再和Email服务供应商的Log合并分析，可能会最终得到您的信息。 QTGate并不能够绝对保障您的隐私。 '
+                    detail: 'OPN是CoNET世界首创的使用Email的IMAP协议建造一个无IP通讯环境，在您利用CoNET进行通讯过程中，CoNET无法获得您目前所使用的IP地址（使用iOPN来连结CoNET代理服务器时，您需要向CoNET系统提供您当前的IP地址），可以最大限度的保障您的个人隐私。但是这项技术并不能够保证您的信息绝对的不被泄露，因为您的IP地址有可能被记录在您所使用的Email服务供应商，如果持有加拿大法院令寻求CoNET的Log公开，再和Email服务供应商的Log合并分析，可能会最终得到您的信息。 CoNET并不能够绝对保障您的隐私。 '
                 },
                 {
-                    header: '关于个人隐私保护，系统日志和接收QTGate传送的信息',
+                    header: '关于个人隐私保护，系统日志和接收CoNET传送的信息',
                     detail: '在您使用服务的过程中，我们可能会向您发送服务公告、管理消息和其他信息。您可以选择不接收上述某些信息。'
                 }, {
                     header: null,
                     detail: '当您使用我们的服务时，我们为了计费处理会自动收集非常有限的数据流量信息，并存储到服务器日志中。数据流量信息仅用于计算客户应支付通讯费用而收集的，它收集的数据是：日期，用户帐号，所使用的代理区域和代理服务器IP，数据包大小，下载或上传。例如：'
                 }, {
                     header: null,
-                    detail: '<p class="tag info">06/20/2017 18:12:16, info@qtgate.com, francisco, 104.236.162.139, 300322 byte up, 482776323 byte down.</p><p class="tag info">06/21/2017 12:04:18, info@qtgate.com, francisco, 104.236.162.139, 1435226 byte up, 11782238 byte down.</p>'
+                    detail: '<p class="tag info">06/20/2017 18:12:16, info@CoNET.com, francisco, 104.236.162.139, 300322 byte up, 482776323 byte down.</p><p class="tag info">06/21/2017 12:04:18, info@CoNET.com, francisco, 104.236.162.139, 1435226 byte up, 11782238 byte down.</p>'
                 },
                 {
                     header: null,
-                    detail: 'QTGate没有保存除了以上信息以外的任何其他信息。我们会配合并向持有加拿大法院令的执法机构提供此日志文件。如果您是加拿大以外地区的执法机构，有这方面信息披露的需求，请通过加拿大外交部来联系我们：'
+                    detail: 'CoNET没有保存除了以上信息以外的任何其他信息。我们会配合并向持有加拿大法院令的执法机构提供此日志文件。如果您是加拿大以外地区的执法机构，有这方面信息披露的需求，请通过加拿大外交部来联系我们：'
                 }, {
                     header: null,
                     detail: '<a class="tag alert" href="http://www.international.gc.ca/">http://www.international.gc.ca/</a>'
                 },
                 {
                     header: '版权所有权',
-                    detail: '该软件是QTGate的智慧产权，并且受到相关版权法，国际版权保护规定和其他在版权授与国家内的相关法律的保护。该软件包含智慧产权材料, 商业秘密及其他产权相关材料。你不能也不应该尝试修改，反向工程操作，反汇编或反编译QTGate服务，也不能由QTGate服务项目创造或衍生其他作品。'
+                    detail: '该软件是CoNET的智慧产权，并且受到相关版权法，国际版权保护规定和其他在版权授与国家内的相关法律的保护。该软件包含智慧产权材料, 商业秘密及其他产权相关材料。你不能也不应该尝试修改，反向工程操作，反汇编或反编译CoNET服务，也不能由CoNET服务项目创造或衍生其他作品。'
                 },
                 {
                     header: null,
-                    detail: '关于我们服务中的软件，QTGate授予您免许可使用费、不可转让的、非独占的全球性个人许可, 允许您使用由QTGate提供的、包含在服务中的软件。本许可仅旨在让您通过本条款允许的方式使用由QTGate提供的服务并从中受益。您不得复制、修改、发布、出售或出租我们的服务, 或所含软件的任何部分。'
+                    detail: '关于我们服务中的软件，CoNET授予您免许可使用费、不可转让的、非独占的全球性个人许可, 允许您使用由CoNET提供的、包含在服务中的软件。本许可仅旨在让您通过本条款允许的方式使用由CoNET提供的服务并从中受益。您不得复制、修改、发布、出售或出租我们的服务, 或所含软件的任何部分。'
                 }, {
                     header: '修改与终止服务',
-                    detail: '我们持续改变和改善所提供的服务。我们可能会新增或移除功能或特性，也可能会暂停或彻底停止某项服务。您随时都可以停止使用服务，尽管我们并不希望您会这样做。 QTGate也可能随时停止向您提供服务，或对服务附加或设定新的限制。'
+                    detail: '我们持续改变和改善所提供的服务。我们可能会新增或移除功能或特性，也可能会暂停或彻底停止某项服务。您随时都可以停止使用服务，尽管我们并不希望您会这样做。 CoNET也可能随时停止向您提供服务，或对服务附加或设定新的限制。'
                 },
                 {
                     header: '服务的责任',
-                    detail: '在法律允许的范围内，QTGate及其供应商和分销商不承担利润损失、收入损失或数据、财务损失或间接、特殊、后果性、惩戒性或惩罚性损害赔偿责任。'
+                    detail: '在法律允许的范围内，CoNET及其供应商和分销商不承担利润损失、收入损失或数据、财务损失或间接、特殊、后果性、惩戒性或惩罚性损害赔偿责任。'
                 }, {
                     header: '法律规定的贸易禁止事项',
                     detail: '当您按下同意按钮，表示您已经确认您不属于加拿大法律所规定的禁止贸易对象的列表之中。 '
                 },
                 {
                     header: '服务的商业使用',
-                    detail: '如果您代表某家企业使用我们的服务，该企业必须接受本条款。对于因使用本服务或违反本条款而导致的或与之相关的任何索赔、起诉或诉讼，包括因索赔、损失、损害赔偿、起诉、判决、诉讼费和律师费而产生的任何责任或费用，该企业应对QTGate及其关联机构、管理人员、代理机构和员工进行赔偿并使之免受损害。'
+                    detail: '如果您代表某家企业使用我们的服务，该企业必须接受本条款。对于因使用本服务或违反本条款而导致的或与之相关的任何索赔、起诉或诉讼，包括因索赔、损失、损害赔偿、起诉、判决、诉讼费和律师费而产生的任何责任或费用，该企业应对CoNET及其关联机构、管理人员、代理机构和员工进行赔偿并使之免受损害。'
                 }, {
                     header: '本条款的变更和约束力',
                     detail: '关于本条款：我们可以修改上述条款或任何适用于某项服务的附加条款，例如，为反映法律的变更或我们服务的变化而进行的修改。您应当定期查阅本条款。我们会在本网页上公布这些条款的修改通知。我们会在适用的服务中公布附加条款的修改通知。所有修改的适用不具有追溯力，且会在公布十四天或更长时间后方始生效。但是，对服务新功能的特别修改或由于法律原因所作的修改将立即生效。如果您不同意服务的修改条款，应停止使用服务。如果本条款与附加条款有冲突，以附加条款为准。'
                 },
                 {
                     header: null,
-                    detail: '本条款约束QTGate与您之间的关系，且不创设任何第三方受益权。如果您不遵守本条款，且我们未立即采取行动，并不意味我们放弃我们可能享有的任何权利（例如，在将来采取行动）。如果某一条款不能被强制执行，这不会影响其他条款的效力。加拿大BC省的法律（不包括BC州的法律冲突规则）将适用于因本条款或服务引起的或与之相关的纠纷。因本条款或服务引起的或与之相关的所有索赔，只能向加拿大BC省法院提起诉讼，且您和QTGate同意上述法院拥有属人管辖权。'
+                    detail: '本条款约束CoNET与您之间的关系，且不创设任何第三方受益权。如果您不遵守本条款，且我们未立即采取行动，并不意味我们放弃我们可能享有的任何权利（例如，在将来采取行动）。如果某一条款不能被强制执行，这不会影响其他条款的效力。加拿大BC省的法律（不包括BC州的法律冲突规则）将适用于因本条款或服务引起的或与之相关的纠纷。因本条款或服务引起的或与之相关的所有索赔，只能向加拿大BC省法院提起诉讼，且您和CoNET同意上述法院拥有属人管辖权。'
                 }
             ],
             disagree: '不同意',
-            agreeMent: 'QTGate服务条款和隐私权'
+            agreeMent: 'CoNET服务条款和隐私权'
         },
         linuxUpdate: {
             newVersionDownload: '点击这里下载并安装',
             step1: '下载新版本',
-            step2: '授权新版本QTGate为可执行文件',
+            step2: '授权新版本CoNET为可执行文件',
             step2J1: '/images/linuxUpdate1_tw.jpg',
             step2J2: '/images/linuxUpdate2_tw.jpeg',
-            step2_detail1: '右键点击已下载的QTGate图标，选择菜单里的文件属性',
+            step2_detail1: '右键点击已下载的CoNET图标，选择菜单里的文件属性',
             step2_detail2: '在权限选项里，选勾“允许档案文件执行”。',
-            step3: '退出旧版本QTGate后，双击QTGate文件执行安装',
-            exit: '退出QTGate',
+            step3: '退出旧版本CoNET后，双击CoNET文件执行安装',
+            exit: '退出CoNET',
             tryAgain: '再次尝试'
         },
         imapInformation: {
             title: '通讯专用Email邮箱设置',
-            tempImapAccount: "\u7533\u8BF7\u4E34\u65F6\u90AE\u7BB1\u6709\u56F0\u96BE\uFF1F\u60A8\u53EF\u4EE5\u6682\u65F6\u4F7F\u7528<a href=\"#\" onclick=\"return linkClick ('https://github.com/QTGate/QTGate-Desktop-Client/wiki/iCloud%E8%87%A8%E6%99%82%E5%B8%B3%E6%88%B6')\">QTGate\u63D0\u4F9B\u7684\u4E34\u65F6IMAP\u5E10\u53F7\u4F9B\u5404\u4F4D\u6D4B\u8BD5\u4F7F\u7528</a>",
-            infomation: "\u8BF7\u8BBE\u7F6EQTGate\u901A\u8BAF\u4E13\u7528Email\u90AE\u7BB1\u4FE1\u606F\u3002\u7531\u4E8E\u6B64\u8D26\u6237\u7684\u7528\u6237\u540D\u548C\u5BC6\u7801\u4FE1\u606F\u4F1A\u63D0\u4EA4\u7ED9QTGate\u7CFB\u7EDF\uFF0C\u4E3A\u4E86\u9632\u6B62\u60A8\u7684\u4E2A\u4EBA\u4FE1\u606F\u88AB\u6CC4\u6F0F\uFF0C\u8BF7\u65B0\u7533\u8BF7\u4E00\u4E2A\u4E34\u65F6Email\u8D26\u6237\u3002\u76EE\u524DQTGate\u6280\u672F\u5BF9\u5E94<a href=\"#\" onclick=\"return linkClick ('https://www.icloud.com/')\">\u82F9\u679CiCloud</a>\uFF0C<a href=\"#\" onclick=\"return linkClick ('https://www.microsoft.com/zh-tw/outlook-com/')\">\u5FAE\u8F6FOUTLOOK</a>\uFF0C<a href=\"#\" onclick=\"return linkClick ('https://tw.mail.yahoo.com/')\">\u96C5\u864E\u90AE\u7BB1</a>\uFF0C<a href=\"#\" onclick=\"return linkClick ('https://www.zoho.com/mail/')\">\u4FC4\u7F57\u65AFZOHO\u90AE\u7BB1</a>\uFF0C<a href=\"#\" onclick=\" return linkClick ('https://gmail.com')\">Google\u90AE\u7BB1</a>\uFF0C<a href=\"#\" onclick=\"return linkClick ('https://www.gmx.com/mail/#.1559516-header-nav1-2')\">\u7F8E\u56FD\u5728\u7EBFGMX\u90AE\u7BB1</a>\uFF0CQTGate\u5F3A\u529B\u63A8\u8350\u4F7F\u7528\u82F9\u679C\u516C\u53F8\u7684Email\u53EF\u4EE5\u8FBE\u5230\u6700\u4F73\u901F\u5EA6(@OPN\u65E0IP\u8FDE\u7ED3\u6280\u672F\u53EA\u5BF9\u5E94\u82F9\u679C\u516C\u53F8iCloud\u90AE\u7BB1)\u3002\u5BC6\u7801\u8BF7\u4F7F\u7528Email\u670D\u52A1\u5546\u7684<a href=\"#\" onclick=\"return linkClick ('https://tw.help.yahoo.com/kb/SLN15241.html')\">\u5E94\u7528\u5BC6\u7801</a>\u3002\u5BF9\u4E8EEmail\u4F9B\u5E94\u5546\u5728\u5E94\u7528\u5BC6\u7801\u7533\u8BF7\u65F6\uFF0C\u987B<a href=\"#\" onclick=\"return linkClick ('https://tw.help.yahoo.com/kb/%E9%96%8B%E5%95%9F%E5%85%A9%E6%AD%A5%E9%A9%9F%E9%A9%97%E8%AD%89-sln5013.html')\" >\u4E8C\u6B65\u8BA4\u8BC1</a>\u5E76\u63D0\u4F9B\u624B\u673A\u53F7\u7801\u63A5\u53D7\u9A8C\u8BC1\u7801\uFF0C\u4E3A\u4FDD\u62A4\u60A8\u7684\u9690\u79C1\uFF0C\u5EFA\u8BAE\u4F7F\u7528\u514D\u8D39\u5728\u7EBF\u4EE3\u7406\u63A5\u6536\u9A8C\u8BC1\u7801\u670D\u52A1\u3002( \u5982<a href=\"#\" onclick=\"return linkClick('http://receive-sms-online.com/')\">receive-sms-online.com</a>, <a href=\"#\" onclick=\"return linkClick('https://sms-online.co/receive-free-sms')\" >sms-online.co</a>, <a href=\"#\" onclick=\"return linkClick('https://receive-a-sms.com/')\" >receive-a-sms.com</a> ) \u66F4\u591A\u8BF7 <a href=\"#\" onclick=\"return linkClick ('http://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=0&rsv_idx=1&tn=baidu&wd=%E5%85%8D%E8%B4%20%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%20%E7%A0%81&rsv_pq=e94f47a50001f66f&rsv_t=b03ePiy3rHH0T4FVoWB8Hx9vrVdZLzVhhErWOo4xdBpjDw%2BtGri%2BViTaVAw&rqlang=cn&rsv_enter=1&rsv_sug3=42&rsv_sug1=5&rsv_sug7=100')\">\u767E\u5EA6\u67E5\u627E</a>\uFF0C<a href=\"#\" onclick=\"return linkClick ('https://www.google.com/search?q=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&oq=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&aqs=chrome..69i57j69i60.254j0j4&sourceid=chrome&ie=UTF-8')\">Google\u67E5\u627E</a>\u3002",
+            tempImapAccount: `申请临时邮箱有困难？您可以暂时使用<a href="#" onclick="return linkClick ('https://github.com/QTGate/QTGate-Desktop-Client/wiki/iCloud%E8%87%A8%E6%99%82%E5%B8%B3%E6%88%B6')">CoNET提供的临时IMAP帐号供各位测试使用</a>`,
+            infomation: `请设置CoNET通讯专用Email邮箱信息。由于此账户的用户名和密码信息会提交给CoNET系统，为了防止您的个人信息被泄漏，请新申请一个临时Email账户。目前CoNET技术对应<a href="#" onclick="return linkClick ('https://www.icloud.com/')">苹果iCloud</a>，<a href="#" onclick="return linkClick ('https://www.microsoft.com/zh-tw/outlook-com/')">微软OUTLOOK</a>，<a href="#" onclick="return linkClick ('https://tw.mail.yahoo.com/')">雅虎邮箱</a>，<a href="#" onclick="return linkClick ('https://www.zoho.com/mail/')">俄罗斯ZOHO邮箱</a>，<a href="#" onclick=" return linkClick ('https://gmail.com')">Google邮箱</a>，<a href="#" onclick="return linkClick ('https://www.gmx.com/mail/#.1559516-header-nav1-2')">美国在线GMX邮箱</a>，CoNET强力推荐使用苹果公司的Email可以达到最佳速度(@OPN无IP连结技术只对应苹果公司iCloud邮箱)。密码请使用Email服务商的<a href="#" onclick="return linkClick ('https://tw.help.yahoo.com/kb/SLN15241.html')">应用密码</a>。对于Email供应商在应用密码申请时，须<a href="#" onclick="return linkClick ('https://tw.help.yahoo.com/kb/%E9%96%8B%E5%95%9F%E5%85%A9%E6%AD%A5%E9%A9%9F%E9%A9%97%E8%AD%89-sln5013.html')" >二步认证</a>并提供手机号码接受验证码，为保护您的隐私，建议使用免费在线代理接收验证码服务。( 如<a href="#" onclick="return linkClick('http://receive-sms-online.com/')">receive-sms-online.com</a>, <a href="#" onclick="return linkClick('https://sms-online.co/receive-free-sms')" >sms-online.co</a>, <a href="#" onclick="return linkClick('https://receive-a-sms.com/')" >receive-a-sms.com</a> ) 更多请 <a href="#" onclick="return linkClick ('http://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=0&rsv_idx=1&tn=baidu&wd=%E5%85%8D%E8%B4%20%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%20%E7%A0%81&rsv_pq=e94f47a50001f66f&rsv_t=b03ePiy3rHH0T4FVoWB8Hx9vrVdZLzVhhErWOo4xdBpjDw%2BtGri%2BViTaVAw&rqlang=cn&rsv_enter=1&rsv_sug3=42&rsv_sug1=5&rsv_sug7=100')">百度查找</a>，<a href="#" onclick="return linkClick ('https://www.google.com/search?q=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&oq=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&aqs=chrome..69i57j69i60.254j0j4&sourceid=chrome&ie=UTF-8')">Google查找</a>。`,
             serverDetail: '详细设定：',
             imapServer: 'IMAP服务器设定',
             imapServerInput: 'IMAP服务器IP或域名',
@@ -441,7 +441,7 @@ var infoDefine = [
             smtpServer: 'SMTP服务器设定',
             smtpServerInput: 'SMTP服务器IP或域名',
             emailServerPassword: '邮箱密码(推荐使用应用专用密码)',
-            imapAccountConform: '<p><dt>警告：</dt></p>当您按下提交按钮时，意味着您已经确认：这个邮箱并不是您常用的邮箱，这是为了使用QTGate系统而特别申请的临时邮箱，您同意承担由此带来的风险，并授权QTGate系统可以使用这个Email邮箱传输信息!',
+            imapAccountConform: '<p><dt>警告：</dt></p>当您按下提交按钮时，意味着您已经确认：这个邮箱并不是您常用的邮箱，这是为了使用CoNET系统而特别申请的临时邮箱，您同意承担由此带来的风险，并授权CoNET系统可以使用这个Email邮箱传输信息!',
             agree: '我已经了解风险，并愿意继续',
             imapOtherCheckError: '不能连接到Email服务器，有可能您设定的服务器名称或IP，通讯端口号有误，请检查您的服务器详细设定！',
             CertificateError: 'Email服务器提示的证书不能被系统信任！您的Email服务器有可能是一个仿冒的，您如果想继续，请在下面详细设定里选择【允许连接到不被信任证书的Email服务器】，但您的Email登陆信息有可能泄漏给此服务器！',
@@ -450,16 +450,31 @@ var infoDefine = [
             AuthenticationFailed: 'Email服务器提示用户名或密码错误，请仔细检查您的用户名和密码！',
             addAEmail: '添加通讯用Email账户',
             tryAgain: '再试一次',
-            connectImap: '连接QTGate',
-            cancelConnect: '终止QTGate连接',
+            connectImap: '连接CoNET',
+            cancelConnect: '终止CoNET连接',
             imapItemTitle: '通讯用邮箱详细信息',
-            imapCheckingStep: ['正在尝试连接email服务器', 'email伺服器IMAP連接成功', 'email伺服器SMTP連接成功'],
-            imapResultTitle: 'IMAP服务器QTGate通讯评分：',
+            imapCheckingStep: [
+                /* 0 */ '正在尝试连接email服务器',
+                /* 1 */ '邮件服务器IMAP连接成功, 正在等待CoNET对接。',
+                /* 2 */ '邮件服务器SMTP连接成功',
+                /* 3 */ 'CoNET客户端向CoNET系统发出联机请求Email。和CoNET联机需要额外的时间，请耐心等待。',
+                /* 4 */ '成功连接CoNET',
+            ],
+            imapResultTitle: 'IMAP服务器CoNET通讯评分：',
             testSuccess: 'email服务器连接试验成功！',
             exitEdit: '退出编辑Email帐户',
             deleteImap: '删除IMAP账户',
             proxyPortError: '端口号应该是从1000-65535之间的数字，或此端口号已被其他APP所占用。请尝试其他号码。',
-            appPassword: '关于APP密码'
+            appPassword: '关于APP密码',
+            imapCheckError: [
+                '不能连接到邮件服务器，有可能您所在网络不支持邮件通讯，请检查您的网络',
+                '邮件服务器提示用户名或密码错误，请仔细检查您的用户名和密码！ ',
+                '邮件服务器证书错误！您所在网络可能存在网络中间人攻击，请换网络环境后再尝试。 ',
+                '邮件服务器发送邮件错误，这通常是您使用的密码是普通密码所致，请换用APP密码后再次尝试',
+                '未连结互联网，请检查网络',
+                '未知错误，请退出CoNET后再试。',
+                '您的邮箱无可用空间错误，请检查邮箱删除不必要的邮件后再试。'
+            ]
         },
         home_index_view: {
             newVersion: '新版本准备就绪，请安装！',
@@ -485,14 +500,14 @@ var infoDefine = [
             newVersionInstallLoading: '更新中请稍候',
             KeypairLength: '请选择加密通讯用密钥对长度：这个数字越大，通讯越难被破解，但会增加通讯量和运算时间。',
             GenerateKeypair: '<em>系统正在生成用于通讯和签名的RSA加密密钥对，计算机需要运行产生大量的随机数字有，可能需要几分钟时间，尤其是长度为4096的密钥对，需要特别长的时间，请耐心等待。关于RSA加密算法的机制和原理，您可以访问维基百科：' +
-                "<a href='https://zh.wikipedia.org/wiki/RSA\u52A0\u5BC6\u6F14\u7B97\u6CD5' target=\"_blank\" onclick=\"return linkClick ('https://zh.wikipedia.org/wiki/RSA\u52A0\u5BC6\u6F14\u7B97\u6CD5')\" >https://zh.wikipedia.org/wiki/RSA\u52A0\u5BC6\u6F14\u7B97\u6CD5</a></em>",
+                `<a href='https://zh.wikipedia.org/wiki/RSA加密演算法' target="_blank" onclick="return linkClick ('https://zh.wikipedia.org/wiki/RSA加密演算法')" >https://zh.wikipedia.org/wiki/RSA加密演算法</a></em>`,
             inputEmail: '让我们来完成设定的最后几个步骤，首先生成RSA密钥对, 它是您的系统信息加密，身份认证及和CoNET网络通讯使用的重要工具。 RSA密钥对的密码请妥善保存，Email地址栏应填入您的常用邮箱地址, 它将被用作您的CoNET网络账号。 <em style="color:brown;">需注意的是CoNET域名在某些网络限制地区可能被列入黑名单，请使用网络自由地区邮箱。</em>',
-            accountEmailInfo: '由于QTGate域名在某些国家和地区被防火墙屏蔽，而不能正常收发Email，如果您是处于防火墙内的用户，建议使用防火墙外部的邮件服务商。'
+            accountEmailInfo: '由于CoNET域名在某些国家和地区被防火墙屏蔽，而不能正常收发Email，如果您是处于防火墙内的用户，建议使用防火墙外部的邮件服务商。'
         },
         Home_keyPairInfo_view: {
             title: '密钥信息',
-            emailNotVerifi: '您的密钥未获QTGate签署认证。',
-            emailVerified: '您的密钥已获QTGate签署认证。',
+            emailNotVerifi: '您的密钥未获CoNET签署认证。',
+            emailVerified: '您的密钥已获CoNET签署认证。',
             NickName: '昵称：',
             creatDate: '密钥创建日期：',
             keyLength: '密钥位强度：',
@@ -501,15 +516,15 @@ var infoDefine = [
             keyID: '密钥对ID：',
             logout: '退出登录',
             deleteKeyPairHaveLogin: '请使用登陆后的客户端来删除您的密钥',
-            deleteKeyPairInfo: '请注意：如果您没有备份您的QTGate系统的话，删除现有的密钥将使您的QTGate设定全部丢失，您有可能需要重新设置您的QTGate系统。如果您的注册Email没有变化，您的QTGate账户支付信息不会丢失！',
-            "delete": '削除',
+            deleteKeyPairInfo: '请注意：如果您没有备份您的CoNET系统的话，删除现有的密钥将使您的CoNET设定全部丢失，您有可能需要重新设置您的CoNET系统。如果您的注册Email没有变化，您的CoNET账户支付信息不会丢失！',
+            delete: '削除',
             locked: '请提供您的RSA密钥以解开密钥后才能继续操作，如果您遗忘了密码，请删除此RSA密钥。',
             systemError: '发生系统错误。如果重复发生，请删除您的密钥，再次设定您的系统！'
         },
         error_message: {
             title: '错误',
             errorNotifyTitle: '系统错误',
-            EmailAddress: ['请按以下格式输入你的电子邮件地址: someone@example.com.', '您已有相同的Email账户', '此类Email服务器暂时QTGate技术不能对应。'],
+            EmailAddress: ['请按以下格式输入你的电子邮件地址: someone@example.com.', '您已有相同的Email账户', '此类Email服务器CoNET暂时技术不支持。'],
             required: '请填写此字段',
             doCancel: '终止完成',
             PasswordLengthError: '密码必须设定为5个字符以上。',
@@ -535,12 +550,16 @@ var infoDefine = [
                 '存在相同Email账号',
                 '您的系统还未连接到CoNET网络！ ',
                 '您的邮箱提示您账号已无可使用容量，请清理邮箱后再试'
-            ]
+            ],
+            CoNET_requestError: [
+                /* 0 */ 'CoNET无响应,正在重新建立CoNET通讯管道，请稍候。',
+                /* 1 */ '无效操作！'
+            ],
         },
         emailConform: {
             activeViewTitle: '验证您的密钥',
-            info1_1: "\u60A8\u7684\u5BC6\u94A5\u8FD8\u672A\u5B8C\u6210\u9A8C\u8BC1\uFF0CCoNET\u5DF2\u5411\u60A8\u7684\u5BC6\u94A5\u90AE\u7BB1\u53D1\u9001\u4E86\u4E00\u5C01\u52A0\u5BC6\u90AE\u4EF6\uFF0C\u8BF7\u68C0\u67E5\u60A8\u7684 \u3010",
-            info1_2: "\u3011 \u90AE\u7BB1\u3002\u5982\u679C\u5B58\u5728\u591A\u5C01CoNET\u7684\u90AE\u4EF6\u65F6\uFF0C\u8BF7\u9009\u62E9\u6700\u540E\u4E00\u5C01\u4FE1\u4EF6\u3002\u8BF7\u6253\u5F00\u4FE1\u4EF6\u5E76\u590D\u5236\u90AE\u4EF6\u5185\u5BB9\u3002\u5982\u679C\u60A8\u8FD8\u672A\u6536\u5230CoNET\u7684\u90AE\u4EF6\uFF0C\u8BF7\u68C0\u67E5\u60A8\u7684\u5BC6\u94A5\u90AE\u7BB1\u662F\u5426\u51C6\u786E\uFF0C\u6216\u8005\u60A8\u53EF\u4EE5\u5220\u9664\u60A8\u73B0\u6709\u7684\u5BC6\u94A5\uFF0C\u91CD\u65B0\u751F\u6210\u65B0\u5BC6\u94A5\u3002",
+            info1_1: `您的密钥还未完成验证，CoNET已向您的密钥邮箱发送了一封加密邮件，请检查您的 【`,
+            info1_2: `】 邮箱。如果存在多封CoNET的邮件时，请选择最后一封信件。请打开信件并复制邮件内容。如果您还未收到CoNET的邮件，请检查您的密钥邮箱是否准确，或者您可以删除您现有的密钥，重新生成新密钥。`,
             info2: '请复制从“-----BEGIN PGP MESSAGE----- （开始，一直到）-----END PGP MESSAGE-----” 结束的完整内容，粘贴在此输入框中。',
             emailTitle: '感谢您使用CoNET服务',
             emailDetail1: '尊敬的 ',
@@ -555,14 +574,14 @@ var infoDefine = [
                 '内容格式错误，请复制从“-----BEGIN PGP MESSAGE----- （开始，一直到）-----END PGP MESSAGE-----” 结束的完整内容，粘贴在此输入框中。 ',
                 '提供的内容不能被解密，请确认这是在您收到的最后一封从CoNET发送过来的激活信。如果还是没法完成激活，请删除您的密钥重新生成和设定。 ',
                 '和CoNET连接发生错误，请退出重新尝试！ ',
-                '无效激活码！ CoNET已重新发送新的激活Email，并断开与您的连接。请退出CoNET重新启动CoNET后，检查您的邮箱重做激活。 ',
+                '无效激活码！如果存在多封CoNET的邮件时，请选择最后一封信件。',
                 '您的CoNET看上去有问题, 请删除您的密钥，重新设置您的CoNET！ ',
-                'CoNET系统故障，请稍后再试。 ',
+                'CoNET系统故障，请稍后再试。',
                 '您当天的数据通讯量达到上限，请等待明天再试或升级用户类型',
                 '用来通讯的Email设定有错误，请检查IMAP设定后重试，或CoNET不支持此Email类型',
                 '您所选区域不能够连结，请稍候再试',
                 '您的IMAP邮箱发信发生错误。请退出CoNET重试。如果持续发生此故障，您的IMAP帐号有可能被锁住，需要登陆您的IMAP邮箱网站解锁操作。 ',
-                'CoNET核心程序发生错误，请退出后重启CoNET！',
+                'CoNET核心程序发生错误，请刷新网页或退出后重启CoNET！',
                 '您是高手，不用我多说了。'
             ],
             activeing: '正在通讯中'
@@ -787,12 +806,12 @@ var infoDefine = [
             serverTitle: 'サーバー'
         },
         twitter: {
-            newTwitterAccount: "Twitter\u306EAPP\u30A4\u30F3\u30D5\u30A9\u30FC\u30E1\u30FC\u30B7\u30E7\u30F3\u3092\u5165\u529B\u3057\u3066\u304F\u3060\u3055\u3044\u3002APP\u30A4\u30F3\u30D5\u30A9\u30FC\u30E1\u30FC\u30B7\u30E7\u30F3\u4F5C\u6210\u3059\u308B\u4E8B\u304C\u308F\u304B\u3089\u306A\u3044\u5834\u5408\u306F<a target=\"_blank\" href='https://github.com/QTGate/QTGate-Desktop-Client/wiki/Create-Twitter-APP'\">\u3053\u3053</a>\u3092\u30AF\u30EA\u30C3\u30AF\u3057\u3066\u304F\u3060\u3055\u3044\u3002",
+            newTwitterAccount: `TwitterのAPPインフォーメーションを入力してください。APPインフォーメーション作成する事がわからない場合は<a target="_blank" href='https://github.com/QTGate/QTGate-Desktop-Client/wiki/Create-Twitter-APP'">ここ</a>をクリックしてください。`,
             addAccount: 'Twitterアカウントを追加',
             following: 'フォロー',
             followers: 'フォロワー',
             second: '秒',
-            videoSizeOver: "\u30D3\u30C7\u30AA\u304CTwitter\u898F\u683C: 140\u79D2\u3001300MB\u3001(1280x1024)\u3092\u8D85\u3048\u3066\u3044\u307E\u3059",
+            videoSizeOver: `ビデオがTwitter規格: 140秒、300MB、(1280x1024)を超えています`,
             month: '月',
             day: '日',
             min: '分',
@@ -832,7 +851,7 @@ var infoDefine = [
             paymentProblem1: '支払い支障がある',
             paymentProblem: 'あなた現在いる所在地ではバンク支払いがブラックされている模様です。CoNET経由でのお支払いをしてください。',
             CancelSuccess: function (PlanExpire, isAnnual, returnAmount) {
-                return "\u30D7\u30E9\u30F3\u30AD\u30E3\u30F3\u30BB\u30EB\u3057\u307E\u3057\u305F\u3002" + new Date(PlanExpire).toLocaleDateString() + "\u307E\u3067\u3001\u5143\u30D7\u30E9\u30F3\u306E\u307E\u307ECoNET\u30B5\u30FC\u30D3\u30B9\u304C\u4F7F\u3048\u307E\u3059\u3002\u305D\u306E\u3042\u3068\u306FCoNET\u306E\u30D5\u30EA\u30FC\u30E6\u30FC\u30B6\u30FC\u3068\u623B\u308A\u307E\u3059\u3002" + (isAnnual ? "\u5143\u30D7\u30E9\u30F3\u6B8B\u308Aus$ " + returnAmount + "\u306F\uFF15\u65E5\u30A6\u30A9\u30AD\u30F3\u30C7\u30A4\u5185\u304A\u652F\u6255\u3044\u4F7F\u3063\u305F\u30AB\u30FC\u30C9\u306B\u623B\u308A\u307E\u3059" : "\u30D7\u30E9\u30F3\u4EE3\u81EA\u52D5\u843D\u3057\u306F\u4E2D\u6B62\u3055\u308C\u307E\u3059") + "\u3002\u3053\u308C\u304B\u3089\u3082\u3088\u308D\u3057\u304F\u304A\u9858\u3044\u7533\u3057\u4E0A\u3052\u307E\u3059\u3002";
+                return `プランキャンセルしました。${new Date(PlanExpire).toLocaleDateString()}まで、元プランのままCoNETサービスが使えます。そのあとはCoNETのフリーユーザーと戻ります。${isAnnual ? `元プラン残りus$ ${returnAmount}は５日ウォキンデイ内お支払い使ったカードに戻ります` : `プラン代自動落しは中止されます`}。これからもよろしくお願い申し上げます。`;
             },
             paymentSuccess: 'あなたのプランをアップグレードしました。これからもよろしくお願い申し上げます。',
             qtgateTeam: 'CoNETチーム全員より',
@@ -867,16 +886,16 @@ var infoDefine = [
             payAmountTitile: 'お支払い金額合計',
             cardNumber: 'クレジットカード番号',
             multiOpn: 'OPN並列ゲットウェイ技術',
-            monthlyAutoPay: function (monthCost) { return "<span>\u53E3\u5EA7\u632F\u66FF</span><span class=\"usDollar\" >@ us$</span><span class=\"amount\" >" + monthCost + "</span>/\u6708<span>"; },
+            monthlyAutoPay: function (monthCost) { return `<span>口座振替</span><span class="usDollar" >@ us$</span><span class="amount" >${monthCost}</span>/月<span>`; },
             cvcNumber: 'セキュリティコード',
             calcelPayment: 'キャンセル',
             doPayment: 'お支払いにします',
             postcodeTitle: 'カード所有者郵便番号',
-            annualPay: function (annual_monthlyCost) { return "<span>\u5E74\u6255\u3044\u3068\u6708\u63DB\u7B97</span><span class=\"usDollar\">@ us$</span><span class=\"amount\" >" + getAmount((Math.round(parseInt(annual_monthlyCost) / 0.12) / 100).toString()) + "</span>/\u6708<span>"; },
+            annualPay: function (annual_monthlyCost) { return `<span>年払いと月換算</span><span class="usDollar">@ us$</span><span class="amount" >${getAmount((Math.round(parseInt(annual_monthlyCost) / 0.12) / 100).toString())}</span>/月<span>`; },
             aboutCancel: 'プランをキャンセルについて',
             expirationYear: 'カード期限',
             canadaCard: '*おカード所有者はカナダ所在者とGST(BC)5.0% 自動加算されます',
-            "continue": '次へ',
+            continue: '次へ',
             multiRegion: ['シンプルリジョーン並列ゲットウェイ', 'マルチリジョーン並列ゲットウェイ', 'マルチリジョーン並列ゲットウェイ', 'マルチリジョーン並列ゲットウェイ'],
             serverShareData: ['シェアゲットウェイ', '一台ゲットウェイ独占*', '二台ゲットウェイ独占*', '四台ゲットウェイ独占'],
             internetShareData: ['シェアハイスピード回線', '独占ハイスピード一回線*', '独占ハイスピード二回線*', '独占ハイスピード四回線'],
@@ -885,7 +904,7 @@ var infoDefine = [
             maxmultigateway: ['最大二つ並列ゲットウェイ', '最大四つ並列ゲットウェイ*', '最大四つ並列ゲットウェイ'],
             cancelPlanMessage: 'CoNETプランは月毎に計算し、来月のあなたの最初加入した日まで、今のプランのままご利用ですます。キャンセルした日から自動的にCoNETの無料ユーザーになります。おアカウトは(月)払いの場合は、来月の自動払いは中止となります。年払いの場合は、ご使った分に月普通料金と計算し控除してから、お支払いを使ったクレジットカードに戻ります。販促コードまたはテストユーザーにはキャンセルすることができません。',
             cancelPlanMessage1: function (planName, isAnnual, expire) {
-                return "<span>\u3042\u306A\u305F\u306E\u30D7\u30E9\u30F3\u306F" + (isAnnual ? "\u4E00\u5E74\u5951\u7D04\u3067\u3059\u3002\u30AD\u30E3\u30F3\u30BB\u30EB\u3092\u3057\u305F\u5834\u5408\u306F\u3001\u3054\u5229\u7528\u3057\u3066\u9802\u3044\u305F\u6708\u306B\u666E\u901A\u6599\u91D1\u3068\u8ACB\u6C42\u3092\u8A08\u7B97\u3055\u308C\u307E\u3059\u3002\u304A\u8FD4\u3057\u91D1\u984D\u306F\uFF0C\u304A\u652F\u6255\u3063\u3066\u9802\u3044\u305F\u30D7\u30E9\u30F3\u5E74\u5951\u7D04\u6599\u91D1 </span><span class=\"usDollar\">us$</span><span class=\"amount\">" + getPlanPrice(planName, true) + "</span><span> - \u305D\u306E\u30D7\u30E9\u30F3\u306E\u666E\u901A\u6708\u6599\u91D1 </span><span class=\"usDollar\">us$</span><span class=\"amount\">" + getPlanPrice(planName, false) + "</span><span> X \u3054\u5229\u7528\u3057\u3066\u9802\u3044\u305F\u6708(\u672C\u6708\u3082\u542B\u3081\u3066)\uFF1A</span><span class=\"amount\">" + (12 - getRemainingMonth(expire)) + "</span><span> = \u623B\u308B\u91D1\u984D </span><span class=\"usDollar\">us$</span><span class=\"amount\">" + getCurrentPlanCancelBalance(expire, planName) + "</span><span>\u3068\u307E\u308A\u307E\u3059\u3002\uFF17\u65E5\u5185\u304A\u652F\u6255\u3063\u3066\u9802\u3044\u305F\u30AF\u30EC\u30B8\u30C3\u30C8\u30AB\u30FC\u30C9\u3078\u8FD4\u91D1\u3068\u3057\u307E\u3059\u3002</span>" : "\u6708\u30D7\u30E9\u30F3\u3067\u3059\u3002\u30AD\u30E3\u30F3\u30BB\u30EB\u306B\u3059\u308B\u3068\u6B21\u306E\u66F4\u65B0\u65E5</span><span class=\"amount\">" + nextExpirDate(expire).toLocaleDateString() + "</span><span>\u306B\u81EA\u52D5\u66F4\u65B0\u306F\u3057\u307E\u305B\u3093\u3067\u3059\u3002</span>");
+                return `<span>あなたのプランは${isAnnual ? `一年契約です。キャンセルをした場合は、ご利用して頂いた月に普通料金と請求を計算されます。お返し金額は，お支払って頂いたプラン年契約料金 </span><span class="usDollar">us$</span><span class="amount">${getPlanPrice(planName, true)}</span><span> - そのプランの普通月料金 </span><span class="usDollar">us$</span><span class="amount">${getPlanPrice(planName, false)}</span><span> X ご利用して頂いた月(本月も含めて)：</span><span class="amount">${12 - getRemainingMonth(expire)}</span><span> = 戻る金額 </span><span class="usDollar">us$</span><span class="amount">${getCurrentPlanCancelBalance(expire, planName)}</span><span>とまります。７日内お支払って頂いたクレジットカードへ返金とします。</span>` : `月プランです。キャンセルにすると次の更新日</span><span class="amount">${nextExpirDate(expire).toLocaleDateString()}</span><span>に自動更新はしませんです。</span>`}`;
             }
         },
         QTGateDonate: {
@@ -999,7 +1018,7 @@ var infoDefine = [
         useInfoAndroid: {
             title1: 'Androidロカールプロキシ設定',
             info: [{
-                    title: "\u7AEF\u672B\u306E\u8A2D\u5B9A\u30A2\u30D7\u30EA\u3092\u958B\u304D\u307E\u3059\u3002[Wi-Fi]\u3092\u30BF\u30C3\u30D7\u3057\u307E\u3059",
+                    title: `端末の設定アプリを開きます。[Wi-Fi]をタップします`,
                     titleImage: '/images/androidSetup.jpg',
                     detail: '',
                     image: '/images/android1.jpg'
@@ -1045,79 +1064,79 @@ var infoDefine = [
             start: 'オプンドア'
         },
         firstNote: {
-            title: 'CoNETの製品およびサービス（以下「本サービス」）をご利用いただきありがとうございます。本サービスはカナダQTGateシステムズ株式会社が提供しています。',
+            title: 'CoNETの製品およびサービス（以下「本サービス」）をご利用いただきありがとうございます。本サービスはカナダCoNETテクノロジ株式会社（以下はCoNETと言い）が提供しています。',
             firstPart: 'ユーザーは、本サービスを利用することにより、本規約に同意することになります。以下を注意してお読みください。',
             detail: [
                 {
                     header: '本サービスのご利用について',
-                    detail: '本サービス内で入手できるすべてのポリシーを遵守してください。本サービスを不正に利用しないでください。たとえば、本サービスの妨害や、QTGateが提供するインターフェースおよび手順以外の方法による、本サービスへのアクセスを試みてはなりません。'
+                    detail: '本サービス内で入手できるすべてのポリシーを遵守してください。本サービスを不正に利用しないでください。たとえば、本サービスの妨害や、CoNETが提供するインターフェースおよび手順以外の方法による、本サービスへのアクセスを試みてはなりません。'
                 }, {
                     header: null,
-                    detail: 'ユーザーは、法律（輸出、再輸出に関して適用される法規制を含みます）で認められている場合に限り、本サービスを利用することができます。ユーザーがQTGateの規約やポリシーを遵守しない場合、またはQTGateが不正行為と疑う行為について調査を行う場合に、QTGateはユーザーに対する本サービスの提供を一時停止または停止することができます。'
+                    detail: 'ユーザーは、法律（輸出、再輸出に関して適用される法規制を含みます）で認められている場合に限り、本サービスを利用することができます。ユーザーがCoNETの規約やポリシーを遵守しない場合、またはCoNETが不正行為と疑う行為について調査を行う場合に、CoNETはユーザーに対する本サービスの提供を一時停止または停止することができます。'
                 }, {
                     header: '無IP通信技術OPNネットワークはプライベートに限界があります',
-                    detail: 'OPN無IP通信は弊社の革新的技術であります。あなたはQTGate端末ソフトを使ってQTGateシステムとのコミニュケーションはお客さんが無IPでプライベートな通信を行います。（但しiOPN技術を選択してゲットウェーに接続した場合は、お客さんのIPアドレスをQTGateシステムに提示するのが必要です。）でもお客さんのIPアドレスはeメールプロバイダーのログに記録していたかもしれません。裁判所命令を持つカナダの法執行機関はQTGateのログを得て、eメールプロバイダーのログと合併して、お客さんのプライベートインフォメーションを入手することも可能です。'
+                    detail: 'OPN無IP通信は弊社の革新的技術であります。あなたはCoNET端末ソフトを使ってCoNETシステムとのコミニュケーションはお客さんが無IPでプライベートな通信を行います。（但しiOPN技術を選択してゲットウェーに接続した場合は、お客さんのIPアドレスをCoNETシステムに提示するのが必要です。）でもお客さんのIPアドレスはeメールプロバイダーのログに記録していたかもしれません。裁判所命令を持つカナダの法執行機関はCoNETのログを得て、eメールプロバイダーのログと合併して、お客さんのプライベートインフォメーションを入手することも可能です。'
                 },
                 {
                     header: null,
                     detail: 'ユーザーは、本サービスを利用することによって、本サービスまたはアクセスするコンテンツに対するいかなる知的財産権も取得することはありません。ユーザーは、本サービスのコンテンツの所有者から許可を得た場合や、法律によって認められる場合を除き、そのコンテンツを利用することはできません。本規約は、本サービスで使用されている、いかなるブランドまたはロゴを利用する権利もユーザーに与えるものではありません。本サービス内に表示される、または、本サービスに伴って表示されるいかなる法的通知も、削除したり、隠したり、改ざんしてはなりません。'
                 },
                 {
-                    header: '個人情報保護及びQTGateからのインフォーメーションの受信について',
-                    detail: '本サービスの利用に関して、QTGateはユーザーに対してサービスの告知、管理上のメッセージ、およびその他の情報を送信することができます。ユーザーは、これらの通知について、受け取らないことを選択できる場合があります。'
+                    header: '個人情報保護及びCoNETからのインフォーメーションの受信について',
+                    detail: '本サービスの利用に関して、CoNETはユーザーに対してサービスの告知、管理上のメッセージ、およびその他の情報を送信することができます。ユーザーは、これらの通知について、受け取らないことを選択できる場合があります。'
                 }, {
                     header: null,
-                    detail: 'お客様がQTGateサービスをご利用になる際に、お客様のデータ通信料計算のために、ご利用データ量が自動的に収集および保存されます。限られたログは以下のようです。日付、お客様アカウント、ご利用ゲットウェーエリアとゲットウェーIPアドレス、データ量、アップ又はダウンロード。例：'
+                    detail: 'お客様がCoNETサービスをご利用になる際に、お客様のデータ通信料計算のために、ご利用データ量が自動的に収集および保存されます。限られたログは以下のようです。日付、お客様アカウント、ご利用ゲットウェーエリアとゲットウェーIPアドレス、データ量、アップ又はダウンロード。例：'
                 }, {
                     header: null,
-                    detail: '<p class="tag info">06/20/2017 18:12:16, info@qtgate.com, francisco, 104.236.162.139, 300322 byte up, 482776323 byte down.</p><p class="tag info">06/21/2017 12:04:18, info@qtgate.com, francisco, 104.236.162.139, 1435226 byte up, 11782238 byte down.</p>'
+                    detail: '<p class="tag info">06/20/2017 18:12:16, info@CoNET.com, francisco, 104.236.162.139, 300322 byte up, 482776323 byte down.</p><p class="tag info">06/21/2017 12:04:18, info@CoNET.com, francisco, 104.236.162.139, 1435226 byte up, 11782238 byte down.</p>'
                 }, {
                     header: null,
-                    detail: 'QTGateは以上の情報以外には保存することしません。QTGateは以上の情報をカナダーの裁判所命令を持つカナダの法執行機関に協力することがありえます。カナダ以外のこのログ情報を協力する要請のあなたは、まずカナダ外務省までお問い合わせ下さい：'
+                    detail: 'CoNETは以上の情報以外には保存することしません。CoNETは以上の情報をカナダーの裁判所命令を持つカナダの法執行機関に協力することがありえます。カナダ以外のこのログ情報を協力する要請のあなたは、まずカナダ外務省までお問い合わせ下さい：'
                 }, {
                     header: null,
                     detail: '<a class="tag alert" href="http://www.international.gc.ca/">http://www.international.gc.ca/</a>'
                 }, {
                     header: 'ソフトウェアの版権について',
-                    detail: 'QTGateは、本サービスの一環としてユーザーに提供するソフトウェアについて、全世界で適用され、譲渡不可で、非独占的な個人使用ライセンスを無償でユーザーに付与します。このライセンスは、QTGateが提供する本サービスを本規約により許可された方法でユーザーが使用し、その便益を享受できるようにすることを唯一の目的としています。'
+                    detail: 'CoNETは、本サービスの一環としてユーザーに提供するソフトウェアについて、全世界で適用され、譲渡不可で、非独占的な個人使用ライセンスを無償でユーザーに付与します。このライセンスは、CoNETが提供する本サービスを本規約により許可された方法でユーザーが使用し、その便益を享受できるようにすることを唯一の目的としています。'
                 }, {
                     header: null,
                     detail: 'ユーザーは、本サービスまたは本サービスに含まれるソフトウェアのどの部分も、複製、変更、配信、販売、貸与することはできず、そのソフトウェアのソース コードのリバース エンジニアリングや抽出を試みることはできません。'
                 }, {
                     header: '本サービスの変更または終了',
-                    detail: 'QTGateは、常に本サービスの変更および改善を行っています。QTGateは、機能性や機能の追加や削除を行うことができ、本サービス全体を一時停止または終了することができます。ユーザーはいつでも本サービスの利用を終了することができます。QTGateもいつでも、ユーザーに対する本サービスの提供を停止し、または、本サービスに対する制限を追加または新規に設定することができます。'
+                    detail: 'CoNETは、常に本サービスの変更および改善を行っています。CoNETは、機能性や機能の追加や削除を行うことができ、本サービス全体を一時停止または終了することができます。ユーザーはいつでも本サービスの利用を終了することができます。CoNETもいつでも、ユーザーに対する本サービスの提供を停止し、または、本サービスに対する制限を追加または新規に設定することができます。'
                 }, {
                     header: '保証および免責',
-                    detail: 'QTGateは、商業上合理的な水準の技術および注意のもとに本サービスを提供し、ユーザーに本サービスの利用を楽しんでいただくことを望んでいますが、本サービスについて約束できないことがあります。'
+                    detail: 'CoNETは、商業上合理的な水準の技術および注意のもとに本サービスを提供し、ユーザーに本サービスの利用を楽しんでいただくことを望んでいますが、本サービスについて約束できないことがあります。'
                 }, {
                     header: null,
-                    detail: '本規約または追加規定に明示的に規定されている場合を除き、QTGateまたはそのサプライヤーもしくはディストリビューターのいずれも、本サービスについて具体的な保証を行いません。たとえば QTGateは、本サービス内のコンテンツ、本サービスの特定の機能、その信頼性、利用可能性、またはユーザーのニーズに応える能力について、何らの約束もしません。本サービスは「現状有姿で」提供されます。'
+                    detail: '本規約または追加規定に明示的に規定されている場合を除き、CoNETまたはそのサプライヤーもしくはディストリビューターのいずれも、本サービスについて具体的な保証を行いません。たとえば CoNETは、本サービス内のコンテンツ、本サービスの特定の機能、その信頼性、利用可能性、またはユーザーのニーズに応える能力について、何らの約束もしません。本サービスは「現状有姿で」提供されます。'
                 }, {
-                    header: '本サービスに対するQTGateの責任',
-                    detail: '法律で認められる場合には、QTGateならびにそのサプライヤーおよびディストリビューターは、逸失利益、逸失売上もしくはデータの紛失、金銭的損失、または間接損害、特別損害、結果損害もしくは懲罰的損害について責任を負いません。'
+                    header: '本サービスに対するCoNETの責任',
+                    detail: '法律で認められる場合には、CoNETならびにそのサプライヤーおよびディストリビューターは、逸失利益、逸失売上もしくはデータの紛失、金銭的損失、または間接損害、特別損害、結果損害もしくは懲罰的損害について責任を負いません。'
                 }, {
                     header: 'カナダー法律によるサービス禁止対象者',
                     detail: 'あなたはカナダー法律によってサービス禁止対象者ではありませんと確認していた事。'
                 },
                 {
                     header: '事業者による本サービスの利用',
-                    detail: '本サービスを事業者のために利用する場合、その事業者は本規約に同意するものとします。かかる事業者は、QTGateとその関連会社、役員、代理店、従業員を、本サービスの利用または本規約への違反に関連または起因するあらゆる請求申し立て、訴訟、法的措置について、請求申し立て、損失、損害、訴訟、裁判、告訴から生じる法的責任および費用、弁護士費用を含め、免責および補償するものとします。'
+                    detail: '本サービスを事業者のために利用する場合、その事業者は本規約に同意するものとします。かかる事業者は、CoNETとその関連会社、役員、代理店、従業員を、本サービスの利用または本規約への違反に関連または起因するあらゆる請求申し立て、訴訟、法的措置について、請求申し立て、損失、損害、訴訟、裁判、告訴から生じる法的責任および費用、弁護士費用を含め、免責および補償するものとします。'
                 }, {
                     header: '本規約について',
-                    detail: 'QTGateは、たとえば、法律の改正または本サービスの変更を反映するために、本サービスに適用する本規約または特定の本サービスについての追加規定を修正することがあります。ユーザーは定期的に本規約をご確認ください。QTGateは、本規約の修正に関する通知をこのページに表示します。'
+                    detail: 'CoNETは、たとえば、法律の改正または本サービスの変更を反映するために、本サービスに適用する本規約または特定の本サービスについての追加規定を修正することがあります。ユーザーは定期的に本規約をご確認ください。CoNETは、本規約の修正に関する通知をこのページに表示します。'
                 }, {
                     header: null,
                     detail: '追加規定の修正については、該当する本サービス内において通知を表示します。変更は、さかのぼって適用されることはなく、その変更が表示されてから 14 日以降に発効します。ただし、本サービスの新機能に対処する変更または法律上の理由に基づく変更は、直ちに発効するものとします。本サービスに関する修正された規定に同意しないユーザーは、本サービスの利用を停止してください。'
                 }, {
                     header: null,
-                    detail: '本規約と追加規定との間に矛盾が存在する場合には、追加規定が本規約に優先します。本規約は、QTGateとユーザーとの間の関係を規定するものです。本規約は、第三者の受益権を創設するものではありません。ユーザーが本規約を遵守しない場合に、QTGateが直ちに法的措置を講じないことがあったとしても、そのことによって、QTGateが有している権利（たとえば、将来において、法的措置を講じる権利）を放棄しようとしていることを意味するものではありません。'
+                    detail: '本規約と追加規定との間に矛盾が存在する場合には、追加規定が本規約に優先します。本規約は、CoNETとユーザーとの間の関係を規定するものです。本規約は、第三者の受益権を創設するものではありません。ユーザーが本規約を遵守しない場合に、CoNETが直ちに法的措置を講じないことがあったとしても、そのことによって、CoNETが有している権利（たとえば、将来において、法的措置を講じる権利）を放棄しようとしていることを意味するものではありません。'
                 }, {
                     header: null,
-                    detail: 'ある特定の規定が強制執行不可能であることが判明した場合であっても、そのことは他のいずれの規定にも影響を及ぼすものではありません。カナダBC州の抵触法を除き、本規約または本サービスに起因するまたは関連するいかなる紛争に関しても、カナダBC州の法律が適用されます。本規約または本サービスに起因するまたは関連するいかなる主張についても、カナダBC州内に所在する裁判所においてのみ裁判手続を取ることができるものとし、ユーザーとQTGateはその裁判所の対人管轄権に同意するものとします。'
+                    detail: 'ある特定の規定が強制執行不可能であることが判明した場合であっても、そのことは他のいずれの規定にも影響を及ぼすものではありません。カナダBC州の抵触法を除き、本規約または本サービスに起因するまたは関連するいかなる紛争に関しても、カナダBC州の法律が適用されます。本規約または本サービスに起因するまたは関連するいかなる主張についても、カナダBC州内に所在する裁判所においてのみ裁判手続を取ることができるものとし、ユーザーとCoNETはその裁判所の対人管轄権に同意するものとします。'
                 }
             ],
             disagree: 'キャンセル',
-            agreeMent: 'QTGate利用規約とプライバシー'
+            agreeMent: 'CoNET利用規約とプライバシー'
         },
         linuxUpdate: {
             newVersionDownload: 'クリックしてダウンロードとインストール',
@@ -1136,8 +1155,8 @@ var infoDefine = [
         },
         imapInformation: {
             title: '通信専用Emailアカウントを登録',
-            tempImapAccount: "IMAP\u306E\u30A2\u30AB\u30A6\u30F3\u30C8\u8A2D\u5B9A\u306B\u56F0\u308B\u306A\u3089\u3001<a href=\"#\" onclick=\"return linkClick ('https://github.com/QTGate/QTGate-Desktop-Client/wiki/IMAP%E9%80%9A%E4%BF%A1%E5%B0%82%E7%94%A8%E4%B8%80%E6%99%82%E7%9A%84%E3%81%AAiCloud%E3%82%A2%E3%82%AB%E3%83%B3%E3%82%A6%E3%83%88')\">CoNET\u3054\u63D0\u4F9B\u3057\u3066\u3044\u308B\u4E00\u6642iCloud\u30A2\u30AB\u30F3\u30A6\u30C8\u3092\u30C6\u30B9\u30C8\u306E\u3054\u5229\u7528\u3044\u305F\u3060\u3051\u307E\u3059\u3002</a>",
-            infomation: "CoNET\u901A\u4FE1\u5C02\u7528email\u30A2\u30AB\u30F3\u30A6\u30C8\u3092\u8A2D\u5B9A\u3057\u307E\u3059\u3002\u3053\u306Eemail\u30A2\u30AB\u30A6\u30F3\u30C8\u306F\u3042\u306A\u305F\u3068CoNET\u304A\u4E92\u3044\u60C5\u5831\u4EA4\u63DB\u3059\u308B\u306E\u305F\u3081\u306B\u3001\u30E6\u30FC\u30B6\u540D\u3068\u30D1\u30B9\u30EF\u30FC\u30C9\u3092CoNET\u30B7\u30B9\u30C6\u30E0\u3078\u63D0\u4F9B\u3057\u307E\u3059\u3002\u500B\u4EBA\u60C5\u5831\u6F0F\u6D29\u306E\u6050\u308C\u3001\u4E00\u6642\u7684\u306Aemail\u30A2\u30AB\u30A6\u30F3\u30C8\u3092\u65B0\u305F\u306B\u3064\u304F\u3066\u304F\u3060\u3055\u3044\u3002CoNET\u6280\u8853\u306F\u53EA\u4ECA<a href=\"#\" onclick=\"return linkClick ('https://icloud.com')\">Apple iCloud</a>, <a href=\"#\" onclick=\"return linkClick ('https://www.microsoft.com/ja-jp/outlook-com/')\">Outlook</a>, <a href=\"#\" onclick=\"return linkClick ('https://login.yahoo.co.jp/config/login?.src=ym&.done=https%3A%2F%2Fmail.yahoo.co.jp%2F')\">Yahoo Mail</a>, <a href=\"#\" onclick=\"return linkClick ('https://gmail.com')\">GMAIL</a>, <a href=\"#\" onclick=\"return linkClick ('https://www.gmx.com/mail/#.1559516-header-nav1-2')\">GMX</a>, <a href=\"#\" onclick=\"return linkClick ('https://www.zoho.com/mail/')\">HOZO</a>\u5BFE\u5FDC\u3057\u3066\u304A\u308A\u307E\u3059\u3001APPLE\u306EiCloud\u3092\u4F7F\u3046\u304A\u52E7\u3081\u3067\u3059\u3002( @OPN IP\u306A\u3057\u901A\u4FE1\u6280\u8853\u306FiCloud\u306E\u307F\u5BFE\u5FDC\u3057\u3066\u304A\u308A\u307E\u3059\uFF09</span>\u30E1\u30FC\u30EB\u30A2\u30AB\u30A6\u30F3\u30C8\u306E\u30D1\u30B9\u30EF\u30FC\u30C9\u306B\u3064\u3044\u3066\u3001<a href=\"#\" onclick=\"return linkClick ('https://support.microsoft.com/ja-jp/help/12409/microsoft-account-app-passwords-two-step-verification')\">\u30A2\u30D7\u30EA\u30D1\u30B9\u30EF\u30FC\u30C9</a>\u3092\u3054\u5229\u7528\u306E\u3092\u304A\u52E7\u3081\u3067\u3059\u3002\u30A2\u30D7\u30EA\u30D1\u30B9\u30EF\u30FC\u30C9\u3092\u7533\u8ACB\u3059\u308B\u969B\u306B\u3001<a href=\"#\" onclick=\"return linkClick ('https://support.microsoft.com/ja-jp/help/12408')\">2\u6BB5\u968E\u8A8D\u8A3C\u30D7\u30ED\u30BB\u30B9</a>\u306B\u5FC5\u8981\u306A\u30B9\u30DE\u30FC\u30C8\u30D5\u30A9\u30F3\u756A\u53F7\u3092\u63D0\u793A\u304C\u5FC5\u8981\u306A\u5834\u5408\u3001\u500B\u4EBA\u30D7\u30E9\u30A4\u30D0\u30B7\u30FC\u3092\u5B88\u308B\u306E\u305F\u3081\u3001( <a href=\"#\" onclick=\"return linkClick('http://receive-sms-online.com/')\">receive-sms-online.com</a>, <a href=\"#\" onclick=\"return linkClick('https://sms-online.co/receive-free-sms')\" >sms-online.co</a>, <a href=\"#\" onclick=\"return linkClick('https://receive-a-sms.com/')\" >receive-a-sms.com</a> ) \u306A\u3069<a href=\"#\" onclick=\"return linkClick ('http://jpnpay.com/archives/561')\">\u30AA\u30F3\u30E9\u30A4\u30F3\u7121\u6599SMS\u53D7\u4FE1\u30B5\u30FC\u30D3\u30B9</a>\u3092\u304A\u52E7\u3081\u3057\u307E\u3059\u3002",
+            tempImapAccount: `IMAPのアカウント設定に困るなら、<a href="#" onclick="return linkClick ('https://github.com/QTGate/QTGate-Desktop-Client/wiki/IMAP%E9%80%9A%E4%BF%A1%E5%B0%82%E7%94%A8%E4%B8%80%E6%99%82%E7%9A%84%E3%81%AAiCloud%E3%82%A2%E3%82%AB%E3%83%B3%E3%82%A6%E3%83%88')">CoNETご提供している一時iCloudアカンウトをテストのご利用いただけます。</a>`,
+            infomation: `CoNET通信専用emailアカンウトを設定します。このemailアカウントはあなたとCoNETお互い情報交換するのために、ユーザ名とパスワードをCoNETシステムへ提供します。個人情報漏洩の恐れ、一時的なemailアカウントを新たにつくてください。CoNET技術は只今<a href="#" onclick="return linkClick ('https://icloud.com')">Apple iCloud</a>, <a href="#" onclick="return linkClick ('https://www.microsoft.com/ja-jp/outlook-com/')">Outlook</a>, <a href="#" onclick="return linkClick ('https://login.yahoo.co.jp/config/login?.src=ym&.done=https%3A%2F%2Fmail.yahoo.co.jp%2F')">Yahoo Mail</a>, <a href="#" onclick="return linkClick ('https://gmail.com')">GMAIL</a>, <a href="#" onclick="return linkClick ('https://www.gmx.com/mail/#.1559516-header-nav1-2')">GMX</a>, <a href="#" onclick="return linkClick ('https://www.zoho.com/mail/')">HOZO</a>対応しております、APPLEのiCloudを使うお勧めです。( @OPN IPなし通信技術はiCloudのみ対応しております）</span>メールアカウントのパスワードについて、<a href="#" onclick="return linkClick ('https://support.microsoft.com/ja-jp/help/12409/microsoft-account-app-passwords-two-step-verification')">アプリパスワード</a>をご利用のをお勧めです。アプリパスワードを申請する際に、<a href="#" onclick="return linkClick ('https://support.microsoft.com/ja-jp/help/12408')">2段階認証プロセス</a>に必要なスマートフォン番号を提示が必要な場合、個人プライバシーを守るのため、( <a href="#" onclick="return linkClick('http://receive-sms-online.com/')">receive-sms-online.com</a>, <a href="#" onclick="return linkClick('https://sms-online.co/receive-free-sms')" >sms-online.co</a>, <a href="#" onclick="return linkClick('https://receive-a-sms.com/')" >receive-a-sms.com</a> ) など<a href="#" onclick="return linkClick ('http://jpnpay.com/archives/561')">オンライン無料SMS受信サービス</a>をお勧めします。`,
             serverDetail: '詳細設定：',
             imapServer: 'IMAP設定',
             imapServerInput: 'IMAPサーバー名又はIP',
@@ -1149,7 +1168,7 @@ var infoDefine = [
             smtpServer: 'SMTP設定',
             smtpServerInput: 'SMTPサーバー名又はIP',
             emailServerPassword: 'Emailパスワード(アプリパスワードお勧め)',
-            imapAccountConform: '<p><dt>以下の事項を確認してから送信ボタンを押してください：</dt></p>このEmailアカンウトはあなたのよく使っているEmailアカンウトと違って、QTGateシステムを使用するのために、一時的新たに作ったEmailアカンウトです。あなたはQTGateにこのEmailアカンウトのフールアクセス権にすることが了承しました。',
+            imapAccountConform: '<p><dt>以下の事項を確認してから送信ボタンを押してください：</dt></p>このEmailアカンウトはあなたのよく使っているEmailアカンウトと違って、CoNETシステムを使用するのために、一時的新たに作ったEmailアカンウトです。あなたはCoNETにこのEmailアカンウトのフールアクセス権にすることが了承しました。',
             agree: '私はそのリスクが了承して続きする',
             imapOtherCheckError: 'Emailサーバーに接続ができませんでした。Emailサーバー名又はIPアドレス又は通信ポート番号に間違いがあります、詳細設定で再チェックをしてください。',
             CertificateError: 'Emailサーバーに提示したセキュリティ証明書は信頼できないものです。続くをしたい場合は、詳細設定の中の「セキュリティ証明書信頼でき無くとも接続をする」を選択してください。その場合はあなたのEmailインフォメーションを漏れる可能性があります。',
@@ -1161,13 +1180,28 @@ var infoDefine = [
             connectImap: 'CoNETに接続にします',
             cancelConnect: 'CoNETとの接続を中止します',
             imapItemTitle: '通信用Email詳細設定',
-            imapCheckingStep: ['emailサーバへ接続しています。', 'emailサーバへIMAP接続しました', 'emailサーバへSMTP接続しました'],
+            imapCheckingStep: [
+                /* 0 */ 'emailサーバへ接続しています。',
+                /* 1 */ 'emailサーバへIMAP接続しました、CoNETからレスポンスを待ちます。',
+                /* 2 */ 'emailサーバへSMTP接続しました',
+                /* 3 */ 'CoNETクライアントは接続要請のメールをCoNETシステムへ送信しました、接続を完了するまで時間がかかるのためしばらくお待ちおください。',
+                /* 4 */ 'CoNETへ接続しました',
+            ],
             imapResultTitle: 'IMAPサーバCoNET評価：',
             testSuccess: 'emailサーバのテストが完了しました',
             exitEdit: '退出編集Emailアカンウト',
             deleteImap: 'IMAPアカウトを削除',
             proxyPortError: 'ポート番号は1000から65535までの数字です。又はこのポート番号は他のアプリが使っています。他の番号にチェンジしてください。',
-            appPassword: 'APPパスワードについて'
+            appPassword: 'APPパスワードについて',
+            imapCheckError: [
+                'Emailサーバーに接続ができませんでした。所在しているネットワークはメール通信プロトコルがサポートしておりません。ネット環境をチェンジしてもう一回してみてください。',
+                'Emailサーバはログインエラーが提示しました。ユーザー名とパスワードを再チェックしてください。',
+                'Emailサーバーに提示したセキュリティ証明書は信頼できないものです。中間者攻撃があるネット環境にいるあもしれないです。ネット環境をチェンジしてもう一回してみてください。',
+                'メール送信の際にエラーが発生しました。そのようなエラーは多分パスワードをAPPパスワードではなく、普通のパースワードを使った模様です。APPパスワードをチェックしてもう一回してみてください。',
+                'ネットはインターネットに接続していない模様です。',
+                'エラーが発生しました。CoNETを一回退出してからもう一回してみてください。',
+                'メールストレージ容量が一杯です、不要なメールを削除してからもう一回してみてください。'
+            ]
         },
         Home_keyPairInfo_view: {
             newVersionDownload: 'クリックしてダウンロードとインストール',
@@ -1183,7 +1217,7 @@ var infoDefine = [
             deleteKeyPairHaveLogin: 'ログインした端末で暗号鍵ペアを削除して下さい。',
             keyID: '暗号鍵ID：',
             deleteKeyPairInfo: '鍵ペアを削除することで、現在のCoNET設定は全部なくなって、一からCoNETの設定をやり直しが必要です。但しあなたのCoNETアカウトEmailアドレスは前回と同じであれば、CoNETアカウトを戻れます。',
-            "delete": '削除',
+            delete: '削除',
             locked: 'まず鍵ペアのパスワードを入力して、鍵ペアのロックを解除してください。',
             systemError: 'システムエラーが発生しました。鍵ペアを削除して一からシステムを再設定をしてください。'
         },
@@ -1211,7 +1245,7 @@ var infoDefine = [
             KeypairLength: 'RSA暗号鍵ペアの長度を選んでください。この数字が長ければ、長いほど秘匿性によいですが、スピードが遅くなります。',
             systemAdministratorEmail: 'RSA暗号鍵ペア生成',
             GenerateKeypair: '<em>強秘匿性通信するのために、RSA暗号鍵ペアを生成中、大量なランダム数字が発生し、数分かかる場合もあります、4096ビットの場合、特に時間がかかります、しばらくお待ち下さい。RSA暗号技術について、ウィキペディア百科辞典を参考してください：' +
-                "<a href='https://ja.wikipedia.org/wiki/RSA\u6697\u53F7' target=\"_blank\" onclick=\"return linkClick ('https://ja.wikipedia.org/wiki/RSA\u6697\u53F7')\">https://ja.wikipedia.org/wiki/RSA\u6697\u53F7</a></em>",
+                `<a href='https://ja.wikipedia.org/wiki/RSA暗号' target="_blank" onclick="return linkClick ('https://ja.wikipedia.org/wiki/RSA暗号')">https://ja.wikipedia.org/wiki/RSA暗号</a></em>`,
             inputEmail: 'お疲れ様です、最後の設定をしましょう。このRSA暗号鍵ペアは本システムに重要な存在です、ユーザーのCoNETへ身元証明、本システムデータを秘密化、CoNETシステムとデータ通信時この暗号鍵ペアを使います。パースワードはCoNETへ保存しませんですから、大事にメモしてください。<em style="color:brown;">CoNETはネットワークの制限があるエリアにブラックリスト入って恐れがあります、ここに制限があるエリアのメールサービスを入れるとCoNETからのメールが受信不能になる可能性もあります、CoNETへ登録完了することができない場合もあります。</em>',
             accountEmailInfo: 'CoNETドメイン名は、ファイヤウォールがある場合はブラックリストに入っている可能性がありますから、CoNETシステムへ登録完了することができません。その場合はファイヤウォール外側のEmailシステムを利用してください。'
         },
@@ -1244,13 +1278,17 @@ var infoDefine = [
                 '同じEmailアカンウトが既に存在します。',
                 'CoNETと接続ができていません！',
                 'ご利用メールアドレスのメールボックス容量がいっぱいになっています。'
+            ],
+            CoNET_requestError: [
+                /* 0 */ 'CoNETが応答していなかったです。CoNET通信を再確立しています。しばらくお待ちください！ ',
+                /* 1 */ '無効な操作です！'
             ]
         },
         emailConform: {
             activeViewTitle: '鍵ペア検証',
             requestReturn: ['エラー発生しました、それは短時間内多数の請求をしたことです。', '検証メールを発送しました。'],
-            info1_1: "\u9375\u30DA\u30A2\u691C\u8A3C\u306F\u672A\u5B8C\u6210\u3067\u3059\u3002CoNET\u306F\u5B9B\u5148 \u300C",
-            info1_2: "\u300D \u306B\u691C\u8A3C\u30E1\u30FC\u30EB\u3092\u3057\u307E\u3057\u305F\u3002\u30E1\u30FC\u30EB\u30DC\u30C3\u30AF\u30B9\u3092\u30C1\u30A7\u30C3\u30AF\u3057\u3066\u304F\u3060\u3055\u3044\u3002CoNET\u304B\u3089\u591A\u6570\u30E1\u30FC\u30EB\u306E\u5834\u5408\u306F\u3001\u6700\u5F8C\u306E\u3092\u9078\u3093\u3067\u304F\u3060\u3055\u3044\u3002CoNET\u304B\u3089\u306E\u30E1\u30FC\u30EB\u304C\u898B\u3064\u304B\u3089\u306A\u3044\u5834\u5408\u306F\u9375\u30DA\u30A2\u3092\u751F\u6210\u3059\u308B\u30E1\u30FC\u30EB\u30A2\u30C9\u30EC\u30B9\u3092\u6B63\u3057\u3044\u304B\u3069\u3046\u304B\u30C0\u30D6\u30C1\u30A7\u30C3\u30AF\u3057\u3066\u304F\u3060\u3055\u3044\u3002\u307E\u305F\u306F\u9375\u30DA\u30A2\u3092\u524A\u9664\u3057\u3066\u65B0\u3057\u3044\u9375\u30DA\u30A2\u3092\u518D\u4F5C\u6210\u3092\u3057\u3066\u304F\u3060\u3055\u3044\u3002",
+            info1_1: `鍵ペア検証は未完成です。CoNETは宛先 「`,
+            info1_2: `」 に検証メールをしました。メールボックスをチェックしてください。CoNETから多数メールの場合は、最後のを選んでください。CoNETからのメールが見つからない場合は鍵ペアを生成するメールアドレスを正しいかどうかダブチェックしてください。または鍵ペアを削除して新しい鍵ペアを再作成をしてください。`,
             info2: 'コピーするのは「-----BEGIN PGP MESSAGE-----」から「-----END PGP MESSAGE-----」まで全ての内容をしてください。',
             emailTitle: 'CoNETをご利用頂いて誠に有難うございます',
             emailDetail1: '',
@@ -1264,14 +1302,14 @@ var infoDefine = [
                 'フォーマットエラー、コピーするのは「-----BEGIN PGP MESSAGE-----」から「-----END PGP MESSAGE-----」まで全ての内容をしてください。',
                 'この内容で暗号化解除ができませんでした。鍵ペアEmailアカンウトメールボックス再検査し、CoNETから最後のを選んでください。または鍵ペアを削除して、鍵ペア再発行してください。',
                 'CoNETに接続するのはエラーが発生した、一回退出し、再起動して接続をしてください。',
-                '検証できません！CoNETシステムは接続を切断しました、新たな検証をCoNETアカンウトメールボックスに届きます、まずCoNET再起動してから、再検証をください。',
+                '検証できません！CoNETから多数メールの場合は、最後のを選んでください。',
                 'あなたのCoNETには問題があります、鍵ペアを削除して一から再セットアップしてください。',
                 'CoNETシステムは故障があります、後からもう一度試しにしてください',
                 'あなたの今日データ通信はリミットになっていますので、明日まで待ってください。またはユーザー種類をアップグレードをしてください',
                 '通信用IMAPの設定にエラーがあるか又はそのタープのIMAPアカンウトがCoNETサポートしません。よくチェックしてもう一回試しにしてください。',
                 '選択していたゲットウェーエリアは只今接続不能になっております、後ほどもう一度試しにしてください。',
                 'IMAPアカウトでEMAIL送信する際エラーが発生しました、一回退出し、起動して見てくださいね。重複発生した場合はIMAPアカウトのウェーブページでアカウトをアンロック操作を必要かもしれない。',
-                'CoNETコアーにエラーが発生したした。CoNETを退出してから再起動してください。',
+                'CoNETコアーにエラーが発生したした。ページをリフレッシュか、CoNETを退出してから再起動してください。',
                 'アララーー、あなたには負けるそ。'
             ],
             activeing: '通信中'
@@ -1298,8 +1336,10 @@ var infoDefine = [
             pingError: 'CoNETゲットウェイエリアスピードチェックエラーが発生しました。一回CoNETを終了して、管理者としてCoNETを再起動をして、スピードチェックをしてください。',
             QTGateRegionERROR: ['CoNETへ接続要請メールの送信ができなかったです。IMAPアカウントの設定を調べてください。',
                 ''],
-            sendConnectRequestMail: ['CoNETクライアントはCoNETシステムとの接続が切れた。再接続要請メールをCoNETシステムへ送信しました、接続を完了するまで時間がかかるのためしばらくお待ちおください。',
-                'CoNETに長い間ご利用していなっかた時、接続は切れた場合もあります。'],
+            sendConnectRequestMail: [
+                'CoNETクライアントはCoNETシステムとの接続が切れた。再接続要請メールをCoNETシステムへ送信しました、接続を完了するまで時間がかかるのためしばらくお待ちおください。',
+                'CoNETに長い間ご利用していなっかた時、接続は切れた場合もあります。'
+            ],
             GlobalIp: 'グロバールIP:',
             GlobalIpInfo: '要注意：【CoNET接続】をおすとあなたのグロバールIPアドレスをCoNETシステムに送信しますので、それを遠慮すれば【@OPN】接続を選んでください。【@OPN】が見つからない場合は、@OPN技術がiCloudしか対応しておりません。',
             cacheDatePlaceDate: [{ name: '1時間', id: 1 }, { name: '12時間', id: 12 }, { name: '一日', id: 24 }, { name: '15日', id: 360 }, { name: '1月', id: 720 }, { name: '6月', id: 4320 }, { name: '永遠', id: -1 }],
@@ -1346,28 +1386,28 @@ var infoDefine = [
             QTGateConnectError: ['CoNETへメールの送信にエラーが発生しました。通信専用Emailをチェックしてください。'],
             QTGateConnectStatus: 'CoNET接続状態',
             QTGateConnectResult: ['未接続、クリックと接続します。', 'CoNETへ接続中.', 'CoNETに接続しました。', 'CoNETへ接続にエラーが発生しました。IMAP設定を立ち直すしてください。',
-                'QTGateに接続しました。'],
+                'CoNETに接続しました。'],
             QTGateSign: ['あなたの鍵ペア状態', 'CoNETに信頼サインがないです', 'CoNETに信頼サインを取得したことで、CoNETのユーザーの間にファイル又はインフォーメーションなど秘密情報を交換する際、あなたの身元証明となります。本人以外のを区別することができます。あなたも持っている鍵ペアで他のCoNETユーサーに信頼サインすることで、あるCoNETユーサーを信頼関係確定することができます。',
-                'QTGateに信頼サインを取得しています', 'CoNETシステムエラー、CoNETを再起動してからもう一度してみてください。もし直れないならCoNETを一から再インストールしてください。', 'CoNETシステムエラー']
+                'CoNETに信頼サインを取得しています', 'CoNETシステムエラー、CoNETを再起動してからもう一度してみてください。もし直れないならCoNETを一から再インストールしてください。', 'CoNETシステムエラー']
         },
         feedBack: {
             title: 'フィードバック',
             additional: '追加情報を添付する',
             okTitle: 'CoNETへ送信'
-        }
+        },
     }, {
         perment: {
             serverTitle: 'Server'
         },
         twitter: {
-            newTwitterAccount: "Please input Twitter APP information. How to create Twitter APP please click <a target=\"_blank\" href='https://github.com/QTGate/QTGate-Desktop-Client/wiki/Create-Twitter-APP'\">hear</a> to got more information.",
+            newTwitterAccount: `Please input Twitter APP information. How to create Twitter APP please click <a target="_blank" href='https://github.com/QTGate/QTGate-Desktop-Client/wiki/Create-Twitter-APP'">hear</a> to got more information.`,
             addAccount: 'Add an Twitter account',
             following: 'Following',
             followers: 'Followers',
             second: 's',
             min: 'm',
             hour: 'h',
-            videoSizeOver: "This video is over Twitter specifications: 140's or 300MB or (1280 x 1024).",
+            videoSizeOver: `This video is over Twitter specifications: 140's or 300MB or (1280 x 1024).`,
             retweeted: 'Retweeted',
             month: 'm',
             day: 'd',
@@ -1408,7 +1448,7 @@ var infoDefine = [
             qtgateTeam: 'The CoNET Team',
             networkShareTitle: 'Bandwidth',
             CancelSuccess: function (PlanExpire, isAnnual, returnAmount) {
-                return "Your subscriptions was cancelled. You may keep use CoNET service with this plan until " + new Date(PlanExpire).toLocaleDateString() + ". Restrictions apply to free accounts and accounts using promotions. " + (isAnnual ? "Refund amount us$" + returnAmount + " will return to your paid card account in 5 working day." : "Automatically canceled.") + " ";
+                return `Your subscriptions was cancelled. You may keep use CoNET service with this plan until ${new Date(PlanExpire).toLocaleDateString()}. Restrictions apply to free accounts and accounts using promotions. ${isAnnual ? `Refund amount us$${returnAmount} will return to your paid card account in 5 working day.` : `Automatically canceled.`} `;
             },
             currentPlanExpire: ['Plan expires on: ', 'Renews at', 'monthly reset day '],
             currentAnnualPlan: ['Monthly plan', 'Annual plan'],
@@ -1436,7 +1476,7 @@ var infoDefine = [
             multiOpn: 'OPN multi-gateway technology',
             MonthBandwidthTitle1: 'Bandwidth',
             serverShare: 'Gateway',
-            monthlyAutoPay: function (monthCost) { return "<span>Billed Monthly</span><span class=\"usDollar\" >@ us$</span><span class=\"amount\" >" + monthCost + "</span>/mo<span>"; },
+            monthlyAutoPay: function (monthCost) { return `<span>Billed Monthly</span><span class="usDollar" >@ us$</span><span class="amount" >${monthCost}</span>/mo<span>`; },
             cardNumber: 'Card number',
             paymentProcessing: 'Connecting...',
             calcelPayment: 'Cancel',
@@ -1445,10 +1485,10 @@ var infoDefine = [
             postcodeTitle: 'Card owner postcode',
             payAmountTitile: 'Amount',
             cvcNumber: 'Card Security Code',
-            annualPay: function (annual_monthlyCost) { return "<span>Billed Annually</span><span class=\"usDollar\">@ us$</span><span class=\"amount\" >" + getAmount((Math.round(parseInt(annual_monthlyCost) / 0.12) / 100).toString()) + "</span>/mo<span>"; },
+            annualPay: function (annual_monthlyCost) { return `<span>Billed Annually</span><span class="usDollar">@ us$</span><span class="amount" >${getAmount((Math.round(parseInt(annual_monthlyCost) / 0.12) / 100).toString())}</span>/mo<span>`; },
             canadaCard: '*For Canadian residents, GST (5%) will be applied automatically.',
             multiRegion: ['multi-gateway in single region', 'multi-gateway in multi-regions*', 'multi-gateway in multi-regions*', 'multi-gateway in multi-regions'],
-            "continue": 'Next step',
+            continue: 'Next step',
             serverShareData: ['Shared gateway', 'Dedicated gateway server*', 'Dedicated 2 gateway server*', 'Dedicated 4 gateway server'],
             internetShareData: ['Shared High Speed Bandwidth', 'Dedicated High Speed Bandwidth*', 'Dedicated 2 High Speed Bandwidth*', 'Dedicated 4 High Speed Bandwidth'],
             maxmultigateway: ['Max: 2 multi-gateway', 'Max: 4 multi-gateway*', 'Max: 4 multi-gateway'],
@@ -1457,13 +1497,13 @@ var infoDefine = [
             cancelPlanMessage: '<span>You may cancel your CoNET subscription at any time from within the this app. You will continue to have access to the CoNET services through the end of your paid period until all remaining subscription time in your account is used up. Please refer to the </span><a class="ui olive tiny label">Terms of Service</a> for cancellation and refund policy. Restrictions may apply to free plans and promotional accounts.',
             serverShareData1: 'Your dedicated server will be share ratio when you connected over your dedicated count via use Multi-gateway technology.',
             cancelPlanMessage1: function (planName, isAnnual, expire) {
-                return "<span>Your are on " + (isAnnual ? "annual payment plan</span><span class=\"usDollar\">us$</span><span class=\"amount\">" + getPlanPrice(planName, true) + "</span><span>. " + getRemainingMonth(expire) + " month" + (getRemainingMonth(expire) > 1 ? 's' : '') + " are available on your account. Your refund amount will be </span><span class=\"usDollar\">us$</span><span class=\"amount\">" + getCurrentPlanCancelBalance(expire, planName) + "</span>." : "monthly, it will not be renew at </span><span class=\"amount\">" + nextExpirDate(expire).toLocaleDateString() + "</span><span> if you cancel this plan.</span>");
+                return `<span>Your are on ${isAnnual ? `annual payment plan</span><span class="usDollar">us$</span><span class="amount">${getPlanPrice(planName, true)}</span><span>. ${getRemainingMonth(expire)} month${getRemainingMonth(expire) > 1 ? 's' : ''} are available on your account. Your refund amount will be </span><span class="usDollar">us$</span><span class="amount">${getCurrentPlanCancelBalance(expire, planName)}</span>.` : `monthly, it will not be renew at </span><span class="amount">${nextExpirDate(expire).toLocaleDateString()}</span><span> if you cancel this plan.</span>`}`;
             }
         },
         QTGateDonate: {
             title: 'Free access website provided by sponsor.',
             meta_title: 'Donor：',
-            detail: "CoNET users may access these sponsored websites via CoNET OPN. Free users may not be able to access if your daily limit has been reached."
+            detail: `CoNET users may access these sponsored websites via CoNET OPN. Free users may not be able to access if your daily limit has been reached.`
         },
         QTGateInfo: {
             title: 'Features',
@@ -1472,7 +1512,7 @@ var infoDefine = [
                     color: '#a333c8',
                     icon: 'exchange',
                     header: 'OPN: Security and Privacy while accessing the Open Internet.',
-                    detail: "@OPN@ uses CoNET\u2019s \u201CQuiet\u201D technology to create a obfuscated private network by refracting encrypted data packets thru email servers. @OPN provides true stealth internet communications where your IP address is hidden to client or proxy servers. iOPN uses CoNET\u2019s technology to obfuscate data traffic over HTTP. Both @OPN and iOPN offer security, protection and privacy while allowing access to the open internet. All data is kept private with encryption using <a onclick=\"return linkClick('https://en.wikipedia.org/wiki/Advanced_Encryption_Standard')\" href=\"#\" target=\"_blank\">AES256-GCM</a> and <a onclick=\"return linkClick ('https://en.wikipedia.org/wiki/Pretty_Good_Privacy')\" href=\"#\" target=\"_blank\">OpenPGP</a> along with CoNET\u2019s proprietary security measures."
+                    detail: `@OPN@ uses CoNET’s “Quiet” technology to create a obfuscated private network by refracting encrypted data packets thru email servers. @OPN provides true stealth internet communications where your IP address is hidden to client or proxy servers. iOPN uses CoNET’s technology to obfuscate data traffic over HTTP. Both @OPN and iOPN offer security, protection and privacy while allowing access to the open internet. All data is kept private with encryption using <a onclick="return linkClick('https://en.wikipedia.org/wiki/Advanced_Encryption_Standard')" href="#" target="_blank">AES256-GCM</a> and <a onclick="return linkClick ('https://en.wikipedia.org/wiki/Pretty_Good_Privacy')" href="#" target="_blank">OpenPGP</a> along with CoNET’s proprietary security measures.`
                 }, {
                     color: '#e03997',
                     icon: 'talk outline',
@@ -1547,7 +1587,7 @@ var infoDefine = [
         useInfoAndroid: {
             title1: 'Android device local proxy setup.',
             info: [{
-                    title: "Open your device\u2019s Settings. Under Networks, Select Wi-Fi.",
+                    title: `Open your device’s Settings. Under Networks, Select Wi-Fi.`,
                     titleImage: '/images/androidSetup.jpg',
                     detail: '',
                     image: '/images/android1.jpg'
@@ -1673,13 +1713,13 @@ var infoDefine = [
                     detail: 'Cancellations to annual subscription may be entitled to a pro-rated refund of your current annual subscription payment amount minus the months of service used calculated at the standard monthly rate. (For example, accounts canceling within 3 months of an annual plan will be entitled to a refund of the amount paid subtracted by the 3 months of service used at the standard monthly rate.)'
                 }, {
                     header: null,
-                    detail: "<p>We refund annual subscription purchase only. We will refund your order if:</p><div class=\"ui ordered list\"><div class=\"item\">It is the first time you've ordered our Services and there have not been previous purchases on your account.</div><div class=\"item\">If you have made less than one hundred connections to our Service and your bandwidth usage is less than 500 MB.</div><div class=\"item\">If you haven't violated CoNET\u2019s Terms of Service in any way.</div></div>"
+                    detail: `<p>We refund annual subscription purchase only. We will refund your order if:</p><div class="ui ordered list"><div class="item">It is the first time you've ordered our Services and there have not been previous purchases on your account.</div><div class="item">If you have made less than one hundred connections to our Service and your bandwidth usage is less than 500 MB.</div><div class="item">If you haven't violated CoNET’s Terms of Service in any way.</div></div>`
                 }, {
                     header: null,
-                    detail: "It is the first time you've ordered our Services and there have not been previous purchases on your account."
+                    detail: `It is the first time you've ordered our Services and there have not been previous purchases on your account.`
                 }, {
                     header: null,
-                    detail: ""
+                    detail: ``
                 }, {
                     header: null,
                     detail: 'We will refund your order if: <p class="tag info">It is the first time you’ve ordered our Services and there have not been previous purchases on your account.</p><p class="tag info">If you have made less than one hundred connections to our Service and your bandwidth usage is less than 500 MB.</p><p class="tag info">If you haven’t violated CoNET’s Terms of Service in any way.</p><p class="tag info">As stated above, if the refund request is made within 7 days since the purchase has been made.</p><p class="tag info">Refunds are generally processed within seven (7) days, and are made to the original form of payment used for purchase. All refunds are sent in USD and therefore the refund amount could differ from the amount originally paid in local currency or bitcoin. How long it takes until you will see the refunded amount in your bank account varies according to the payment method you used, bank regulations, etc.</p>'
@@ -1738,8 +1778,8 @@ var infoDefine = [
         },
         imapInformation: {
             title: 'Email account to use by OPN.',
-            tempImapAccount: "Have problem with your IMAP enabled email account? <a href=\"#\" onclick=\"return linkClick ('https://github.com/QTGate/QTGate-Desktop-Client/wiki/iCloud-temporary-account')\">get temporary account.</a>",
-            infomation: "Please provide an IMAP enabled email account to be used with CoNET\u2019s OPN services. The account name and password will be required. For your personal privacy, please consider registering a new email account to use. CoNET currently supports <a href=\"#\" onclick=\"return linkClick('https://www.icloud.com/')\">Apple iCloud</a>, <a href=\"#\" onclick=\"return linkClick('https://outlook.live.com/owa/')\">Outlook Mail</a>, <a href=\"#\" onclick=\"return linkClick('https://login.yahoo.com/')\">Yahoo Mail</a>, <a href=\"#\" onclick=\"return linkClick('https://mail.google.com')\">GMAIL</a>, <a href=\"#\" onclick=\"return linkClick('https://www.gmx.com/')\">GMX</a>, <a href=\"#\" onclick=\"return linkClick('https://www.zoho.com/mail/')\">ZOHO</a>. (@OPN currently supports iCloud mail only.) For passwords, it is recommended use a <a href=\"#\" onclick=\"return linkClick('https://help.yahoo.com/kb/SLN15241.html')\">generated app-specific password.</a> If using <a href=\"#\" onclick=\"return linkClick('https://help.yahoo.com/kb/two-step-verification-sln5013.html')\">2-step verification</a>, we recommend using a free anonymous SMS receiving site to receive SMS codes, ( such as <a href=\"#\" onclick=\"return linkClick('http://receive-sms-online.com/')\">receive-sms-online.com</a>, <a href=\"#\" onclick=\"return linkClick('https://sms-online.co/receive-free-sms')\" >sms-online.co</a>, <a href=\"#\" onclick=\"return linkClick('https://receive-a-sms.com/')\" >receive-a-sms.com</a>, or <a href=\"#\" onclick=\"return linkClick('https://www.google.com/search?q=free+anonymous+SMS+receiving+site&oq=free+anonymous+SMS+receiving+site&aqs=chrome..69i57.268j0j4&sourceid=chrome&ie=UTF-8')\" >others</a> ).",
+            tempImapAccount: `Have problem with your IMAP enabled email account? <a href="#" onclick="return linkClick ('https://github.com/QTGate/QTGate-Desktop-Client/wiki/iCloud-temporary-account')"> Get temporary account.</a>`,
+            infomation: `Please provide an IMAP enabled email account to be used with CoNET’s OPN services. The account name and password will be required. For your personal privacy, please consider registering a new email account to use. CoNET currently supports <a href="#" onclick="return linkClick('https://www.icloud.com/')">Apple iCloud</a>, <a href="#" onclick="return linkClick('https://outlook.live.com/owa/')">Outlook Mail</a>, <a href="#" onclick="return linkClick('https://login.yahoo.com/')">Yahoo Mail</a>, <a href="#" onclick="return linkClick('https://mail.google.com')">GMAIL</a>, <a href="#" onclick="return linkClick('https://www.gmx.com/')">GMX</a>, <a href="#" onclick="return linkClick('https://www.zoho.com/mail/')">ZOHO</a>. (@OPN currently supports iCloud mail only.) For passwords, it is recommended use a <a href="#" onclick="return linkClick('https://help.yahoo.com/kb/SLN15241.html')">generated app-specific password.</a> If using <a href="#" onclick="return linkClick('https://help.yahoo.com/kb/two-step-verification-sln5013.html')">2-step verification</a>, we recommend using a free anonymous SMS receiving site to receive SMS codes, ( such as <a href="#" onclick="return linkClick('http://receive-sms-online.com/')">receive-sms-online.com</a>, <a href="#" onclick="return linkClick('https://sms-online.co/receive-free-sms')" >sms-online.co</a>, <a href="#" onclick="return linkClick('https://receive-a-sms.com/')" >receive-a-sms.com</a>, or <a href="#" onclick="return linkClick('https://www.google.com/search?q=free+anonymous+SMS+receiving+site&oq=free+anonymous+SMS+receiving+site&aqs=chrome..69i57.268j0j4&sourceid=chrome&ie=UTF-8')" >others</a> ).`,
             serverDetail: 'settings:',
             imapServer: 'IMAP server setup',
             imapServerInput: 'IMAP server name or IP address',
@@ -1752,7 +1792,7 @@ var infoDefine = [
             emailServerPassword: 'Email account password ( app password )',
             Error_portNumber: 'Port number should be from 1 to 65535.',
             imapAccountConform: '<p><dt>By clicking submit you are agreeing to:</dt></p>This email is a temporary account for use with CoNET services. CoNET may have full access to this account in use of CoNET’s services.',
-            agree: "I understand and agree to continue.",
+            agree: `I understand and agree to continue.`,
             imapOtherCheckError: 'Cannot connect to email server! Server name, IP address or Port number may have a mistake. Please check the details of your email setup!',
             CertificateError: 'Certificate for this email server is not trusted. Please select "Keep connected even if certificate is not trusted" in settings if you still want to connect. Your email login information maybe leaked to this email server!',
             IgnoreCertificate: 'Keep connected even when certificate is not trusted',
@@ -1763,13 +1803,28 @@ var infoDefine = [
             connectImap: 'Connect to CoNET',
             cancelConnect: 'Stop connecting to CoNET.',
             imapItemTitle: 'Email account details:',
-            imapCheckingStep: ['Trying to connect to email server.', 'Connected to email server with IMAP.', 'Connected to email server with SMTP.'],
+            imapCheckingStep: [
+                /* 0 */ 'Trying to connect to email server.',
+                /* 1 */ 'Connected to email server with IMAP. Waiting response from CoNET.',
+                /* 2 */ 'Connected to email server with SMTP.',
+                /* 3 */ 'Please wait a moment, connecting to CoNET network.',
+                /* 4 */ 'Connected to CoNET',
+            ],
             imapResultTitle: 'IMAP Server CoNET Communication Rating: ',
             testSuccess: 'Email server setup success!',
             exitEdit: 'Exit edit email account',
             deleteImap: 'Delete IMAP account.',
             proxyPortError: 'Port number should be a number from 1000 to 65535. Or this port is being used by another process. Please try another port number.',
-            appPassword: 'About APP password.'
+            appPassword: 'About APP password.',
+            imapCheckError: [
+                /* 0 */ 'Cannot connect to email server! Your network may not support email protocol.',
+                /* 1 */ 'Invalid login username or password! Please check username and password.',
+                /* 2 */ 'Certificate for this email server is not trusted. You may have Man-in-the-middle attack in your network. Try again when chenged network.',
+                /* 3 */ 'Sent mail error. It may happened when you use normail password. Check your mail APP password.',
+                /* 4 */ 'Your network have not internet.',
+                /* 5 */ 'Unknow error. Please exit CoNET and try it again.',
+                /* 6 */ 'Over Quota error. Please access your mail account, delete some mail.'
+            ]
         },
         Home_keyPairInfo_view: {
             title: 'Key pair information',
@@ -1783,8 +1838,8 @@ var infoDefine = [
             password1: 'Platform Password',
             logout: 'Logout',
             keyID: 'ID：',
-            deleteKeyPairInfo: 'Note: By deleting your key pair, you will lose your current account settings. You will need to set up CoNET account settings again. If your email address is the same as the one used previously, you may restore your QTGate account balance.',
-            "delete": 'Delete',
+            deleteKeyPairInfo: 'Note: By deleting your key pair, you will lose your current account settings. You will need to set up CoNET account settings again. If your email address is the same as the one used previously, you may restore your CoNET account balance.',
+            delete: 'Delete',
             locked: 'Please enter your key pair password to continue.',
             systemError: 'System error! Please delete this key pair and set up CoNET again.'
         },
@@ -1811,10 +1866,10 @@ var infoDefine = [
             SystemAdministratorNickName: 'Nick name ( Required )',
             systemAdministratorEmail: 'Generate RSA Key pair',
             GenerateKeypair: '<em>Generating RSA Key pair. Please wait, as it may take a few minutes. More time will be needed if you selected 4096 bit key length. Information about RSA keypair system can be found here:' +
-                "<a href='hhttp://en.wikipedia.org/wiki/RSA_(cryptosystem)' target=\"_blank\" onclick=\"return linkClick ('https://en.wikipedia.org/wiki/RSA_(cryptosystem)')\">https://en.wikipedia.org/wiki/RSA_(cryptosystem)</a></em>",
+                `<a href='hhttp://en.wikipedia.org/wiki/RSA_(cryptosystem)' target="_blank" onclick="return linkClick ('https://en.wikipedia.org/wiki/RSA_(cryptosystem)')">https://en.wikipedia.org/wiki/RSA_(cryptosystem)</a></em>`,
             systemPassword: 'CoNET Client System Password',
-            inputEmail: "This RSA key is a private key used for authentication, identification and secure encryption/decryption of data transmission within CoNET\u2019s system. The password and key are not stored by CoNET. You cannot reset your password if lost and you cannot access CoNET services without your password. Please store your password in a safe place. <em style=\"color: brown;\">CoNET\u2019s domain may be blocked in some regions. Please use an email account with servers outside these regions,</em>",
-            accountEmailInfo: "Because CoNET may be on a firewall's black list in some regions. It is best to choose an email account with servers outside your region\u2019s firewall."
+            inputEmail: `This RSA key is a private key used for authentication, identification and secure encryption/decryption of data transmission within CoNET’s system. The password and key are not stored by CoNET. You cannot reset your password if lost and you cannot access CoNET services without your password. Please store your password in a safe place. <em style="color: brown;">CoNET’s domain may be blocked in some regions. Please use an email account with servers outside these regions,</em>`,
+            accountEmailInfo: `Because CoNET may be on a firewall's black list in some regions. It is best to choose an email account with servers outside your region’s firewall.`
         },
         error_message: {
             title: 'Error',
@@ -1834,16 +1889,20 @@ var infoDefine = [
                 'There was an error in establishing connection to CoNET. Please try to connect again or try at a later time. If you continue to receive this error, please contact CoNET support. ',
                 'Data format error!',
                 'This computer does not detect an internet connection. Please check your network and try again!',
-                "Email server did respond to username or an error in password. You may need use APP password to pass this test if you did normal password. Or your app passwords need to be updated.",
-                "Error in connecting to email server with the current IMAP port. Please check the email account to make sure IMAP is enabled and the IMAP port settings. The port may be filtered by a firewall on your network.",
-                "There is a problem with this IMAP email server's security certificate!",
-                "Error in email server\u2019s address. Please check the email server\u2019s domain. Or have not internet, please check your network.",
+                `Email server did respond to username or an error in password. You may need use APP password to pass this test if you did normal password. Or your app passwords need to be updated.`,
+                `Error in connecting to email server with the current IMAP port. Please check the email account to make sure IMAP is enabled and the IMAP port settings. The port may be filtered by a firewall on your network.`,
+                `There is a problem with this IMAP email server's security certificate!`,
+                `Error in email server’s address. Please check the email server’s domain. Or have not internet, please check your network.`,
                 'This email provider currently looks does not support CoNET’s @OPN technology, please try do test again, or change to another email provider.',
-                "Email server did respond to SMTP's username or an error in password.",
-                "There is a problem with this SMTP email server\u2019s security certificate!",
-                "Connecting to SMTP Email server received an unknown error!", 'Please check email account!',
+                `Email server did respond to SMTP's username or an error in password.`,
+                `There is a problem with this SMTP email server’s security certificate!`,
+                `Connecting to SMTP Email server received an unknown error!`, 'Please check email account!',
                 'Does not establishing connection to CoNET yet.',
                 'Your mail account has exceeded (over quota). '
+            ],
+            CoNET_requestError: [
+                /* 0 */ 'Did not received response from CoNET. Try reconnect to CoNET, please wait.',
+                /* 1 */ 'Invalid request!'
             ]
         },
         emailConform: {
@@ -1864,14 +1923,14 @@ var infoDefine = [
                 'Format error! Copy all content from [-----BEGIN PGP MESSAGE-----] ... to [-----END PGP MESSAGE-----]. Paste into this text box.',
                 'Oops. Find the lasest mail from CoNET in your key pair email mailbox. Or delete this key pair and rebuild new key pair please.',
                 'Connection to CoNET had an error!. Please exit and restart CoNET.',
-                'This secret verification code was invalid. CoNET disconnected. A new verification email was sent to your mail box. Please restart CoNET and check your email. Do validate again!',
+                'This secret verification code was invalid. If you received more then one email from CoNET, please choose the newest email. Do validate again!',
                 'Your CoNET account may have a problem, Please delete your key pair and setup again!',
                 'There is an error in connection to CoNET, Please try again late.',
-                "Your data transfer has hit the daily limit today, please try again tomorrow or upgrade your user type.",
+                `Your data transfer has hit the daily limit today, please try again tomorrow or upgrade your user type.`,
                 'Your transfer email account may not be working, please check the IMAP account. Or your IMAP accout may not support CoNET system.',
                 'Selected region is unavailable, try again later.',
                 'Your IMAP account recieved an error. Please restart CoNET and try again. If the error is not fixed, You may need check your IMAP account setting to enable third party IMAP applications.',
-                'CoNET coresystem error! Plesee restart CoNET.',
+                'CoNET coresystem error! Refresh page or restart CoNET plesee.',
                 'Oooooops! How are you today?'
             ],
             activeing: 'sending...'
@@ -1886,7 +1945,7 @@ var infoDefine = [
             MultipleGateway: 'Multi-Gateway:',
             dataViaGateway: 'All internet data transfered via CoNET gateway.',
             dataTransfer: 'Data:',
-            dataTransfer_datail: ['All data on CoNET gateway.', "Only when cannot connect to target server."],
+            dataTransfer_datail: ['All data on CoNET gateway.', `Only when cannot connect to target server.`],
             proxyDataCache: 'Web cache:',
             proxyDataCache_detail: ['Yes', 'No'],
             clearCache: 'Delete all cache now',
@@ -1896,15 +1955,19 @@ var infoDefine = [
             GlobalIp: 'Global IP:',
             option: 'option',
             pingError: 'CoNET gateway area speed check error! Please exit CoNET and reopen CoNET as administrator. Then do check speed again.',
-            QTGateRegionERROR: ['Send connect request mail has an error. Please check your IMAP account settings.',
-                ''],
-            GlobalIpInfo: "Please note: Both iOPN and @OPN will conceal your IP from others. iOPN offers the highest level of data speeds. @OPN offers additional layer of anonymity with some speed as a trade off.  If [@OPN] option is not available, you may need to check your IMAP email account. (currently @OPN only supports iClould Email.) Please refer to the Terms of Service for our privacy policy.",
+            QTGateRegionERROR: [
+                'Send connect request mail has an error. Please check your IMAP account settings.',
+                ''
+            ],
+            GlobalIpInfo: `Please note: Both iOPN and @OPN will conceal your IP from others. iOPN offers the highest level of data speeds. @OPN offers additional layer of anonymity with some speed as a trade off.  If [@OPN] option is not available, you may need to check your IMAP email account. (currently @OPN only supports iClould Email.) Please refer to the Terms of Service for our privacy policy.`,
             cacheDatePlaceholder: 'Web cache freshness lifetime.',
-            sendConnectRequestMail: ['CoNET connection maybe down. Please wait a moment, re-connecting to CoNET gateway.',
-                'Your connection will reset if you long time non use.'],
+            sendConnectRequestMail: [
+                'CoNET connection maybe down. Please wait a moment, re-connecting to CoNET gateway.',
+                'Your connection will reset if you long time non use.'
+            ],
             cacheDatePlaceDate: [{ name: '1 hour', id: 1 }, { name: '12 hour', id: 12 }, { name: '1 day', id: 24 }, { name: '15 days', id: 360 }, { name: '1 month', id: 720 }, { name: '6 months', id: 4320 }, { name: 'forever', id: -1 }],
             atQTGateDetail: [
-                "Recommended for full privacy. @OPN@ uses CoNET\u2019s \u201CQuiet\u201D technology to create a obfuscated private network by refracting encrypted data packets thru email servers. @OPN provides stealth internet communications where your IP address is hidden to client or proxy servers. Gaming and video stream my not be supported due to stability and speeds affected by email server choice. Currently iCloud mail is only supported.",
+                `Recommended for full privacy. @OPN@ uses CoNET’s “Quiet” technology to create a obfuscated private network by refracting encrypted data packets thru email servers. @OPN provides stealth internet communications where your IP address is hidden to client or proxy servers. Gaming and video stream my not be supported due to stability and speeds affected by email server choice. Currently iCloud mail is only supported.`,
                 'Recommended for high speed open internet access. iOPN uses CoNET’s “Quiet” technology to obfuscate encrypted data traffic to look like normal HTTP communications. iOPN offer security and protection of privacy while allowing access to the open internet.',
                 'Use CoNET’s gateway for domain search to get the right IP address from DNS cache. This is default.',
                 'Transfer all internet data over OPN.',
@@ -1948,21 +2011,23 @@ var infoDefine = [
                 'CoNET disconnected, click to connect to CoNET.', 'Connecting to CoNET.', 'CoNET Connected.', 'Connection stopped with error! Please check IMAP account settings!',
                 'CoNET Connected.'
             ],
-            QTGateSign: ['Keypair status', 'Your key pair is not signed by CoNET.',
-                'CoNET certification authority is a trusted thus certifying your public keys is yoursalf in CoNET users when you share files of send message to other CoNET user. You also can signing another QTGate users with your keypair for make your trust relationship.',
-                'Getting CoNET certification authority.', 'Opps. System error. Try restart CoNET, if still have please re-install CoNET.', 'System error!']
+            QTGateSign: [
+                'Keypair status', 'Your key pair is not signed by CoNET.',
+                'CoNET certification authority is a trusted thus certifying your public keys is yoursalf in CoNET users when you share files of send message to other CoNET user. You also can signing another CoNET users with your keypair for make your trust relationship.',
+                'Getting CoNET certification authority.', 'Opps. System error. Try restart CoNET, if still have please re-install CoNET.', 'System error!'
+            ]
         },
         feedBack: {
             title: 'FEEDBACK',
             additional: 'Additional info',
             okTitle: 'Send to CoNET'
-        }
+        },
     }, {
         perment: {
             serverTitle: '伺服器'
         },
         twitter: {
-            newTwitterAccount: "\u8ACB\u8F38\u5165\u60A8\u7684\u63A8\u7279APP\u4FE1\u606F\uFF0C\u5982\u4F55\u7372\u5F97\u548C\u8A2D\u7F6E\u63A8\u7279\u8CEC\u865FAPP\u4FE1\u606F\uFF0C\u8ACB\u9EDE\u64CA<a target=\"_blank\" href='https://github.com/QTGate/QTGate-Desktop-Client/wiki/%E5%89%B5%E5%BB%BA%E6%82%A8%E7%9A%84QTGate%E6%8E%A8%E7%89%B9%E6%87%89%E7%94%A8'\">\u9019\u88E1</a>\u7372\u5F97\u66F4\u591A\u4FE1\u606F",
+            newTwitterAccount: `請輸入您的推特APP信息，如何獲得和設置推特賬號APP信息，請點擊<a target="_blank" href='https://github.com/QTGate/QTGate-Desktop-Client/wiki/%E5%89%B5%E5%BB%BA%E6%82%A8%E7%9A%84QTGate%E6%8E%A8%E7%89%B9%E6%87%89%E7%94%A8'">這裡</a>獲得更多信息`,
             addAccount: '添加推特賬戶',
             following: '正在關注',
             followers: '關注者',
@@ -2010,7 +2075,7 @@ var infoDefine = [
             title: '賬戶管理',
             currentPlanExpire: ['訂閱截止日期：', '下一次自動續訂日', '每月數據重置日'],
             CancelSuccess: function (PlanExpire, isAnnual, returnAmount) {
-                return "\u4E2D\u6B62\u8A02\u95B1\u6210\u529F\u3002\u60A8\u53EF\u4EE5\u4E00\u76F4\u4F7F\u7528\u60A8\u7684\u539F\u8A02\u95B1\u5230" + new Date(PlanExpire).toLocaleDateString() + "\u70BA\u6B62\u3002\u4EE5\u5F8C\u60A8\u5C07\u6703\u81EA\u52D5\u6210\u70BACoNET\u514D\u8CBB\u7528\u6236\uFF0C\u53EF\u4EE5\u7E7C\u7E8C\u4F7F\u7528CoNET\u7684\u5404\u9805\u514D\u8CBB\u529F\u80FD\u3002 " + (isAnnual ? "\u9000\u6B3E\u91D1\u984Dus$" + returnAmount + "\u6703\u57285\u500B\u5DE5\u4F5C\u65E5\u5167\u9000\u9084\u5230\u60A8\u7684\u652F\u4ED8\u5361\u3002 " : '下月起CoNET系統不再自動扣款。 ') + " \u795D\u60A8\u7DB2\u7D61\u885D\u6D6A\u6109\u5FEB\u3002";
+                return `中止訂閱成功。您可以一直使用您的原訂閱到${new Date(PlanExpire).toLocaleDateString()}為止。以後您將會自動成為CoNET免費用戶，可以繼續使用CoNET的各項免費功能。 ${isAnnual ? `退款金額us$${returnAmount}會在5個工作日內退還到您的支付卡。 ` : '下月起CoNET系統不再自動扣款。 '} 祝您網絡衝浪愉快。`;
             },
             currentAnnualPlan: ['月度訂閱', '年度訂閱'],
             cardPaymentErrorMessage: ['輸入的信用卡號有誤！', '輸入的信用卡期限有誤！', '輸入的信用卡安全碼有誤！', '輸入的信用卡持有人郵編有誤！', '支付失敗，支付無法完成請稍後再試',
@@ -2037,8 +2102,8 @@ var infoDefine = [
             cancelPlan: '終止當前訂閱',
             cantCancelInformation: '您的賬戶可能是CoNET測試用戶，或使用優惠碼產生的訂閱用戶，此類賬戶可以升級但不能被中止',
             MonthBandwidthTitle1: '傳送限額',
-            monthlyAutoPay: function (monthCost) { return "<span>\u6BCF\u6708\u81EA\u52D5\u6263\u6B3E</span><span class=\"usDollar\">@ us$</span><span class=\"amount\" >" + monthCost + "</span>/\u6708<span>"; },
-            annualPay: function (annual_monthlyCost) { return "<span>\u5E74\u4ED8\u6B3E\u6BCF\u6708\u53EA\u9700</span><span class=\"usDollar\">@ us$</span><span class=\"amount\" >" + getAmount((Math.round(parseInt(annual_monthlyCost) / 0.12) / 100).toString()) + "</span>/\u6708<span>"; },
+            monthlyAutoPay: function (monthCost) { return `<span>每月自動扣款</span><span class="usDollar">@ us$</span><span class="amount" >${monthCost}</span>/月<span>`; },
+            annualPay: function (annual_monthlyCost) { return `<span>年付款每月只需</span><span class="usDollar">@ us$</span><span class="amount" >${getAmount((Math.round(parseInt(annual_monthlyCost) / 0.12) / 100).toString())}</span>/月<span>`; },
             expirationYear: '信用卡期限',
             serverShare: '代理伺服器',
             cardNumber: '信用卡號',
@@ -2051,14 +2116,14 @@ var infoDefine = [
             canadaCard: '*加拿大持卡人將自動加算GST(BC)5%',
             multiRegion: ['單一代理區域並發代理', '多代理區域混合併發代理', '多代理區域混合併發代理', '多代理區域混合併發代理'],
             maxmultigateway: ['最大同時可二條並發代理數', '最大同時可使用四條並發代理數*', '最大同時可使用四條並發代理數'],
-            "continue": '下一步',
+            continue: '下一步',
             serverShareData: ['共享伺服器', '獨佔一台伺服器*', '獨佔二台伺服器*', '獨佔四台伺服器'],
             monthlyPay: '月租費',
             internetShareData: ['共享高速帶寬', '獨享高速帶寬*', '獨享雙線高速帶寬*', '獨享四線高速帶寬'],
             serverShareData1: 'OPN併發多代理技術，同時使用數大於獨占數時，會相應分享您所獨占的資源',
             cancelPlanMessage: '可隨時終止您的訂閱，CoNET的訂閱是以月為基本的單位。您的月訂閱將在下月您的訂閱起始日前被終止，您可以繼續使用您的本月訂閱計劃，您將自動回到免費用戶。如果您是每月自動扣款，則下月將不再扣款。如果您是年度訂閱計劃，您的退款將按普通每月訂閱費，扣除您已經使用的月份後計算的差額，將自動返還您所支付的信用卡賬號，如果您是使用促銷碼，或您是測試用戶，您的終止訂閱將不能被接受。 ',
             cancelPlanMessage1: function (planName, isAnnual, expire) {
-                return "<span>\u60A8\u7684\u8A02\u95B1\u8A08\u5283\u662F" + (isAnnual ? "\u5E74\u5EA6\u8A02\u95B1\uFF0C\u9000\u9084\u91D1\u984D\u5C07\u6309\u7167\u60A8\u5DF2\u4ED8\u5E74\u8A02\u95B1\u8CBB</span><span class=\"usDollar\">us$</span><span class=\"amount\">" + getPlanPrice(planName, true) + "</span><span> - \u8A72\u8A02\u95B1\u539F\u50F9 </span><span class=\"usDollar\">us$</span><span class=\"amount\">" + getPlanPrice(planName, false) + "</span><span> X \u5DF2\u4F7F\u7528\u6708\u6578(\u5305\u62EC\u672C\u6708) </span><span class=\"amount\">" + (12 - getRemainingMonth(expire)) + "</span><span> = \u9918\u984D </span><span class=\"usDollar\">us$</span><span class=\"amount\">" + getCurrentPlanCancelBalance(expire, planName) + "</span><span>\uFF0C\u5C07\u57287\u500B\u5DE5\u4F5C\u65E5\u5167\uFF0C\u9000\u9084\u5230\u60A8\u7528\u4F86\u652F\u4ED8\u7684\u4FE1\u7528\u5361\u5E33\u6236\u3002</span>" : "\u6708\u8A02\u95B1\uFF0C\u60A8\u7684\u8A02\u95B1\u5C07\u4E0B\u6B21\u66F4\u65B0\u65E5</span><span class=\"amount\">" + nextExpirDate(expire).toLocaleDateString() + "</span><span>\u6642\u4E0D\u518D\u88AB\u81EA\u52D5\u6263\u6B3E\u548C\u66F4\u65B0\u3002</span>");
+                return `<span>您的訂閱計劃是${isAnnual ? `年度訂閱，退還金額將按照您已付年訂閱費</span><span class="usDollar">us$</span><span class="amount">${getPlanPrice(planName, true)}</span><span> - 該訂閱原價 </span><span class="usDollar">us$</span><span class="amount">${getPlanPrice(planName, false)}</span><span> X 已使用月數(包括本月) </span><span class="amount">${12 - getRemainingMonth(expire)}</span><span> = 餘額 </span><span class="usDollar">us$</span><span class="amount">${getCurrentPlanCancelBalance(expire, planName)}</span><span>，將在7個工作日內，退還到您用來支付的信用卡帳戶。</span>` : `月訂閱，您的訂閱將下次更新日</span><span class="amount">${nextExpirDate(expire).toLocaleDateString()}</span><span>時不再被自動扣款和更新。</span>`}`;
             }
         },
         QTGateDonate: {
@@ -2240,7 +2305,7 @@ var infoDefine = [
                     detail: '當您使用我們的服務時，我們為了計費處理會自動收集非常有限的數據流量信息，並存儲到伺服器日誌中。數據流量信息僅用於計算客戶應支付通訊費用而收集的，它收集的數據是：日期，用戶帳號，所使用的代理服務區域和代理伺服器IP，數據包大小，下載或上傳。例如：'
                 }, {
                     header: null,
-                    detail: '<p class="tag info">06/20/2017 18:12:16, info@qtgate.com, francisco, 104.236.162.139, 300322 byte up, 482776323 byte down.</p><p class="tag info">06/21/2017 12:04:18, info@qtgate.com, francisco, 104.236.162.139, 1435226 byte up, 11782238 byte down.</p>'
+                    detail: '<p class="tag info">06/20/2017 18:12:16, info@CoNET.com, francisco, 104.236.162.139, 300322 byte up, 482776323 byte down.</p><p class="tag info">06/21/2017 12:04:18, info@CoNET.com, francisco, 104.236.162.139, 1435226 byte up, 11782238 byte down.</p>'
                 }, {
                     header: null,
                     detail: 'CoNET沒有保存除了以上信息以外的任何其他信息。我們會配合並向持有加拿大法院令的執法機構提供此日誌文件。如果您是加拿大以外地區的執法機構，有這方面信息披露的需求，請通過加拿大外交部來聯繫我們：'
@@ -2290,8 +2355,8 @@ var infoDefine = [
         },
         imapInformation: {
             title: '通訊專用Email郵箱設置',
-            tempImapAccount: "\u81E8\u6642\u90F5\u7BB1\u7533\u8ACB\u6709\u56F0\u96E3\uFF1F\u60A8\u53EF\u4EE5\u66AB\u6642\u4F7F\u7528<a href=\"#\" onclick=\"return linkClick ('https://github.com/QTGate/QTGate-Desktop-Client/wiki/iCloud%E8%87%A8%E6%99%82%E5%B8%B3%E6%88%B6')\">CoNET\u7DB2\u7D61\u63D0\u4F9B\u7684\u81E8\u6642IMAP\u5E33\u865F\u4F9B\u5404\u4F4D\u6E2C\u8A66</a>",
-            infomation: "\u8ACB\u8A2D\u7F6ECoNET\u7DB2\u7D61\u901A\u8A0A\u5C08\u7528Email\u90F5\u7BB1\u4FE1\u606F\u3002\u7531\u65BC\u6B64\u8CEC\u6236\u7684\u7528\u6236\u540D\u548C\u5BC6\u78BC\u4FE1\u606F\u6703\u63D0\u4EA4\u7D66CoNET\u7DB2\u7D61\uFF0C\u70BA\u4E86\u9632\u6B62\u60A8\u7684\u500B\u4EBA\u4FE1\u606F\u88AB\u6D29\u6F0F\uFF0C\u8ACB\u65B0\u7533\u8ACB\u4E00\u500B\u81E8\u6642Email\u8CEC\u6236\u3002\u76EE\u524DCoNET\u7DB2\u7D61\u6280\u8853\u5C0D\u61C9<a href=\"#\" onclick=\"return linkClick ('https://www.icloud.com/')\">Apple iCloud</a>\uFF0C<a href=\"#\" onclick=\"return linkClick ('https://www.microsoft.com/zh-tw/outlook-com/mobile/?WT.mc_id=mscom')\">\u5FAE\u8EDFOUTLOOK</a>\uFF0C<a href=\"#\" onclick=\"return linkClick ('http://tw.mail.yahoo.com/')\">\u96C5\u864E\u90F5\u7BB1</a>\uFF0C<a href=\"#\" onclick=\"return linkClick ('https://www.zoho.com/mail/')\">\u4FC4\u7F85\u65AFZOHO\u90F5\u7BB1</a>\uFF0C<a href=\"#\" onclick=\"return linkClick ('https://gmail.com')\">Google\u90F5\u7BB1</a>\uFF0C<a href=\"#\" onclick=\"return linkClick ('https://www.gmx.com/mail/#.1559516-header-nav1-2')\">\u7F8E\u570B\u5728\u7DDAGMX\u90F5\u7BB1</a>\uFF0CCoNET\u5F37\u529B\u63A8\u85A6\u4F7F\u7528\u860B\u679C\u516C\u53F8\u7684Email\u53EF\u4EE5\u9054\u5230\u6700\u4F73\u901F\u5EA6(@OPN\u7121IP\u9023\u7D50\u6280\u8853\u53EA\u5C0D\u61C9\u860B\u679C\u516C\u53F8iCloud\u90F5\u7BB1)\u3002\u5BC6\u78BC\u8ACB\u4F7F\u7528Email\u670D\u52D9\u5546\u7684<a href=\"#\" onclick=\"return linkClick ('https://tw.help.yahoo.com/kb/SLN15241.html')\">\u61C9\u7528\u5BC6\u78BC</a>\u3002\u5C0D\u65BCEmail\u4F9B\u61C9\u5546\u5728\u61C9\u7528\u5BC6\u78BC\u7533\u8ACB\u6642\uFF0C\u9808\u6253\u958B<a href=\"#\" onclick=\"return linkClick ('https://tw.help.yahoo.com/kb/%E9%96%8B%E5%95%9F%E5%85%A9%E6%AD%A5%E9%A9%9F%E9%A9%97%E8%AD%89-sln5013.html')\">\u4E8C\u6B65\u8A8D\u8B49</a>\u4E26\u5FC5\u9808\u63D0\u4F9B\u624B\u6A5F\u865F\u78BC\u63A5\u53D7\u9A57\u8B49\u78BC\uFF0C\u70BA\u4FDD\u8B77\u60A8\u7684\u96B1\u79C1\uFF0C\u5EFA\u8B70\u4F7F\u7528\u514D\u8CBB\u5728\u7DDA\u4EE3\u7406\u63A5\u6536\u9A57\u8B49\u78BC\u670D\u52D9\u3002\u5982 ( <a href=\"#\" onclick=\"return linkClick('http://receive-sms-online.com/')\">receive-sms-online.com</a>, <a href=\"#\" onclick=\"return linkClick('https://sms-online.co/receive-free-sms')\" >sms-online.co</a>, <a href=\"#\" onclick=\"return linkClick('https://receive-a-sms.com/')\" >receive-a-sms.com</a> ) \u66F4\u591A\u8ACB <a href=\"#\" onclick=\"return linkClick ('http://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=0&rsv_idx=1&tn=baidu&wd=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&rsv_pq=e94f47a50001f66f&rsv_t=b03ePiy3rHH0T4FVoWB8Hx9vrVdZLzVhhErWOo4xdBpjDw%2BtGri%2BViTaVAw&rqlang=cn&rsv_enter=1&rsv_sug3=42&rsv_sug1=5&rsv_sug7=100')\">\u767E\u5EA6\u67E5\u627E</a>\uFF0C<a href=\"#\" onclick=\"return linkClick ('https://www.google.com/search?q=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&oq=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&aqs=chrome..69i57j69i60.254j0j4&sourceid=chrome&ie=UTF-8')\">Google\u67E5\u627E</a>\u3002",
+            tempImapAccount: `臨時郵箱申請有困難？您可以暫時使用<a href="#" onclick="return linkClick ('https://github.com/QTGate/QTGate-Desktop-Client/wiki/iCloud%E8%87%A8%E6%99%82%E5%B8%B3%E6%88%B6')">CoNET網絡提供的臨時IMAP帳號供各位測試</a>`,
+            infomation: `請設置CoNET網絡通訊專用Email郵箱信息。由於此賬戶的用戶名和密碼信息會提交給CoNET網絡，為了防止您的個人信息被洩漏，請新申請一個臨時Email賬戶。目前CoNET網絡技術對應<a href="#" onclick="return linkClick ('https://www.icloud.com/')">Apple iCloud</a>，<a href="#" onclick="return linkClick ('https://www.microsoft.com/zh-tw/outlook-com/mobile/?WT.mc_id=mscom')">微軟OUTLOOK</a>，<a href="#" onclick="return linkClick ('http://tw.mail.yahoo.com/')">雅虎郵箱</a>，<a href="#" onclick="return linkClick ('https://www.zoho.com/mail/')">俄羅斯ZOHO郵箱</a>，<a href="#" onclick="return linkClick ('https://gmail.com')">Google郵箱</a>，<a href="#" onclick="return linkClick ('https://www.gmx.com/mail/#.1559516-header-nav1-2')">美國在線GMX郵箱</a>，CoNET強力推薦使用蘋果公司的Email可以達到最佳速度(@OPN無IP連結技術只對應蘋果公司iCloud郵箱)。密碼請使用Email服務商的<a href="#" onclick="return linkClick ('https://tw.help.yahoo.com/kb/SLN15241.html')">應用密碼</a>。對於Email供應商在應用密碼申請時，須打開<a href="#" onclick="return linkClick ('https://tw.help.yahoo.com/kb/%E9%96%8B%E5%95%9F%E5%85%A9%E6%AD%A5%E9%A9%9F%E9%A9%97%E8%AD%89-sln5013.html')">二步認證</a>並必須提供手機號碼接受驗證碼，為保護您的隱私，建議使用免費在線代理接收驗證碼服務。如 ( <a href="#" onclick="return linkClick('http://receive-sms-online.com/')">receive-sms-online.com</a>, <a href="#" onclick="return linkClick('https://sms-online.co/receive-free-sms')" >sms-online.co</a>, <a href="#" onclick="return linkClick('https://receive-a-sms.com/')" >receive-a-sms.com</a> ) 更多請 <a href="#" onclick="return linkClick ('http://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=0&rsv_idx=1&tn=baidu&wd=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&rsv_pq=e94f47a50001f66f&rsv_t=b03ePiy3rHH0T4FVoWB8Hx9vrVdZLzVhhErWOo4xdBpjDw%2BtGri%2BViTaVAw&rqlang=cn&rsv_enter=1&rsv_sug3=42&rsv_sug1=5&rsv_sug7=100')">百度查找</a>，<a href="#" onclick="return linkClick ('https://www.google.com/search?q=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&oq=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&aqs=chrome..69i57j69i60.254j0j4&sourceid=chrome&ie=UTF-8')">Google查找</a>。`,
             serverDetail: '詳細設定：',
             imapServer: 'IMAP伺服器設定',
             UserName: '登陸用戶名稱',
@@ -2315,13 +2380,28 @@ var infoDefine = [
             connectImap: '連結CoNET網絡',
             cancelConnect: '終止CoNET網絡連接',
             imapItemTitle: '通訊用郵箱詳細信息',
-            imapCheckingStep: ['正在嘗試連接email伺服器', 'IMAP成功登陸email伺服器', 'SMTP成功登陸email伺服器'],
+            imapCheckingStep: [
+                /* 0 */ '正在尝试连接邮件伺服器',
+                /* 1 */ '邮件伺服器IMAP連接成功，正在等待CoNET對接。',
+                /* 2 */ '邮件伺服器SMTP連接成功',
+                /* 3 */ 'CoNET客户端向CoNET系统发出联机请求Email。和CoNET联机需要额外的时间，请耐心等待。',
+                /* 4 */ '成功連接CoNET',
+            ],
             imapResultTitle: 'IMAP伺服器CoNET通訊評分：',
             testSuccess: '電子郵件伺服器連接試驗成功！',
             exitEdit: '退出編輯Email帳戶',
             deleteImap: '刪除IMAP帳戶',
             proxyPortError: '連接埠應該是從1000-65535之間的數字，或此端口已被其他APP所占用，請再嘗試其他號碼。',
-            appPassword: '關於APP密碼'
+            appPassword: '關於APP密碼',
+            imapCheckError: [
+                '不能连接到郵件伺服器，有可能您所在網絡不支持郵件通訊，請檢查您的網絡',
+                '郵件伺服器提示用户名或密码错误，请仔细检查您的用户名和密码！',
+                '郵件伺服器證書錯誤！您所在網絡可能存在網絡中間人攻擊，請換網絡環境後再嘗試。',
+                '郵件伺服器發送郵件錯誤，這通常是您使用的密碼是普通密碼所致，請換用APP密碼後再次嘗試',
+                '未連結互聯網，請檢查網絡',
+                '未知錯誤，請退出CoNET後再試。',
+                '您的郵箱無可用空間錯誤，請檢查郵箱刪除不必要的郵件後再試。'
+            ]
         },
         Home_keyPairInfo_view: {
             deleteKeyPairHaveLogin: '請使用登陸後的客戶端來刪除您的密鑰',
@@ -2335,7 +2415,7 @@ var infoDefine = [
             password1: '請輸入平台密碼',
             logout: '退出登錄',
             deleteKeyPairInfo: '請注意：如果您沒有備份您的CoNET系統的話，刪除現有的密鑰將使您的CoNET網絡設定全部丟失，您有可能需要重新設置您的CoNET系統。如果您的註冊Email沒有變化，您的CoNET賬戶支付信息不會丟失！',
-            "delete": '刪除',
+            delete: '刪除',
             keyID: '密鑰對ID：',
             locked: '請提供您的RSA密鑰以解開密鑰後才能繼續操作，如果您遺忘了密碼，請刪除此RSA密鑰。',
             systemError: '發生系統錯誤。如果重複發生，請刪除您的密鑰，再次設定您的系統！'
@@ -2364,9 +2444,9 @@ var infoDefine = [
             KeypairLength: '請選擇加密通訊用密鑰對長度：這個數字越大，通訊越難被破解，但會增加通訊量和運算時間。',
             systemAdministratorEmail: 'RSA密鑰生成',
             GenerateKeypair: '<em>系統正在生成用於通訊和簽名的RSA加密密鑰對，計算機需要運行產生大量的隨機數字，可能需要幾分鐘時間，尤其是長度為4096的密鑰對，需要特別長的時間，請耐心等待。關於RSA加密算法的機制和原理，您可以訪問維基百科：' +
-                "<a href='#' target=\"_blank\" onclick=\"return linkClick ('https://zh.wikipedia.org/wiki/RSA\u52A0\u5BC6\u6F14\u7B97\u6CD5')\">https://zh.wikipedia.org/wiki/RSA\u52A0\u5BC6\u6F14\u7B97\u6CD5</a></em>",
+                `<a href='#' target="_blank" onclick="return linkClick ('https://zh.wikipedia.org/wiki/RSA加密演算法')">https://zh.wikipedia.org/wiki/RSA加密演算法</a></em>`,
             inputEmail: '让我们来完成设定的最后几个步骤，首先生成RSA密鑰對, 它是您的系統信息加密，身份認證及和CoNET網絡通訊使用的重要組成部分。 RSA密鑰對的密碼請妥善保存，Email地址欄請填入您的常用邮箱地址, 它將被用作您的CoNET網絡賬號。<em style="color:brown;">需注意的是CoNET域名在某些网络限制地区可能被列入黑名单，推薦使用網絡自由地區郵箱。</em>',
-            accountEmailInfo: "\u7531\u65BCCoNET\u57DF\u540D\u5728\u67D0\u4E9B\u570B\u5BB6\u548C\u5730\u5340\u88AB\u9632\u706B\u7246\u5C4F\u853D\uFF0C\u800C\u4E0D\u80FD\u6B63\u5E38\u6536\u767CCoNET\u7684Email\uFF0C\u5982\u679C\u60A8\u662F\u8655\u65BC\u9632\u706B\u7246\u5167\u7684\u7528\u6236\uFF0C\u5EFA\u8B70\u4F7F\u7528\u9632\u706B\u7246\u5916\u90E8\u7684\u90F5\u4EF6\u670D\u52D9\u5546\u3002"
+            accountEmailInfo: `由於CoNET域名在某些國家和地區被防火牆屏蔽，而不能正常收發CoNET的Email，如果您是處於防火牆內的用戶，建議使用防火牆外部的郵件服務商。`
         },
         error_message: {
             title: '錯誤',
@@ -2374,7 +2454,7 @@ var infoDefine = [
             Success: '完成',
             localServerError: '本地伺服器錯誤，請重新啟動CoNET！',
             required: '請填寫此字段',
-            EmailAddress: ['請按照下列格式輸入你的電子郵件地址: someone@example.com.', '您已有相同的Email賬戶', '此類Email伺服器暫時CoNET網絡技術不能對應。'],
+            EmailAddress: ['請按照下列格式輸入你的電子郵件地址: someone@example.com.', '您已有相同的Email賬戶', '此類Email伺服器CoNET暫時不對應。'],
             PasswordLengthError: '密碼必須設定為5個字符以上。',
             finishedKeyPair: '密鑰對創建完成',
             doCancel: '終止生成',
@@ -2397,6 +2477,10 @@ var infoDefine = [
                 '您已有相同的Email賬戶',
                 '您的系統還未連接到CoNET網絡！',
                 '您的郵箱提示您賬號已無可使用容量，請清理郵箱後再試'
+            ],
+            CoNET_requestError: [
+                /* 0 */ 'CoNET無響應,正在重新建立CoNET通訊管道，請稍候！',
+                /* 1 */ '無效操作！'
             ]
         },
         emailConform: {
@@ -2416,14 +2500,14 @@ var infoDefine = [
             formatError: ['內容格式錯誤，請複制從“-----BEGIN PGP MESSAGE----- （開始，一直到）-----END PGP MESSAGE-----” 結束的完整內容，粘貼在此輸入框中。',
                 '提供的內容不能被解密，請確認這是在您收到的最後一封從CoNET發送過來的激活信。如果還是沒法完成激活，請刪除您的密鑰重新生成和設定。',
                 '和CoNET網絡連接發生錯誤，請退出重新嘗試！',
-                '無效激活碼！ CoNET已重新發送新的激活Email，並斷開與您的連接。請退出CoNET重新啟動CoNET後，檢查您的郵箱重做激活。',
+                '無效激活碼！如果存在多封CoNET的郵件時，請選擇最後一封信件。',
                 '您的CoNET看上去有問題, 請刪除您的密鑰，重新設置您的CoNET！',
                 'CoNET網絡系統故障，請稍後再試。 ',
                 '您當天的數據通訊量達到上限，請等待明天再試或升級用戶類型',
                 '用來通訊的Email設定有錯誤，請檢查IMAP設定後重試，或CoNET網絡不支持此Email類型',
                 '您所選區域不能夠連結，請稍候再試',
                 '您的IMAP郵箱發信發生錯誤。請退出CoNET重試。如果持續發生此故障，您的IMAP帳號有可能被鎖住，需要登陸您的IMAP郵箱網站解鎖操作。',
-                'CoNET核心程序發生錯誤，請退出後重新啟動CoNET。',
+                'CoNET核心程序發生錯誤，請刷新頁面，或退出後重新啟動CoNET。',
                 '嗯，高手過招身手非凡啊！'
             ],
             activeing: '正在通訊中'
@@ -2503,9 +2587,9 @@ var infoDefine = [
             title: '使用信息反饋',
             additional: '添附附加信息',
             okTitle: '發送至CoNET'
-        }
+        },
     }
 ];
-var linkClick = function (url) {
+const linkClick = function (url) {
     return window.open(url, '_blank');
 };

@@ -1,20 +1,19 @@
 "use strict";
-exports.__esModule = true;
-var Path = require("path");
-var Fs = require("fs");
-var child_process_1 = require("child_process");
-var testElectronSystem = function (CallBack) {
+Object.defineProperty(exports, "__esModule", { value: true });
+const Path = require("path");
+const Fs = require("fs");
+const child_process_1 = require("child_process");
+const testElectronSystem = (CallBack) => {
     try {
-        var ele = require('electron');
+        const ele = require('electron');
     }
     catch (ex) {
         return CallBack(ex);
     }
     return CallBack();
 };
-var RendererProcess = /** @class */ (function () {
-    function RendererProcess(forkName, data, debug, CallBack) {
-        var _this = this;
+class RendererProcess {
+    constructor(forkName, data, debug, CallBack) {
         this.forkName = forkName;
         this.data = data;
         this.debug = debug;
@@ -22,88 +21,85 @@ var RendererProcess = /** @class */ (function () {
         this.win = null;
         this._fork = null;
         this.file = Path.join(__dirname, 'render', this.forkName);
-        testElectronSystem(function (err1) {
+        testElectronSystem(err1 => {
             if (err1) {
-                console.log("RendererProcess: running system have not electron.");
-                _this.file += '.js';
+                console.log(`RendererProcess: running system have not electron.`);
+                this.file += '.js';
             }
             else {
-                _this.file += '.html';
+                this.file += '.html';
             }
-            return Fs.access(_this.file, function (err) {
+            return Fs.access(this.file, err => {
                 if (err) {
                     return CallBack(err);
                 }
-                if (/.js$/.test(_this.file)) {
-                    return _this.childProcess();
+                if (/.js$/.test(this.file)) {
+                    return this.childProcess();
                 }
-                return _this.electronRendererProcess();
+                return this.electronRendererProcess();
             });
         });
     }
-    RendererProcess.prototype.childProcess = function () {
-        var _this = this;
-        var _fork = child_process_1.fork(this.file, this.data);
-        _fork.once('close', function (code, signal) {
-            console.log("RendererProcess exit");
-            if (!_this.CallBack || typeof _this.CallBack !== 'function') {
+    childProcess() {
+        const _fork = child_process_1.fork(this.file, this.data);
+        _fork.once('close', (code, signal) => {
+            console.log(`RendererProcess exit`);
+            if (!this.CallBack || typeof this.CallBack !== 'function') {
                 return;
             }
             if (!code) {
-                _this.CallBack();
+                this.CallBack();
             }
             else {
-                _this.CallBack(new Error("RendererProcess exit with code [" + code + "] signal [" + signal + "]"));
+                this.CallBack(new Error(`RendererProcess exit with code [${code}] signal [${signal}]`));
             }
-            return _this.CallBack = null;
+            return this.CallBack = null;
         });
-        _fork.once('message', function (message) {
-            console.log("RendererProcess [" + _this.forkName + "] on message");
-            if (!_this.CallBack || typeof _this.CallBack !== 'function') {
+        _fork.once('message', message => {
+            console.log(`RendererProcess [${this.forkName}] on message`);
+            if (!this.CallBack || typeof this.CallBack !== 'function') {
                 return;
             }
-            _this.CallBack(null, message);
-            _this.CallBack = null;
+            this.CallBack(null, message);
+            this.CallBack = null;
         });
-    };
-    RendererProcess.prototype.electronRendererProcess = function () {
-        var _this = this;
-        var _a = require('electron'), remote = _a.remote, screen = _a.screen, desktopCapturer = _a.desktopCapturer;
+    }
+    electronRendererProcess() {
+        const { remote, screen, desktopCapturer } = require('electron');
         this.win = new remote.BrowserWindow({ show: this.debug });
         this.win.setIgnoreMouseEvents(!this.debug);
         if (this.debug) {
             this.win.webContents.openDevTools();
             this.win.maximize();
         }
-        this.win.once('first', function () {
-            _this.win.once('firstCallBackFinished', function (returnData) {
-                _this.win.close();
-                _this.win = null;
-                _this.CallBack(returnData);
-                return _this.CallBack = null;
+        this.win.once('first', () => {
+            this.win.once('firstCallBackFinished', returnData => {
+                this.win.close();
+                this.win = null;
+                this.CallBack(returnData);
+                return this.CallBack = null;
             });
-            _this.win.emit('firstCallBack', _this.data);
+            this.win.emit('firstCallBack', this.data);
         });
-        this.win.once('closed', function () {
-            if (_this.CallBack && typeof _this.CallBack === 'function') {
-                _this.CallBack();
-                return _this.CallBack = null;
+        this.win.once('closed', () => {
+            if (this.CallBack && typeof this.CallBack === 'function') {
+                this.CallBack();
+                return this.CallBack = null;
             }
         });
-        this.win.loadURL("file://" + Path.join(__dirname, name + '.html'));
-    };
-    RendererProcess.prototype.cancel = function () {
+        this.win.loadURL(`file://${Path.join(__dirname, name + '.html')}`);
+    }
+    cancel() {
         if (this.win && typeof this.win.destroy === 'function') {
             return this.win.destroy();
         }
         if (this._fork) {
             return this._fork.kill();
         }
-        console.log("RendererProcess on cancel but have not any ");
-    };
-    RendererProcess.prototype.sendCommand = function (command, data) {
+        console.log(`RendererProcess on cancel but have not any `);
+    }
+    sendCommand(command, data) {
         return this.win.emit(command, data);
-    };
-    return RendererProcess;
-}());
-exports["default"] = RendererProcess;
+    }
+}
+exports.default = RendererProcess;

@@ -99,7 +99,14 @@ interface WeakSetConstructor {
 declare var WeakSet: WeakSetConstructor;
 
 
-
+interface imapConnect {
+    imapServer: string
+    imapUserName: string
+    imapUserPassword: string
+    imapPortNumber: number|number[]
+    imapSsl: boolean
+    imapIgnoreCertificate: boolean
+}
 
 interface keypair {
 	publicKey?: string
@@ -117,7 +124,6 @@ interface keypair {
     showConform?: KnockoutObservable < boolean >
     deleteKeyPairNext?: () => void
     keyPairPassword?: KnockoutObservable < keyPairPassword >
-    showLoginPasswordFieldClick?: () => void
     showDeleteKeyPairNoite?: KnockoutObservable < boolean >
 }
 
@@ -128,7 +134,7 @@ interface install_config {
     version: string
     newVersion?: string
     newVersionCheckFault?: boolean
-    newVersionDownloadFault?: number 
+    newVersionDownloadFault?: number
     newVerReady?: boolean
     keypair: keypair
     iterations: number
@@ -157,4 +163,78 @@ interface INewKeyPair {
 interface keyPair {
     publicKey: string;
     privateKey: string;
+}
+
+interface imapData {
+    email: string
+}
+interface requestPoolData {
+	CallBack: ( err?: Error, returnData?: any ) => void
+}
+interface IinputData extends imapConnect {
+    account:string
+    email: string
+    smtpServer:string
+    smtpUserName:string
+    smtpUserPassword:string
+    smtpPortNumber:number|number[]
+    smtpSsl:boolean
+    smtpIgnoreCertificate: boolean
+    imapTestResult: number
+    language: string
+    clientFolder: string
+    serverFolder: string
+    timeZoneOffset: number
+    randomPassword: string
+    uuid: string
+    clientIpAddress: string
+    ciphers: string
+    confirmRisk: boolean
+    sendToQTGate: boolean
+}
+interface iTransferData {
+    startDate: string
+    transferDayLimit: number
+    transferMonthly: number
+    account: string
+    resetTime: string
+    usedDayTransfer: number
+    productionPackage: string
+    usedMonthlyTransfer: number
+    availableDayTransfer: number
+    availableMonthlyTransfer: number
+    usedMonthlyOverTransfer: number
+    uploaded?: number
+    downloaded?: number
+    power: number
+    timeZoneOffset: number
+    expire: string
+    isAnnual: boolean
+    paidID: string[]
+    automatically: boolean
+}
+interface QTGate_DnsAddress {
+	dnsName: string,
+	ipv4: string,
+	url: string
+}
+interface QTGateAPIRequestCommand {
+	command: string
+    myIpServer?: QTGate_DnsAddress []
+    account?: string
+	error: number
+	requestSerial: string
+    Args: any[]
+    fingerprint?: string
+    dataTransfer?: iTransferData
+}
+interface QTGateCommand {
+    account: string
+    QTGateVersion: string
+    command: string
+    imapData?: IinputData
+    language: string
+    error: Error
+    callback: any
+    publicKey: string
 }

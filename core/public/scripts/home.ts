@@ -29,49 +29,57 @@ const InitKeyPair = function () {
 	return keyPair
 }
 
-const socketIo = io ({ reconnectionAttempts: 5, timeout: 500 })
-const makeKeyPairData = function ( keypair: keypair ) {
+const socketIo = io ({ reconnectionAttempts: 100, timeout: 500 })
+
+const makeKeyPairData = function ( view: view_layout.view, keypair: keypair ) {
     const length = keypair.publicKeyID.length
-        keypair.publicKeyID = keypair.publicKeyID.substr ( length - 8 ).toUpperCase()
-        keypair.publicKeyID = `${ keypair.publicKeyID.substr (0, 4 ) } ${ keypair.publicKeyID.substr (4) }`
-        let keyPairPasswordClass = new keyPairPassword (function () {
-            keypair.keyPairPassword ( keyPairPasswordClass = null )
-            keypair.showLoginPasswordField ( false )
-        })
-        keypair.keyPairPassword = ko.observable( keyPairPasswordClass )
-        keypair.showLoginPasswordField = ko.observable ( false )
-        keypair.delete_btn_view = ko.observable ( true )
-        keypair.showConform = ko.observable ( false )
-        keypair.delete_btn_click = function () {
-            keypair.delete_btn_view ( false )
-            return keypair.showConform ( true )
-        }
-
-        keypair.showLoginPasswordFieldClick = function () {
-            keypair.showLoginPasswordField ( !keypair.showLoginPasswordField ())
-            return keypair.keyPairPassword().inputFocus( keypair.showLoginPasswordField ())
-        }
+    keypair.publicKeyID = keypair.publicKeyID.substr ( length - 16 )
         
-        keypair.deleteKeyPairNext = function () {
-            socketIo.emit ( 'deleteKeyPairNext' )
-            return keypair.delete_btn_view ( false )
-        }
-        socketIo.on ( 'deleteKeyPairNoite', function () {
-            return keypair.showDeleteKeyPairNoite ( true )
-        })
+    let keyPairPasswordClass = new keyPairPassword ( function ( _imapData: IinputData ) {
+        keypair.keyPairPassword ( keyPairPasswordClass = null )
+        keypair.passwordOK = true
+        keypair.showLoginPasswordField ( false )
+        
+        return view.imapSetup( new imapForm ( keypair.email, _imapData, keypair.verified  ))
+        
+        
+    })
+    keypair.keyPairPassword = ko.observable( keyPairPasswordClass )
+    keypair.showLoginPasswordField = ko.observable ( false )
+    keypair.delete_btn_view = ko.observable ( true )
+    keypair.showConform = ko.observable ( false )
+    keypair.delete_btn_click = function () {
+        keypair.delete_btn_view ( false )
+        return keypair.showConform ( true )
+    }
+    
+    
+    keypair.deleteKeyPairNext = function () {
+        socketIo.emit ( 'deleteKeyPairNext' )
+        view.showIconBar ( false )
+        view.connectedCoNET ( false )
+        view.connectToCoNET ( false )
+        return keypair.delete_btn_view ( false )
+    }
 
-        keypair.showDeleteKeyPairNoite = ko.observable ( false )
+    socketIo.on ( 'deleteKeyPairNoite', function () {
+        return keypair.showDeleteKeyPairNoite ( true )
+    })
+
+    keypair.showDeleteKeyPairNoite = ko.observable ( false )
 }
 
 const initPopupArea = () => {
     const popItem = $( '.activating.element' ).popup('hide')
+    const inline = popItem.hasClass ('inline')
     return popItem.popup({
         on: 'focus',
         movePopup: false,
-        position: 'right center',
-        inline: true
+        position: 'top left',
+        inline: inline
     })
 }
+
 module view_layout {
     export class view {
         public sectionLogin = ko.observable ( false )
@@ -79,7 +87,6 @@ module view_layout {
         public sectionWelcome = ko.observable ( true )
         public isFreeUser = ko.observable ( true )
         public QTTransferData = ko.observable ( false )
-        public keyPair_delete_btn_view = ko.observable ( false )
         public LocalLanguage = 'up'
         public menu = Menu
         public CoNETLocalServerError = ko.observable ( false )
@@ -90,22 +97,47 @@ module view_layout {
         public localServerConfig: KnockoutObservable < install_config > = ko.observable ()
         public keyPair: KnockoutObservable < keypair > = ko.observable (InitKeyPair())
         public hacked = ko.observable ( false )
+        public imapSetup: KnockoutObservable < imapForm > = ko.observable ()
+        public showIconBar = ko.observable ( false )
+        public connectToCoNET = ko.observable ( false )
+        public connectedCoNET = ko.observable ( false )
+        public showKeyPair = ko.observable ( true )
         private systemError () {
             this.modalContent ( infoDefine[ this.languageIndex() ].emailConform.formatError [ 10 ] )
             $( '#CoNETError').modal ('setting', 'closable', false ).modal ( 'show' )
             return this.CoNETLocalServerError ( true )
         }
 
-        
+        private listingConnectStage ( err, stage ) {
+            if ( stage > -1 ) {
+                this.showIconBar ( true )
+                this.connectToCoNET ( true )
+                if ( stage === 4 ) {
+                    this.connectToCoNET ( false )
+                    this.connectedCoNET ( true )
+                }
+                
+            }
+
+        }
     
         private initConfig ( self: view, config: install_config ) {
+            
             if ( config.keypair && config.keypair.publicKeyID ) {
                 const keypair = config.keypair
-                makeKeyPairData ( keypair )
+                makeKeyPairData ( this, keypair )
+                if ( ! keypair.passwordOK ) {
+                    this.showKeyPair ( true )
+                    keypair.showLoginPasswordField ( true )
+                }
+                
             } else {
+                this.showKeyPair ( true )
                 config.keypair = null
+                let imap = self.imapSetup()
+                self.imapSetup( imap = null )
                 let _keyPairGenerateForm =  new keyPairGenerateForm ( function ( _keyPair: keypair ) {
-                    makeKeyPairData ( _keyPair )
+                    makeKeyPairData ( self, _keyPair )
                     _keyPair.passwordOK = true
                     let keyPairPassword = _keyPair.keyPairPassword ()
                     _keyPair.keyPairPassword ( keyPairPassword = null )
@@ -113,6 +145,7 @@ module view_layout {
                     self.localServerConfig ( config )
                     self.keyPair ( _keyPair )
                     initPopupArea ()
+                    self.imapSetup( new imapForm ( config.account ))
                     return self.keyPairGenerateForm ( _keyPairGenerateForm = null )
 
                 })
@@ -120,8 +153,10 @@ module view_layout {
             }
             self.localServerConfig ( config )
             self.keyPair ( self.localServerConfig ().keypair )
-            
-            return self.isFreeUser ( self.localServerConfig().freeUser )
+            if ( self.keyPair() && self.keyPair().keyPairPassword() &&  typeof self.keyPair().keyPairPassword().inputFocus ==='function' ) {
+                self.keyPair().keyPairPassword().inputFocus( true )
+            }
+           
         }
     
         private socketListen () {
@@ -132,6 +167,11 @@ module view_layout {
                 }
                 return self.systemError()
             })
+
+            socketIo.on( 'reconnect_attempt', () => {
+
+                return self.systemError()
+            });
     
             
             socketIo.once ( 'CoNET_systemError', function () {
@@ -145,13 +185,17 @@ module view_layout {
             socketIo.emit ( 'init', function ( config: install_config ) {
                 return self.initConfig ( self, config )
             })
+
+            socketIo.on ( 'tryConnectCoNETStage',function ( err, stage ) {
+                return self.listingConnectStage ( err, stage )
+            })
         }
     
         constructor () {
             this.socketListen()
         }
         
-        
+        //          change language
         public selectItem ( that: any, site: () => number ) {
     
             const tindex = lang [ this.tLang ()]
@@ -178,7 +222,7 @@ module view_layout {
             $('.KnockoutAnimation').transition('jiggle')
             return initPopupArea()
         }
-    
+        //          start click
         public openClick () {
             this.sectionWelcome ( false )
             if ( this.localServerConfig().firstRun ) {
@@ -195,6 +239,7 @@ module view_layout {
             this.localServerConfig().firstRun = false
             return this.openClick()
         }
+
     
         public exit () {
             if ( typeof require === 'undefined' ) {
@@ -206,7 +251,6 @@ module view_layout {
         }
     }
 }
-
 
 const _view = new view_layout.view ()
 

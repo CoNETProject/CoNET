@@ -13,8 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-var InitKeyPair = function () {
-    var keyPair = {
+const InitKeyPair = function () {
+    const keyPair = {
         publicKey: null,
         privateKey: null,
         keyLength: null,
@@ -27,14 +27,15 @@ var InitKeyPair = function () {
     };
     return keyPair;
 };
-var socketIo = io({ reconnectionAttempts: 5, timeout: 500 });
-var makeKeyPairData = function (keypair) {
-    var length = keypair.publicKeyID.length;
-    keypair.publicKeyID = keypair.publicKeyID.substr(length - 8).toUpperCase();
-    keypair.publicKeyID = keypair.publicKeyID.substr(0, 4) + " " + keypair.publicKeyID.substr(4);
-    var keyPairPasswordClass = new keyPairPassword(function () {
+const socketIo = io({ reconnectionAttempts: 100, timeout: 500 });
+const makeKeyPairData = function (view, keypair) {
+    const length = keypair.publicKeyID.length;
+    keypair.publicKeyID = keypair.publicKeyID.substr(length - 16);
+    let keyPairPasswordClass = new keyPairPassword(function (_imapData) {
         keypair.keyPairPassword(keyPairPasswordClass = null);
+        keypair.passwordOK = true;
         keypair.showLoginPasswordField(false);
+        return view.imapSetup(new imapForm(keypair.email, _imapData, keypair.verified));
     });
     keypair.keyPairPassword = ko.observable(keyPairPasswordClass);
     keypair.showLoginPasswordField = ko.observable(false);
@@ -44,12 +45,11 @@ var makeKeyPairData = function (keypair) {
         keypair.delete_btn_view(false);
         return keypair.showConform(true);
     };
-    keypair.showLoginPasswordFieldClick = function () {
-        keypair.showLoginPasswordField(!keypair.showLoginPasswordField());
-        return keypair.keyPairPassword().inputFocus(keypair.showLoginPasswordField());
-    };
     keypair.deleteKeyPairNext = function () {
         socketIo.emit('deleteKeyPairNext');
+        view.showIconBar(false);
+        view.connectedCoNET(false);
+        view.connectToCoNET(false);
         return keypair.delete_btn_view(false);
     };
     socketIo.on('deleteKeyPairNoite', function () {
@@ -57,25 +57,25 @@ var makeKeyPairData = function (keypair) {
     });
     keypair.showDeleteKeyPairNoite = ko.observable(false);
 };
-var initPopupArea = function () {
-    var popItem = $('.activating.element').popup('hide');
+const initPopupArea = () => {
+    const popItem = $('.activating.element').popup('hide');
+    const inline = popItem.hasClass('inline');
     return popItem.popup({
         on: 'focus',
         movePopup: false,
-        position: 'right center',
-        inline: true
+        position: 'top left',
+        inline: inline
     });
 };
 var view_layout;
 (function (view_layout) {
-    var view = /** @class */ (function () {
-        function view() {
+    class view {
+        constructor() {
             this.sectionLogin = ko.observable(false);
             this.sectionAgreement = ko.observable(false);
             this.sectionWelcome = ko.observable(true);
             this.isFreeUser = ko.observable(true);
             this.QTTransferData = ko.observable(false);
-            this.keyPair_delete_btn_view = ko.observable(false);
             this.LocalLanguage = 'up';
             this.menu = Menu;
             this.CoNETLocalServerError = ko.observable(false);
@@ -86,43 +86,71 @@ var view_layout;
             this.localServerConfig = ko.observable();
             this.keyPair = ko.observable(InitKeyPair());
             this.hacked = ko.observable(false);
+            this.imapSetup = ko.observable();
+            this.showIconBar = ko.observable(false);
+            this.connectToCoNET = ko.observable(false);
+            this.connectedCoNET = ko.observable(false);
+            this.showKeyPair = ko.observable(true);
             this.socketListen();
         }
-        view.prototype.systemError = function () {
+        systemError() {
             this.modalContent(infoDefine[this.languageIndex()].emailConform.formatError[10]);
             $('#CoNETError').modal('setting', 'closable', false).modal('show');
             return this.CoNETLocalServerError(true);
-        };
-        view.prototype.initConfig = function (self, config) {
+        }
+        listingConnectStage(err, stage) {
+            if (stage > -1) {
+                this.showIconBar(true);
+                this.connectToCoNET(true);
+                if (stage === 4) {
+                    this.connectToCoNET(false);
+                    this.connectedCoNET(true);
+                }
+            }
+        }
+        initConfig(self, config) {
             if (config.keypair && config.keypair.publicKeyID) {
-                var keypair = config.keypair;
-                makeKeyPairData(keypair);
+                const keypair = config.keypair;
+                makeKeyPairData(this, keypair);
+                if (!keypair.passwordOK) {
+                    this.showKeyPair(true);
+                    keypair.showLoginPasswordField(true);
+                }
             }
             else {
+                this.showKeyPair(true);
                 config.keypair = null;
-                var _keyPairGenerateForm_1 = new keyPairGenerateForm(function (_keyPair) {
-                    makeKeyPairData(_keyPair);
+                let imap = self.imapSetup();
+                self.imapSetup(imap = null);
+                let _keyPairGenerateForm = new keyPairGenerateForm(function (_keyPair) {
+                    makeKeyPairData(self, _keyPair);
                     _keyPair.passwordOK = true;
-                    var keyPairPassword = _keyPair.keyPairPassword();
+                    let keyPairPassword = _keyPair.keyPairPassword();
                     _keyPair.keyPairPassword(keyPairPassword = null);
                     config.keypair = _keyPair;
                     self.localServerConfig(config);
                     self.keyPair(_keyPair);
                     initPopupArea();
-                    return self.keyPairGenerateForm(_keyPairGenerateForm_1 = null);
+                    self.imapSetup(new imapForm(config.account));
+                    return self.keyPairGenerateForm(_keyPairGenerateForm = null);
                 });
-                self.keyPairGenerateForm(_keyPairGenerateForm_1);
+                self.keyPairGenerateForm(_keyPairGenerateForm);
             }
             self.localServerConfig(config);
             self.keyPair(self.localServerConfig().keypair);
-            return self.isFreeUser(self.localServerConfig().freeUser);
-        };
-        view.prototype.socketListen = function () {
-            var self = this;
+            if (self.keyPair() && self.keyPair().keyPairPassword() && typeof self.keyPair().keyPairPassword().inputFocus === 'function') {
+                self.keyPair().keyPairPassword().inputFocus(true);
+            }
+        }
+        socketListen() {
+            let self = this;
             socketIo.once('reconnect_failed', function (err) {
                 if (self.CoNETLocalServerError()) {
                     return;
                 }
+                return self.systemError();
+            });
+            socketIo.on('reconnect_attempt', () => {
                 return self.systemError();
             });
             socketIo.once('CoNET_systemError', function () {
@@ -134,54 +162,58 @@ var view_layout;
             socketIo.emit('init', function (config) {
                 return self.initConfig(self, config);
             });
-        };
-        view.prototype.selectItem = function (that, site) {
-            var tindex = lang[this.tLang()];
-            var index = tindex + 1;
+            socketIo.on('tryConnectCoNETStage', function (err, stage) {
+                return self.listingConnectStage(err, stage);
+            });
+        }
+        //          change language
+        selectItem(that, site) {
+            const tindex = lang[this.tLang()];
+            let index = tindex + 1;
             if (index > 3) {
                 index = 0;
             }
             this.languageIndex(index);
             this.tLang(lang[index]);
             $.cookie('langEH', this.tLang(), { expires: 180, path: '/' });
-            var obj = $("span[ve-data-bind]");
+            const obj = $("span[ve-data-bind]");
             obj.each(function (index, element) {
-                var ele = $(element);
-                var data = ele.attr('ve-data-bind');
+                const ele = $(element);
+                const data = ele.attr('ve-data-bind');
                 if (data && data.length) {
                     ele.text(eval(data));
                 }
             });
-            $('.languageText').shape("flip " + this.LocalLanguage);
+            $('.languageText').shape(`flip ${this.LocalLanguage}`);
             $('.KnockoutAnimation').transition('jiggle');
             return initPopupArea();
-        };
-        view.prototype.openClick = function () {
+        }
+        //          start click
+        openClick() {
             this.sectionWelcome(false);
             if (this.localServerConfig().firstRun) {
                 return this.sectionAgreement(true);
             }
             this.sectionLogin(true);
             return initPopupArea();
-        };
-        view.prototype.agreeClick = function () {
+        }
+        agreeClick() {
             this.sectionAgreement(false);
             socketIo.emit('agreeClick');
             this.localServerConfig().firstRun = false;
             return this.openClick();
-        };
-        view.prototype.exit = function () {
+        }
+        exit() {
             if (typeof require === 'undefined') {
                 this.modalContent(infoDefine[this.languageIndex()].emailConform.formatError[11]);
                 return this.hacked(true);
             }
-            var remote = require('electron').remote;
+            const { remote } = require('electron');
             return remote.app.quit();
-        };
-        return view;
-    }());
+        }
+    }
     view_layout.view = view;
 })(view_layout || (view_layout = {}));
-var _view = new view_layout.view();
+const _view = new view_layout.view();
 ko.applyBindings(_view, document.getElementById('body'));
-$("." + _view.tLang()).addClass('active');
+$(`.${_view.tLang()}`).addClass('active');

@@ -33,11 +33,11 @@ body {
 	display: -webkit-box;
 	display: -ms-flexbox;
 	display: flex;
-	-webkit-box-pack: center;
-		-ms-flex-pack: center;
-			justify-content: center;
-	-webkit-box-align: center;
-		-ms-flex-align: center;
+	
+	-ms-flex-pack: center;
+		justify-content: center;
+
+	-ms-flex-align: center;
 			align-items: center;
   }
 
@@ -54,7 +54,7 @@ body {
 	-ms-transition: opacity 0.4s ease-in-out;
 	-o-transition: opacity 0.4s ease-in-out;
 	transition: opacity 0.4s ease-in-out;
-	opacity: 0.4;
+	opacity: 0.6;
 }
 #languageArea {
 	z-index: 100;
@@ -69,7 +69,7 @@ body {
 }
 .languageText:hover {
 	text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.4);
-	opacity: 0.7;
+	opacity: 1;
 }
 .welcome {
 	width: 100%;
@@ -78,14 +78,13 @@ body {
 	display: -webkit-box;
 	display: -ms-flexbox;
 	display: flex;
-	-webkit-box-pack: center;
+	
 		-ms-flex-pack: center;
 			justify-content: center;
-	-webkit-box-align: center;
+	
 		-ms-flex-align: center;
 			align-items: center;
-	-webkit-box-orient: vertical;
-	-webkit-box-direction: normal;
+	
 		-ms-flex-direction: column;
 			flex-direction: column;
 }
@@ -136,4 +135,36 @@ body {
 }
 .displayNono {
 	display: none;
+}
+
+.iconButton {
+	cursor: pointer;
+	-webkit-transition: opacity 0.2s ease-in-out;
+	-moz-transition: opacity 0.2s ease-in-out;
+	-ms-transition: opacity 0.2s ease-in-out;
+	-o-transition: opacity 0.2s ease-in-out;
+	transition: opacity 0.2s ease-in-out;
+	opacity: 0.6!important;
+}
+
+.iconButton:hover {
+	text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.4);
+	opacity: 1!important;
+}
+
+.CoNET_info {
+	text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.4);
+	opacity: 0.7;
+	
+	padding-right: 1em;
+}
+
+.white {
+	color: white;
+}
+.red {
+	color: brown;
+}
+.yellow {
+	color: yellow;
 }

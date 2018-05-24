@@ -1,10 +1,25 @@
+/*!
+ * Copyright 2018 CoNET Technology Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 /**
  *      check email address
  *      @param email <string>
  *      @param return <string>  Valid = '' Err = errorMessage
  */
-var insideChinaEmail = /(\@|\.)(sina|sohu|qq|126|163|tom)\.com|(\.|\@)yeah\.net/i;
-var getNickName = function (email) {
+const insideChinaEmail = /(\@|\.)(sina|sohu|qq|126|163|tom)\.com|(\.|\@)yeah\.net/i;
+const getNickName = (email) => {
     var ret = '';
     if (email.length) {
         ret = email.split('@')[0];
@@ -12,10 +27,8 @@ var getNickName = function (email) {
     }
     return ret;
 };
-var IsNullValidator = /** @class */ (function () {
-    function IsNullValidator() {
-    }
-    IsNullValidator.prototype.isAcceptable = function (s) {
+class IsNullValidator {
+    isAcceptable(s) {
         if (s === undefined) {
             return true;
         }
@@ -25,20 +38,16 @@ var IsNullValidator = /** @class */ (function () {
         if (s.length == 0) {
             return true;
         }
-    };
-    return IsNullValidator;
-}());
-var EmailValidator = /** @class */ (function () {
-    function EmailValidator() {
     }
-    EmailValidator.prototype.isAcceptable = function (s) {
+}
+class EmailValidator {
+    isAcceptable(s) {
         return EmailRegexp.test(s);
-    };
-    return EmailValidator;
-}());
-var testVal = new IsNullValidator();
-var testEmail = new EmailValidator();
-var checkEmail = function (email) {
+    }
+}
+const testVal = new IsNullValidator();
+const testEmail = new EmailValidator();
+const checkEmail = (email) => {
     if (testVal.isAcceptable(email)) {
         return 'required';
     }
@@ -47,9 +56,8 @@ var checkEmail = function (email) {
     }
     return '';
 };
-var keyPairGenerateForm = /** @class */ (function () {
-    function keyPairGenerateForm(exit) {
-        var _this = this;
+class keyPairGenerateForm {
+    constructor(exit) {
         this.exit = exit;
         this.EmailAddressError = ko.observable(false);
         this.SystemAdministratorEmailAddress = ko.observable('');
@@ -67,33 +75,27 @@ var keyPairGenerateForm = /** @class */ (function () {
         this.message_keyPairGenerateSuccess = ko.observable(false);
         this.showKeyPairForm = ko.observable(true);
         this.showKeyInfomation = ko.observable(false);
-        this.SystemAdministratorEmailAddress.subscribe(function (newValue) {
-            return _this.checkEmailAddress(newValue);
+        this.SystemAdministratorEmailAddress.subscribe(newValue => {
+            return this.checkEmailAddress(newValue);
         });
-        this.SystemAdministratorNickName.subscribe(function (newValue) {
-            return _this.checkNickname(newValue);
+        this.SystemAdministratorNickName.subscribe(newValue => {
+            return this.checkNickname(newValue);
         });
-        this.systemSetup_systemPassword.subscribe(function (newValue) {
-            return _this.checkPassword(newValue);
+        this.systemSetup_systemPassword.subscribe(newValue => {
+            return this.checkPassword(newValue);
         });
     }
-    keyPairGenerateForm.prototype.showPopUp = function () {
-        $('.activating.element').popup({
-            on: 'focus',
-            movePopup: false
-        });
-    };
-    keyPairGenerateForm.prototype.checkEmailAddress = function (email) {
+    checkEmailAddress(email) {
         $('.ui.checkbox').checkbox();
         this.EmailAddressError(false);
         this.NickNameError(false);
         if (!email || !email.length) {
             this.EmailAddressError(true);
-            return this.showPopUp();
+            return initPopupArea();
         }
         if (checkEmail(email).length) {
             this.EmailAddressError(true);
-            return this.showPopUp();
+            return initPopupArea();
         }
         if (!this.SystemAdministratorNickName().length) {
             this.SystemAdministratorNickName(getNickName(email));
@@ -102,33 +104,32 @@ var keyPairGenerateForm = /** @class */ (function () {
             this.showInsideFireWallEmail(true);
         }
         return true;
-    };
-    keyPairGenerateForm.prototype.checkNickname = function (nickname) {
+    }
+    checkNickname(nickname) {
         this.NickNameError(false);
         if (!nickname || !nickname.length) {
-            this.showPopUp();
+            initPopupArea();
             this.NickNameError(true);
         }
         return true;
-    };
-    keyPairGenerateForm.prototype.checkPassword = function (password) {
+    }
+    checkPassword(password) {
         this.passwordError(false);
         if (!password || password.length < 5) {
             this.passwordError(true);
-            this.showPopUp();
+            initPopupArea();
         }
         return true;
-    };
-    keyPairGenerateForm.prototype.stopDoingProcessBar = function () {
+    }
+    stopDoingProcessBar() {
         clearTimeout(this.doingProcessBarTime);
         this.showKeyPairPorcess(false);
         return $('.keyPairProcessBar').progress({
             percent: 0
         });
-    };
-    keyPairGenerateForm.prototype.form_AdministratorEmail_submit = function () {
-        var _this = this;
-        var self = this;
+    }
+    form_AdministratorEmail_submit() {
+        const self = this;
         this.checkEmailAddress(this.SystemAdministratorEmailAddress());
         this.checkNickname(this.SystemAdministratorNickName());
         this.checkPassword(this.systemSetup_systemPassword());
@@ -137,18 +138,18 @@ var keyPairGenerateForm = /** @class */ (function () {
         }
         this.showKeyPairPorcess(true);
         this.showKeyPairForm(false);
-        var email = this.SystemAdministratorEmailAddress();
-        var sendData = {
+        const email = this.SystemAdministratorEmailAddress();
+        const sendData = {
             password: this.systemSetup_systemPassword(),
             nikeName: this.SystemAdministratorNickName(),
             email: email
         };
-        var percent = 1;
+        let percent = 1;
         $('.keyPairProcessBar').progress('reset');
-        var timeSet = 10000;
-        var doingProcessBar = function () {
-            clearTimeout(_this.doingProcessBarTime);
-            _this.doingProcessBarTime = setTimeout(function () {
+        const timeSet = 10000;
+        const doingProcessBar = () => {
+            clearTimeout(this.doingProcessBarTime);
+            this.doingProcessBarTime = setTimeout(() => {
                 $('.keyPairProcessBar').progress({
                     percent: percent++
                 });
@@ -156,7 +157,7 @@ var keyPairGenerateForm = /** @class */ (function () {
                     return doingProcessBar();
             }, timeSet);
         };
-        socketIo.once('newKeyPairCallBack', function (keyPair) {
+        socketIo.once('newKeyPairCallBack', keyPair => {
             self.stopDoingProcessBar();
             self.keyPairGenerateFormMessage(true);
             if (!keyPair) {
@@ -167,13 +168,12 @@ var keyPairGenerateForm = /** @class */ (function () {
         });
         socketIo.emit('NewKeyPair', sendData);
         return doingProcessBar();
-    };
-    keyPairGenerateForm.prototype.CloseKeyPairGenerateFormMessage = function () {
+    }
+    CloseKeyPairGenerateFormMessage() {
         this.message_cancel(false);
         this.message_keyPairGenerateError(false);
         this.message_keyPairGenerateSuccess(false);
         this.keyPairGenerateFormMessage(false);
         return this.showKeyPairForm(true);
-    };
-    return keyPairGenerateForm;
-}());
+    }
+}
