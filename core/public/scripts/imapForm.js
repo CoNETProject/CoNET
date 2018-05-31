@@ -158,7 +158,7 @@ class keyPairSign {
         this.conformTextErrorNumber = ko.observable(-1);
         this.activeing = ko.observable(false);
         const self = this;
-        this.conformText.subscribe(newValue => {
+        this.conformText.subscribe(function (newValue) {
             if (!newValue || !newValue.length) {
                 self.conformButtom(false);
             }
@@ -171,7 +171,7 @@ class keyPairSign {
         const self = this;
         this.conformTextError(false);
         this.activeing(true);
-        return socketIo.emit('checkActiveEmailSubmit', this.conformText(), (err, req) => {
+        return socketIo.emit11('checkActiveEmailSubmit', this.conformText(), function (err, req) {
             self.activeing(false);
             if (err !== null && err > -1 || req && req.error != null && req.error > -1) {
                 self.conformTextErrorNumber(err !== null && err > -1 ? err :
@@ -179,7 +179,7 @@ class keyPairSign {
                 self.conformTextError(true);
                 return $('.activating.element1').popup({
                     on: 'click',
-                    onHidden: () => {
+                    onHidden: function () {
                         self.conformTextError(false);
                     }
                 });
@@ -194,79 +194,83 @@ class keyPairSign {
         });
     }
     requestActivEmail() {
+        const self = this;
         this.requestActivEmailrunning(true);
         this.showSentActivEmail(-1);
-        return socketIo.emit('requestActivEmail', (err, res) => {
-            this.requestActivEmailrunning(false);
+        return socketIo.emit11('requestActivEmail', function (err, res) {
+            self.requestActivEmailrunning(false);
             if (err !== null && err > -1) {
-                return this.requestError(err);
+                return self.requestError(err);
             }
-            return this.showSentActivEmail(1);
+            return self.showSentActivEmail(1);
         });
     }
 }
-class CoNETConnect1 {
-    constructor(email, isKeypairBeSign, showSendImapData, account, exit) {
+class CoNETConnect {
+    constructor(email, isKeypairBeSign, confirmRisk, account, ready) {
         this.email = email;
         this.isKeypairBeSign = isKeypairBeSign;
         this.account = account;
-        this.exit = exit;
+        this.ready = ready;
         this.showSendImapDataWarning = ko.observable(false);
-        this.showConnectCoNETProcess = ko.observable(false);
-        this.connectStage = ko.observable(-1);
+        this.showConnectCoNETProcess = ko.observable(true);
+        this.connectStage = ko.observable(0);
         this.connetcError = ko.observable(-1);
+        this.connectedCoNET = ko.observable(false);
         this.keyPairSign = ko.observable(null);
-        this.showSendImapDataWarning(showSendImapData);
-        if (!showSendImapData) {
+        const self = this;
+        if (!confirmRisk) {
+            this.showSendImapDataWarning(true);
+        }
+        else {
             this.imapConform();
         }
+        socketIo.on('tryConnectCoNETStage', function (err, stage, showCoGate) {
+            return self.listingConnectStage(err, stage, showCoGate);
+        });
+    }
+    listingConnectStage(err, stage, showCoGate) {
+        const self = this;
+        this.showConnectCoNETProcess(true);
+        let processBarCount = 0;
+        if (err !== null && err > -1) {
+            this.connectStage(-1);
+            return this.connetcError(err);
+        }
+        if (stage === 4) {
+            this.showConnectCoNETProcess(false);
+            this.connectedCoNET(true);
+            processBarCount = 67;
+            if (!this.isKeypairBeSign) {
+                let u = null;
+                return this.keyPairSign(u = new keyPairSign((function () {
+                    self.keyPairSign(u = null);
+                    self.ready(null, showCoGate);
+                })));
+            }
+            return this.ready(null, showCoGate);
+        }
+        $('.keyPairProcessBar').progress({
+            percent: processBarCount += 33
+        });
+        return this.connectStage(stage);
+    }
+    returnToImapSetup() {
+        return this.ready(true);
     }
     imapConform() {
         const self = this;
-        let processBarCount = 0;
         let sendconnectMail = false;
         this.showSendImapDataWarning(false);
         this.connetcError(-1);
         this.showConnectCoNETProcess(true);
-        const listingConnectStage = function (err, stage) {
-            self.showConnectCoNETProcess(true);
-            if (err !== null && err > -1) {
-                self.connectStage(-1);
-                return self.connetcError(err);
-            }
-            if (stage === 4) {
-                processBarCount = 67;
-                if (!self.isKeypairBeSign) {
-                    let u = null;
-                    self.keyPairSign(u = new keyPairSign((() => {
-                        self.keyPairSign(u = null);
-                        self.exit();
-                    })));
-                }
-                self.showConnectCoNETProcess(false);
-                if (!self.keyPairSign()) {
-                    return self.exit();
-                }
-                return;
-            }
-            $('.keyPairProcessBar').progress({
-                percent: processBarCount += 33
-            });
-            return self.connectStage(stage);
-        };
-        this.connectStage(0);
-        socketIo.on('tryConnectCoNETStage', listingConnectStage);
-        self.showConnectCoNETProcess(true);
-        return socketIo.emit('tryConnectCoNET');
-    }
-    returnToImapSetup() {
-        return this.exit(true);
+        return socketIo.emit11('tryConnectCoNET');
     }
 }
 class imapForm {
-    constructor(account, imapData, isKeypairBeSign) {
+    constructor(account, imapData, exit) {
         this.account = account;
-        this.isKeypairBeSign = isKeypairBeSign;
+        this.exit = exit;
         this.emailAddress = ko.observable('');
         this.password = ko.observable('');
         this.emailAddressShowError = ko.observable(false);
@@ -277,22 +281,10 @@ class imapForm {
         this.checkImapError = ko.observable(-1);
         this.showCheckProcess = ko.observable(false);
         this.checkImapStep = ko.observable(0);
-        this.CoNETConnect = ko.observable(null);
         const self = this;
         if (imapData) {
             this.emailAddress(imapData.imapUserName);
             this.password(imapData.imapUserPassword);
-            this.showForm(false);
-            /**
-             * 		start connect CoNET
-             */
-            let uu = null;
-            this.CoNETConnect(uu = new CoNETConnect1(this.emailAddress(), isKeypairBeSign, !conetImapAccount.test(imapData.imapUserName) ? !imapData.confirmRisk : false, account, function (err) {
-                self.CoNETConnect(uu = null);
-                if (err) {
-                    return self.showForm(true);
-                }
-            }));
         }
         this.emailAddress.subscribe(function (newValue) {
             return self.checkEmailAddress(newValue);
@@ -313,16 +305,16 @@ class imapForm {
         this.checkProcessing(true);
         this.checkImapStep(0);
         const imapTest = function (err) {
-            if (err > -1) {
+            if (err !== null && err > -1) {
                 return errorProcess(err);
             }
-            self.checkImapStep(1);
+            self.checkImapStep(5);
             $('.keyPairProcessBar').progress({
                 percent: 33
             });
         };
         const smtpTest = function (err) {
-            if (err > -1) {
+            if (err !== null && err > -1) {
                 return errorProcess(err);
             }
             self.checkImapStep(2);
@@ -330,23 +322,9 @@ class imapForm {
                 percent: 66
             });
         };
-        const imapTestFinish = function (err) {
-            if (err > -1) {
-                return errorProcess(err);
-            }
-            self.checkImapStep(3);
-            $('.keyPairProcessBar').progress({
-                percent: 100
-            });
-            self.showCheckProcess(false);
-            /**
-             * 		start connect CoNET
-             */
-            let u = null;
-            self.CoNETConnect(u = new CoNETConnect1(self.emailAddress(), false, !conetImapAccount.test(self.emailAddress()), self.account, function () {
-                self.CoNETConnect(u = null);
-                self.showForm(true);
-            }));
+        const imapTestFinish = function (IinputData) {
+            removeAllListen();
+            return self.exit(IinputData);
         };
         const removeAllListen = function () {
             socketIo.removeEventListener('smtpTest', smtpTest);
@@ -360,7 +338,7 @@ class imapForm {
         socketIo.once('smtpTest', smtpTest);
         socketIo.once('imapTest', imapTest);
         socketIo.once('imapTestFinish', imapTestFinish);
-        socketIo.emit('checkImap', self.emailAddress(), self.password(), new Date().getTimezoneOffset(), _view.tLang());
+        socketIo.emit11('checkImap', self.emailAddress(), self.password(), new Date().getTimezoneOffset(), _view.tLang());
     }
     checkEmailAddress(email) {
         this.clearError();

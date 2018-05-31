@@ -21,7 +21,5 @@ export const start = ( cmd: () => void, _test ) => {
 	const localServer = new LocalServer ( cmd, _test )
 }
 if ( _start ) {
-	start (() => {
-
-	}, false )
+	start ( null, false )
 }

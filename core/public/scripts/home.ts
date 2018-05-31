@@ -29,19 +29,56 @@ const InitKeyPair = function () {
 	return keyPair
 }
 
-const socketIo = io ({ reconnectionAttempts: 100, timeout: 500 })
+const socketIo = io ({ reconnectionAttempts: 5, timeout: 500, autoConnect: true })
+
+socketIo.emit11 = function ( eventName: string, ...args ) {
+    
+    let CallBack = args.pop ()
+    if ( typeof CallBack !== 'function') {
+        CallBack ? args.push ( CallBack ) : null
+        CallBack = null
+    }
+
+    const localTimeOut = setTimeout ( function () {
+        let uu = eventName
+        _view.systemError()
+    }, 10000 )
+
+    const _CallBack = function ( err ) {
+        clearTimeout ( localTimeOut )
+        
+        if ( CallBack ) {
+            socketIo.once ( eventName, function ( ...args ) {
+                return CallBack ( ...args )
+            })
+        }
+        
+    }
+    args.length
+    ? socketIo.emit ( eventName, ...args, _CallBack ) 
+    : socketIo.emit ( eventName, _CallBack )
+}
 
 const makeKeyPairData = function ( view: view_layout.view, keypair: keypair ) {
     const length = keypair.publicKeyID.length
     keypair.publicKeyID = keypair.publicKeyID.substr ( length - 16 )
         
     let keyPairPasswordClass = new keyPairPassword ( function ( _imapData: IinputData ) {
+        //      password OK
+
         keypair.keyPairPassword ( keyPairPasswordClass = null )
         keypair.passwordOK = true
         keypair.showLoginPasswordField ( false )
-        
-        return view.imapSetup( new imapForm ( keypair.email, _imapData, keypair.verified  ))
-        
+        view.showIconBar ( true )
+        view.showKeyPair ( false )
+        if ( _imapData && _imapData.imapTestResult ) {
+            return view.imapSetupClassExit ( _imapData )
+        }
+        let uu = null
+        return view.imapSetup ( uu = new imapForm ( keypair.email, _imapData, function ( imapData: IinputData ) {
+            view.imapSetup ( uu = null )
+            view.imapSetupClassExit ( imapData )
+        }))
         
     })
     keypair.keyPairPassword = ko.observable( keyPairPasswordClass )
@@ -55,14 +92,16 @@ const makeKeyPairData = function ( view: view_layout.view, keypair: keypair ) {
     
     
     keypair.deleteKeyPairNext = function () {
-        socketIo.emit ( 'deleteKeyPairNext' )
+        socketIo.emit11 ( 'deleteKeyPairNext' )
         view.showIconBar ( false )
         view.connectedCoNET ( false )
         view.connectToCoNET ( false )
         return keypair.delete_btn_view ( false )
+        
+        
     }
 
-    socketIo.on ( 'deleteKeyPairNoite', function () {
+    socketIo.once ( 'deleteKeyPairNoite', function () {
         return keypair.showDeleteKeyPairNoite ( true )
     })
 
@@ -101,62 +140,106 @@ module view_layout {
         public showIconBar = ko.observable ( false )
         public connectToCoNET = ko.observable ( false )
         public connectedCoNET = ko.observable ( false )
-        public showKeyPair = ko.observable ( true )
-        private systemError () {
+        public showKeyPair = ko.observable ( false )
+        public CoGate = ko.observable ( false )
+        public CoGateClass: KnockoutObservable< CoGateClass > = ko.observable (null)
+        public showCoGateButton = ko.observable ( false )
+        public showCoGate = ko.observable (false)
+        public CoNETConnect: KnockoutObservable < CoNETConnect > = ko.observable ( null )
+        
+        public systemError () {
             this.modalContent ( infoDefine[ this.languageIndex() ].emailConform.formatError [ 10 ] )
             $( '#CoNETError').modal ('setting', 'closable', false ).modal ( 'show' )
             return this.CoNETLocalServerError ( true )
+        }
+
+        private afterInitConfig ( ) {
+            
+            this.keyPair ( this.localServerConfig ().keypair )
+            if ( this.keyPair() && this.keyPair().keyPairPassword() &&  typeof this.keyPair().keyPairPassword().inputFocus ==='function' ) {
+                this.keyPair().keyPairPassword().inputFocus( true )
+            }
         }
 
         private listingConnectStage ( err, stage ) {
             if ( stage > -1 ) {
                 this.showIconBar ( true )
                 this.connectToCoNET ( true )
+                this.showKeyPair ( false )
                 if ( stage === 4 ) {
                     this.connectToCoNET ( false )
                     this.connectedCoNET ( true )
+                    if ( this.keyPair().verified ) {
+                        if ( this.showCoGate() ) {
+                            this.showCoGateButton ( true )
+                            return this.CoGateClick ()
+                        }
+                        
+                    }
+                    
                 }
                 
             }
 
         }
     
-        private initConfig ( self: view, config: install_config ) {
-            
+        private initConfig ( config: install_config ) {
+            const self = this
+            this.showKeyPair ( true )
             if ( config.keypair && config.keypair.publicKeyID ) {
-                const keypair = config.keypair
-                makeKeyPairData ( this, keypair )
-                if ( ! keypair.passwordOK ) {
-                    this.showKeyPair ( true )
-                    keypair.showLoginPasswordField ( true )
+                /**
+                 * 
+                 *      Key pair ready
+                 * 
+                 */
+                makeKeyPairData ( this, config.keypair )
+                if ( ! config.keypair.passwordOK ) {
+                    config.keypair.showLoginPasswordField ( true )
                 }
                 
+                
             } else {
-                this.showKeyPair ( true )
+                /**
+                 * 
+                 *      No key pair
+                 * 
+                 */
+                
+                this.clearImapData ()
                 config.keypair = null
-                let imap = self.imapSetup()
-                self.imapSetup( imap = null )
                 let _keyPairGenerateForm =  new keyPairGenerateForm ( function ( _keyPair: keypair ) {
+                    /**
+                     *      key pair ready
+                     */
                     makeKeyPairData ( self, _keyPair )
                     _keyPair.passwordOK = true
                     let keyPairPassword = _keyPair.keyPairPassword ()
                     _keyPair.keyPairPassword ( keyPairPassword = null )
                     config.keypair = _keyPair
-                    self.localServerConfig ( config )
+                    
                     self.keyPair ( _keyPair )
+                    self.showIconBar ( true )
+                    self.showKeyPair ( false )
                     initPopupArea ()
-                    self.imapSetup( new imapForm ( config.account ))
+                    let uu = null
+                    self.imapSetup ( uu = new imapForm ( config.account, null, ( imapData: IinputData ) => {
+                        self.imapSetup ( uu = null )
+                        return self.imapSetupClassExit ( imapData )
+                    }))
                     return self.keyPairGenerateForm ( _keyPairGenerateForm = null )
 
                 })
-                self.keyPairGenerateForm ( _keyPairGenerateForm )
+                this.keyPairGenerateForm ( _keyPairGenerateForm )
             }
-            self.localServerConfig ( config )
-            self.keyPair ( self.localServerConfig ().keypair )
-            if ( self.keyPair() && self.keyPair().keyPairPassword() &&  typeof self.keyPair().keyPairPassword().inputFocus ==='function' ) {
-                self.keyPair().keyPairPassword().inputFocus( true )
-            }
+            this.localServerConfig ( config )
+            this.afterInitConfig ()
            
+        }
+
+        private clearImapData () {
+            
+            let imap = this.imapSetup()
+            this.imapSetup( imap = null )
         }
     
         private socketListen () {
@@ -168,31 +251,27 @@ module view_layout {
                 return self.systemError()
             })
 
-            socketIo.on( 'reconnect_attempt', () => {
+            socketIo.on( 'reconnect_attempt', function () {
 
-                return self.systemError()
+                //return self.systemError()
             });
     
             
             socketIo.once ( 'CoNET_systemError', function () {
                 return self.systemError ()
             })
+            
+            socketIo.on ( 'init', function ( err, config: install_config ) {
+                
+                return self.initConfig ( config )
+            })
+            
     
-            socketIo.on ( 'init', function ( config: install_config ) {
-                return self.initConfig ( self, config )
-            })
-    
-            socketIo.emit ( 'init', function ( config: install_config ) {
-                return self.initConfig ( self, config )
-            })
-
-            socketIo.on ( 'tryConnectCoNETStage',function ( err, stage ) {
-                return self.listingConnectStage ( err, stage )
-            })
+            socketIo.emit11 ( 'init' )
         }
     
         constructor () {
-            this.socketListen()
+            this.socketListen ()
         }
         
         //          change language
@@ -234,20 +313,83 @@ module view_layout {
         }
     
         public agreeClick () {
+            
+            socketIo.emit11 ( 'agreeClick' )
             this.sectionAgreement ( false )
-            socketIo.emit ( 'agreeClick' )
             this.localServerConfig().firstRun = false
             return this.openClick()
+            
+            
         }
 
-    
-        public exit () {
+        public CoGateClick () {
+            this.showKeyPair ( false )
+            if ( this.CoGate()) {
+                
+                let uu = this.CoGateClass ()
+                if ( uu.doingCommand ) {
+                    return
+                }
+                this.CoGate( false )
+                return this.CoGateClass ( uu = null )
+
+            }
+            this.CoGateClass ( new CoGateClass ())
+            this.CoGate ( true )
+        }
+
+        public refresh () {
             if ( typeof require === 'undefined' ) {
                 this.modalContent ( infoDefine[ this.languageIndex() ].emailConform.formatError [ 11 ] )
                 return this.hacked ( true )
             }
             const { remote } = require ('electron')
             return remote.app.quit()
+        }
+
+        public showKeyInfoClick () {
+            if ( this.showKeyPair () ) {
+                if ( this.CoNETConnect() !== null && !this.CoGate() ) {
+                    this.CoGateClass ( new CoGateClass ())
+                    this.CoGate ( true )
+                }
+                return this.showKeyPair ( false )
+            }
+            this.showKeyPair ( true )
+            this.CoGate( false )
+            let uu = this.CoGateClass ()
+            return this.CoGateClass ( uu = null )
+        }
+
+        public imapSetupClassExit ( _imapData: IinputData ) {
+            const self = this
+            let uu = null
+            return this.CoNETConnect ( uu = new CoNETConnect ( _imapData.imapUserName, this.keyPair().verified, _imapData.confirmRisk, this.keyPair().email, function ( err, showCoGate ) {
+                if ( err ) {
+                    self.CoNETConnect ( uu = null )
+                    return self.imapSetup ( uu = new imapForm ( _imapData.account, null, function ( imapData: IinputData ) {
+                        self.imapSetup ( uu = null )
+                        return self.imapSetupClassExit ( imapData )
+                    }))
+                }
+                self.showCoGate ( showCoGate )
+                if ( showCoGate ) {
+                    return self.CoGateClick ()
+                }
+            }))
+
+        }
+
+        public reFreshLocalServer () {
+            const self = this
+            socketIo.once ( 'connect', function () {
+                return location.reload()
+            })
+            socketIo.once ( 'connect_error', function () {
+                return self.refresh ()
+            })
+            socketIo.connect ()
+
         }
     }
 }

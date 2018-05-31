@@ -18,6 +18,7 @@ import * as Imap from './imap'
 import * as OpenPgp from 'openpgp'
 import * as Tool from './initSystem'
 import * as Fs from 'fs'
+import * as Async from 'async'
 
 
 let logFileFlag = 'w'
@@ -33,37 +34,102 @@ const saveLog = ( err: {} | string, _console = false ) => {
 }
 const timeOutWhenSendConnectRequestMail = 1000 * 60
 const commandRequestTimeOutTime = 1000 * 15
+const requestTimeOut = 1000 * 30
 
 export default class extends Imap.imapPeer {
 	private commandCallBackPool: Map <string, requestPoolData > = new Map ()
 	private CoNETConnectReady = false
 	public connectStage = -1
+	private alreadyExit = false
+	private ignorePingTimeout = false
 	private timeOutWhenSendConnectRequestMail: NodeJS.Timer = null
 
 	private sendFeedback () {
 		return
 	}
 
-	private makeTimeOutEvent ( request: boolean ) {
+	private makeTimeOutEvent () {
 		const self = this
-		saveLog ( `doing makeTimeOutEvent request [${ request }]`, true )
+		
 		clearTimeout ( this.timeOutWhenSendConnectRequestMail )
+		this.ignorePingTimeout = true
 		return this.timeOutWhenSendConnectRequestMail = setTimeout (() => {
-			saveLog (`timeOutWhenSendConnectRequestMail UP! request [${ request }]`, true )
-			if ( this.ready ) {
-				return saveLog (`timeOutWhenSendConnectRequestMail ready!`)
+			this.ignorePingTimeout = false
+			if ( this.peerReady ) {
+				
+				return saveLog ( `timeOutWhenSendConnectRequestMail peerReady already true!`, true )
 			}
 
-			
-			saveLog (`destroy connect!`, true )
+			saveLog ( `makeTimeOutEvent destroy connect!`, true )
 			return self.destroy (0)
-		}, request ? commandRequestTimeOutTime : commandRequestTimeOutTime )
+		}, timeOutWhenSendConnectRequestMail )
 
 	}
 
-	private ready () {
+
+	private checkConnect ( CallBack ) {
+		if ( this.wImap && this.wImap.imapStream && this.wImap.imapStream.writable &&
+			this.rImap && this.rImap.imapStream && this.rImap.imapStream.readable ) {
+
+				if ( this.needPing ) {
+					this.once ( 'ready', () => {
+						console.log (`wImap && rImap looks good, doing PING get ready!`)
+						return CallBack ()
+					})
+					this.Ping ()
+					return console.log ( `doing wait ping ready!` )
+				}
+				return CallBack ()
+				
+		}
+		this.destroy ()
+		return CallBack ( new Error ( 'checkConnect no connect!' ))
 		
-		saveLog( `doReady`)
+	}
+
+	public exit1 ( err ) {
+		if ( !this.alreadyExit ) {
+			this.alreadyExit = true
+			return this._exit ( err )
+		}
+		console.log (`exit1 cancel already Exit [${ err }]`)
+	}
+
+	constructor ( public imapData: IinputData, private sockerServer: SocketIo.Server, private openKeyOption: OpenPgp.option_KeyOption, public doNetSendConnectMail: boolean,
+		private cmdResponse: ( cmd: QTGateAPIRequestCommand ) => void, public _exit: ( err ) => void ) {
+		super ( imapData, imapData.clientFolder, imapData.serverFolder, ( encryptText: string, CallBack ) => {
+			
+			return Tool.encryptMessage ( openKeyOption, encryptText, CallBack )
+		}, ( decryptText: string, CallBack ) => {
+			return Tool.decryptoMessage ( openKeyOption, decryptText, CallBack )
+		}, err => {
+			console.log (`coNETConnect IMAP class exit with err: [${ err }] doing this.exit(err)!`)
+			return this.exit1 ( err )
+		})
+		saveLog (`=====================================  new CoNET connect() doNetSendConnectMail = [${ doNetSendConnectMail }]\n`, true )
+
+		this.newMail = ( ret: QTGateAPIRequestCommand ) => {
+			//		have not requestSerial that may from system infomation
+			saveLog ( 'clearTimeout timeOutWhenSendConnectRequestMail !', true )
+			clearTimeout ( this.timeOutWhenSendConnectRequestMail )
+			if ( ! ret.requestSerial ) {
+				console.trace (`CoNETConnect.ts newMail Error !ret.requestSerial`, ret )
+				
+				if ( this.cmdResponse && typeof this.cmdResponse === 'function') {
+					return this.cmdResponse ( ret )
+				}
+				
+			}
+			saveLog ( `on newMail command [${ ret.command }] have requestSerial [${ ret.requestSerial }]`, true )
+			const poolData = this.commandCallBackPool.get ( ret.requestSerial )
+	
+			if ( ! poolData || typeof poolData.CallBack !== 'function' ) {
+				return saveLog ( `QTGateAPIRequestCommand got commandCallBackPool ret.requestSerial [${ ret.requestSerial }] have not callback `)
+			}
+			clearTimeout ( poolData.timeout )
+			return poolData.CallBack ( null, ret )
+			
+		}
 
 		this.on ( 'wImapReady', () => {
 			console.log ( 'on imapReady !' )
@@ -71,95 +137,88 @@ export default class extends Imap.imapPeer {
 			return this.sockerServer.emit ( 'tryConnectCoNETStage', null, 1 )
 		})
 
-		return this.on ( 'ready', () => {
+		this.on ( 'ready', () => {
 			clearTimeout ( this.timeOutWhenSendConnectRequestMail )
 			
 			this.CoNETConnectReady = true
 			saveLog ( 'Connected CoNET!', true )
 			this.connectStage = 4
-			this.sockerServer.emit ( 'tryConnectCoNETStage', null, 4 )
+			this.sockerServer.emit ( 'tryConnectCoNETStage', null, 4, cmdResponse ? false : true  )
 			
 			return this.sendFeedback ()
 		})
-	}
 
-
-	constructor ( public imapData: IinputData, private sockerServer: SocketIo.Server, private openKeyOption: OpenPgp.option_KeyOption, public doNetSendConnectMail: boolean,
-		cmdResponse: ( cmd: QTGateAPIRequestCommand ) => void, exit: ( err ) => void ) {
-		super ( imapData, imapData.clientFolder, imapData.serverFolder, ( encryptText: string, CallBack ) => {
+		this.on ( 'pingTimeOut', () => {
 			
-			return Tool.encryptMessage ( openKeyOption, encryptText, ( err, text ) => {
-				if ( err ) {
-					console.log (`encryptText error`, err )
-				}
-				console.log (`encryptText success` )
-				return CallBack ( err, text )
-			})
-		}, ( decryptText: string, CallBack ) => {
-			return Tool.decryptoMessage ( openKeyOption, decryptText, CallBack )
-		}, err => {
-			console.log (`coNETConnect class exit with err: [${ err }] doing this.exit(err)!`)
-			return exit ( err )
+			if ( this.ignorePingTimeout ) {
+				return saveLog (`coNETConnect on pingTimeOut this.ignorePingTimeout = true, do nothing!`, true )
+			}
+			return this.destroy ()
 		})
-		console.log (`new CoNET connect() doNetSendConnectMail = [${ doNetSendConnectMail }]`)
-		if ( !doNetSendConnectMail ) {
-			this.once ( 'pingTimeOut', () => {
-				if ( !this.CoNETConnectReady ) {
-					return this.destroy ( 1 )
-				}
-			})
-		} else {
-			this.makeTimeOutEvent ( false )
-		}
+		
+		this.sockerServer.emit ( 'tryConnectCoNETStage', null, this.connectStage = 0 )
 
-		this.newMail = ( ret: QTGateAPIRequestCommand ) => {
-			//		have not requestSerial that may from system infomation
-			saveLog ( 'clearTimeout timeOutWhenSendConnectRequestMail !' )
-			
-			if ( ! ret.requestSerial ) {
-				return cmdResponse ( ret )
-			}
-			saveLog ( `on newMail command [${ ret.command }] have requestSerial [${ ret.requestSerial }]`)
-			const poolData = this.commandCallBackPool.get ( ret.requestSerial )
-
-			if ( ! poolData || typeof poolData.CallBack !== 'function' ) {
-				return saveLog ( `QTGateAPIRequestCommand got commandCallBackPool ret.requestSerial [${ ret.requestSerial }] have not callback `)
-			}
-			return poolData.CallBack ( null, ret )
-			
-		}
-
-		this.ready ()
 	}
 
 	public request ( command: QTGateAPIRequestCommand, CallBack ) {
 
-		saveLog ( `request command [${ command.command }] requestSerial [${ command.requestSerial }]` )
-		if ( command.requestSerial ) {
-			const poolData: requestPoolData = {
-				CallBack: CallBack
-			}
-			this.commandCallBackPool.set ( command.requestSerial, poolData )
-		}
-			
-		return Tool.encryptMessage ( this.openKeyOption, JSON.stringify ( command ), ( err1, data: string ) => {
-			if ( err1 ) {
-				saveLog ( `request _deCrypto got error [${ JSON.stringify ( err1 )}]` )
+		Async.waterfall ([
+			next => Tool.myIpServer ( next ),
+			( ip, next ) => this.checkConnect ( next ),
+			next => {
+				saveLog ( `request command [${ command.command }] requestSerial [${ command.requestSerial }]`, true )
+				if ( command.requestSerial ) {
+					const poolData: requestPoolData = {
+						CallBack: CallBack,
+						timeout: setTimeout (() => {
+							console.log (`request command [${ command.command }] timeout! do again`)
+							this.commandCallBackPool.delete ( command.requestSerial )
+							return this.request ( command, CallBack )
+						}, requestTimeOut )
+					}
+					this.commandCallBackPool.set ( command.requestSerial, poolData )
+				}
+					
+				return Tool.encryptMessage ( this.openKeyOption, JSON.stringify ( command ), next )
+				
+			},
+			( data: string, next ) => this.trySendToRemote ( Buffer.from ( data ), next )
+				
+		], ( err: Error ) => {
+			if ( err ) {
+				saveLog ( `request got error [${ err.message ? err.message : null }]` )
 				this.commandCallBackPool.delete ( command.requestSerial )
-				return CallBack ( err1 )
+				return CallBack ( err )
 			}
-
-			return this.trySendToRemote ( Buffer.from ( data ), () => {
-				return this.makeTimeOutEvent ( true )
-			})
+			console.log (`request success!`)
 		})
+		
 		
 	}
 
-	public tryConnect () {
+	public tryConnect1 () {
+		
 		this.connectStage = 1
 		this.sockerServer.emit ( 'tryConnectCoNETStage', null, this.connectStage = 1 )
-		this.Ping ()
-		this.makeTimeOutEvent ( true )
+		return Tool.myIpServer (( err, localIpAddress ) => {
+			if ( err ) {
+				console.log (`Tool.myIpServer callback error`, err )
+				this.connectStage = 0
+				return this.sockerServer.emit ( 'tryConnectCoNETStage', 0 )
+			}
+			saveLog (`tryConnect success Tool.myIpServer [${ localIpAddress }]`, true )
+			if ( this.doNetSendConnectMail ) {
+				//	 wait long time to get response from CoNET
+				console.log (`this.doNetSendConnectMail = true`)
+
+			} 
+			return this.checkConnect ( err => {
+				if ( err ) {
+					return this.exit1 ( err )
+				}
+			})
+			
+		})
+		
 	}
 }

@@ -1,3 +1,18 @@
+/*!
+ * Copyright 2018 CoNET Technology Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 interface ReadonlyArray<T> {
     /**
@@ -168,9 +183,19 @@ interface keyPair {
 interface imapData {
     email: string
 }
+
 interface requestPoolData {
-	CallBack: ( err?: Error, returnData?: any ) => void
+    CallBack: ( err?: Error, returnData?: any ) => void
+    timeout: any
 }
+
+interface regionV1 {
+    regionName: string
+    testHostIp: string
+    testUrl: string
+    testHost: string
+}
+
 interface IinputData extends imapConnect {
     account:string
     email: string
@@ -180,7 +205,7 @@ interface IinputData extends imapConnect {
     smtpPortNumber:number|number[]
     smtpSsl:boolean
     smtpIgnoreCertificate: boolean
-    imapTestResult: number
+    imapTestResult: boolean
     language: string
     clientFolder: string
     serverFolder: string
@@ -192,6 +217,7 @@ interface IinputData extends imapConnect {
     confirmRisk: boolean
     sendToQTGate: boolean
 }
+
 interface iTransferData {
     startDate: string
     transferDayLimit: number
@@ -213,11 +239,13 @@ interface iTransferData {
     paidID: string[]
     automatically: boolean
 }
+
 interface QTGate_DnsAddress {
 	dnsName: string,
 	ipv4: string,
 	url: string
 }
+
 interface QTGateAPIRequestCommand {
 	command: string
     myIpServer?: QTGate_DnsAddress []
@@ -228,6 +256,7 @@ interface QTGateAPIRequestCommand {
     fingerprint?: string
     dataTransfer?: iTransferData
 }
+
 interface QTGateCommand {
     account: string
     QTGateVersion: string
@@ -237,4 +266,27 @@ interface QTGateCommand {
     error: Error
     callback: any
     publicKey: string
+}
+
+interface IQTGateRegionsSetup {
+    title: string
+}
+
+interface QTGateRegions {
+    icon: string
+    content: string[]
+    description: string[]
+    meta: string[]
+    canVoe: KnockoutObservable < boolean >
+    canVoH: KnockoutObservable < boolean >
+    available: KnockoutObservable < boolean >
+    selected: KnockoutObservable < boolean >
+    showExtraContent: KnockoutObservable < boolean >
+    QTGateRegionsSetup: IQTGateRegionsSetup[]
+    qtRegion: string
+    error: KnockoutObservable<number >
+    showRegionConnectProcessBar: KnockoutObservable < boolean >
+    showConnectedArea: KnockoutObservable < boolean >
+    ping: KnockoutObservable <number >
+    downloadSpeed: KnockoutObservable <number >
 }

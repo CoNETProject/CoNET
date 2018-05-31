@@ -227,6 +227,7 @@ exports.emitConfig = (config, passwordOK) => {
         iterations: config.iterations,
         connectedImapDataUuid: config.connectedImapDataUuid
     };
+    ret.keypair.passwordOK = false;
     return ret;
 };
 exports.saveConfig = (config, CallBack) => {
@@ -277,7 +278,6 @@ exports.newKeyPair = (emailAddress, nickname, password, CallBack) => {
         aead_protect: true,
         aead_protect_version: 4
     };
-    console.log(Util.inspect(option));
     return OpenPgp.generateKey(option).then((keypair) => {
         const ret = {
             publicKey: keypair.publicKeyArmored,
@@ -489,6 +489,7 @@ const _smtpVerify = (imapData, CallBack) => {
     */
 };
 exports.smtpVerify = (imapData, CallBack) => {
+    console.log(`doing smtpVerify!`);
     let testArray = null;
     let _ret = false;
     let err1 = null;
@@ -595,10 +596,19 @@ exports.readImapData = (savedPasswrod, config, CallBack) => {
     };
     return Async.waterfall([
         next => Fs.access(exports.imapDataFileName, next),
-        (acc, next) => exports.getPbkdf2(config, savedPasswrod, next),
+        (acc, next) => {
+            /**
+             * 		support old nodejs
+             */
+            let _next = acc;
+            if (typeof _next !== 'function') {
+                //console.trace (` _next !== 'function' [${ typeof _next}]`)
+                _next = next;
+            }
+            exports.getPbkdf2(config, savedPasswrod, _next);
+        },
         (data, next) => {
             return options.privateKeys[0].decrypt(data.toString('hex')).then(keyOk => {
-                console.log(`options.privateKey.decrypt success!`, keyOk);
                 if (!keyOk) {
                     return next(new Error('key password not OK!'));
                 }
@@ -615,7 +625,12 @@ exports.readImapData = (savedPasswrod, config, CallBack) => {
         if (err) {
             return CallBack(err);
         }
-        options.message = OpenPgp.message.readArmored(data.toString());
+        try {
+            options.message = OpenPgp.message.readArmored(data.toString());
+        }
+        catch (ex) {
+            return CallBack(ex);
+        }
         return OpenPgp.decrypt(options).then(data => {
             if (data.signatures && data.signatures[0] && data.signatures[0].valid) {
                 return CallBack(null, data.data);
@@ -632,7 +647,7 @@ exports.encryptMessage = (openKeyOption, message, CallBack) => {
         publicKeys: openKeyOption.publicKeys,
         data: message
     };
-    console.log(`encryptMessage `, message);
+    //console.log (`encryptMessage `, message )
     return OpenPgp.encrypt(option).then(ciphertext => {
         return CallBack(null, ciphertext.data);
     }).catch(CallBack);
@@ -641,8 +656,14 @@ exports.decryptoMessage = (openKeyOption, message, CallBack) => {
     const option = {
         privateKeys: openKeyOption.privateKeys,
         publicKeys: openKeyOption.publicKeys,
-        message: OpenPgp.message.readArmored(message)
+        message: null
     };
+    try {
+        option.message = OpenPgp.message.readArmored(message);
+    }
+    catch (ex) {
+        return CallBack(ex);
+    }
     return OpenPgp.decrypt(option).then(data => {
         if (data.signatures && data.signatures.length && data.signatures.findIndex(n => { return n.valid; }) > -1) {
             return CallBack(null, data.data);
@@ -715,4 +736,30 @@ exports.sendCoNETConnectRequestEmail = (imapData, openKeyOption, ver, publicKey,
             return transporter.sendMail(mailOptions, next);
         }
     ], CallBack);
+};
+const testPingTimes = 5;
+exports.testPing = (hostIp, CallBack) => {
+    let pingTime = 0;
+    const test = new Array(testPingTimes);
+    test.fill(hostIp);
+    console.log(`start testPing [${hostIp}]`);
+    return Async.eachSeries(test, (n, next) => {
+        const netPing = require('net-ping');
+        const session = netPing.createSession();
+        session.pingHost(hostIp, (err, target, sent, rcvd) => {
+            session.close();
+            if (err) {
+                console.log(`session.pingHost ERROR, ${err.message}`);
+                return next(err);
+            }
+            const ping = rcvd.getTime() - sent.getTime();
+            pingTime += ping;
+            return next();
+        });
+    }, err => {
+        if (err) {
+            return CallBack(new Error('ping error'));
+        }
+        return CallBack(null, Math.round(pingTime / testPingTimes));
+    });
 };

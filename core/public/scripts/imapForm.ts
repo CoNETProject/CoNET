@@ -176,7 +176,7 @@ class keyPairSign {
 	
 	constructor ( private exit: () => void ) {
 		const self = this
-		this.conformText.subscribe ( newValue => {
+		this.conformText.subscribe ( function ( newValue ) {
 			if ( !newValue || !newValue.length ) {
 				self.conformButtom ( false )
 			} else {
@@ -190,7 +190,7 @@ class keyPairSign {
 		const self = this
 		this.conformTextError ( false )
 		this.activeing ( true )
-		return socketIo.emit ( 'checkActiveEmailSubmit', this.conformText(), ( err, req: QTGateAPIRequestCommand ) => {
+		return socketIo.emit11 ( 'checkActiveEmailSubmit', this.conformText(), function ( err, req: QTGateAPIRequestCommand ) {
 			self.activeing ( false )
 			if ( err !== null && err > -1 || req && req.error != null && req.error > -1 ) {
 				self.conformTextErrorNumber ( err !== null && err > -1 ? err :
@@ -198,7 +198,7 @@ class keyPairSign {
 					 self.conformTextError ( true )
 				return $( '.activating.element1' ).popup({
 					on: 'click',
-					onHidden: () => {
+					onHidden: function () {
 						self.conformTextError ( false )
 					}
 				})
@@ -217,79 +217,85 @@ class keyPairSign {
 	}
 
 	public requestActivEmail () {
+		const self = this
 		this.requestActivEmailrunning ( true )
 		this.showSentActivEmail (-1)
-		return socketIo.emit ( 'requestActivEmail', ( err, res ) => {
-			this.requestActivEmailrunning ( false )
+		return socketIo.emit11 ( 'requestActivEmail', function ( err, res ) {
+			self.requestActivEmailrunning ( false )
 			if ( err !== null && err > -1 ) {
-				return this.requestError ( err )
+				return self.requestError ( err )
 			}
-			return this.showSentActivEmail (1)
+			return self.showSentActivEmail (1)
 			
 			
 		})
 	}
 }
 
-class CoNETConnect1 {
+class CoNETConnect {
 	public showSendImapDataWarning = ko.observable ( false )
-	public showConnectCoNETProcess = ko.observable ( false )
-	public connectStage = ko.observable ( -1 )
+	public showConnectCoNETProcess = ko.observable ( true )
+	public connectStage = ko.observable ( 0 )
 	public connetcError = ko.observable ( -1 )
+	public connectedCoNET = ko.observable ( false )
 	public keyPairSign: KnockoutObservable< keyPairSign > = ko.observable ( null )
-	constructor ( public email: string, private isKeypairBeSign: boolean, showSendImapData: boolean, public account: string, private exit: ( err? ) => void ) {
-		
-		this.showSendImapDataWarning ( showSendImapData )
-		if ( !showSendImapData ) {
+	constructor ( public email: string, private isKeypairBeSign: boolean, confirmRisk: boolean, public account: string, private ready: ( err, showCoGate? ) => void ) {
+		const self = this
+		if ( !confirmRisk ) {
+			this.showSendImapDataWarning ( true )
+			
+		} else {
 			this.imapConform ()
 		}
+
+		socketIo.on ( 'tryConnectCoNETStage', function ( err, stage, showCoGate: boolean ) {
+			return self.listingConnectStage ( err, stage, showCoGate )
+		})
 	}
 
+	public listingConnectStage ( err, stage, showCoGate: boolean ) {
+		const self = this
+		this.showConnectCoNETProcess ( true )
+		let processBarCount = 0
+		if ( err !== null && err > -1 ) {
+			this.connectStage ( -1 )
+			return this.connetcError ( err )
+		}
+		if ( stage === 4 ) {
+			this.showConnectCoNETProcess ( false )
+			this.connectedCoNET ( true )
+			processBarCount = 67
+			if ( !this.isKeypairBeSign ) {
+				let u = null
+				return this.keyPairSign ( u = new keyPairSign (( function () {
+					
+					self.keyPairSign ( u = null )
+					self.ready ( null, showCoGate )
+				})))
+			}
+
+			return this.ready ( null, showCoGate )
+		}
+		$('.keyPairProcessBar').progress ({
+			percent: processBarCount += 33
+		})
+		
+		return this.connectStage ( stage )
+		
+	}
+
+	public returnToImapSetup () {
+		return this.ready ( true )
+	}
 
 	public imapConform () {
 		const self = this
 		
-		let processBarCount = 0
 		let sendconnectMail = false
 		this.showSendImapDataWarning ( false )
 		this.connetcError ( -1 )
 		this.showConnectCoNETProcess ( true )
-		const listingConnectStage = function ( err, stage ) {
-			self.showConnectCoNETProcess ( true )
-			if ( err !== null && err > -1 ) {
-				self.connectStage ( -1 )
-				return self.connetcError ( err )
-			}
-			if ( stage === 4 ) {
-				processBarCount = 67
-				if ( !self.isKeypairBeSign ) {
-					let u = null
-					self.keyPairSign ( u = new keyPairSign ((() => {
-						
-						self.keyPairSign ( u = null )
-						self.exit ()
-					})))
-				}
-				self.showConnectCoNETProcess ( false )
-				if ( !self.keyPairSign()) {
-					return self.exit ()
-				}
-				return 
-			}
-			$('.keyPairProcessBar').progress ({
-				percent: processBarCount += 33
-			})
-			
-			return self.connectStage ( stage )
-		}
-		this.connectStage (0)
-		socketIo.on ( 'tryConnectCoNETStage', listingConnectStage )
-		self.showConnectCoNETProcess ( true )
-		return socketIo.emit ( 'tryConnectCoNET' )
-	}
-
-	public returnToImapSetup () {
-		return this.exit ( true )
+		return socketIo.emit11 ( 'tryConnectCoNET' )
 	}
 }
 
@@ -307,7 +313,7 @@ class imapForm {
 	public showCheckProcess = ko.observable ( false )
 	public checkImapStep = ko.observable (0)
 	
-	public CoNETConnect: KnockoutObservable < CoNETConnect1 > = ko.observable ( null )
+	
 	private clearError () {
 		this.emailAddressShowError ( false )
 		this.EmailAddressErrorType (0)
@@ -322,10 +328,10 @@ class imapForm {
 		this.checkImapStep (0)
 		
 		const imapTest = function ( err ) {
-			if (  err > -1 ) {
+			if ( err !== null && err > -1 ) {
 				return errorProcess ( err )
 			}
-			self.checkImapStep (1)
+			self.checkImapStep (5)
 			$('.keyPairProcessBar').progress ({
 				percent: 33
 			})
@@ -333,7 +339,7 @@ class imapForm {
 
 		const smtpTest = function ( err ) {
 			
-			if ( err > -1 ) {
+			if ( err !== null && err > -1 ) {
 				return errorProcess ( err )
 			}
 			self.checkImapStep (2)
@@ -342,24 +348,9 @@ class imapForm {
 			})
 		}
 
-		const imapTestFinish = function ( err ) {
-			if ( err > -1 ) {
-				return errorProcess ( err )
-			}
-			self.checkImapStep (3)
-			$('.keyPairProcessBar').progress ({
-				percent: 100
-			})
-			self.showCheckProcess ( false )
-			/**
-			 * 		start connect CoNET
-			 */
-			let u = null
-			self.CoNETConnect( u = new CoNETConnect1 ( self.emailAddress (), false, !conetImapAccount.test (self.emailAddress()), self.account, function () {
-				self.CoNETConnect( u = null )
-				self.showForm ( true )
-			}))
-
+		const imapTestFinish = function ( IinputData: IinputData ) {
+			removeAllListen ()
+			return self.exit ( IinputData )
 		}
 
 		const removeAllListen = function () {
@@ -376,7 +367,7 @@ class imapForm {
 		socketIo.once ( 'smtpTest', smtpTest )
 		socketIo.once ( 'imapTest', imapTest )
 		socketIo.once ( 'imapTestFinish', imapTestFinish )
-		socketIo.emit ( 'checkImap', self.emailAddress (), self.password (), new Date ().getTimezoneOffset (), _view.tLang())
+		socketIo.emit11 ( 'checkImap', self.emailAddress (), self.password (), new Date ().getTimezoneOffset (), _view.tLang ())
 	}
 
 	private checkEmailAddress ( email: string ) {
@@ -394,23 +385,11 @@ class imapForm {
 		}
 	}
 
-	constructor ( private account: string, imapData?: IinputData, private isKeypairBeSign?: boolean ) {
+	constructor ( private account: string, imapData: IinputData, private exit: ( IinputData: IinputData ) => void ) {
 		const self = this
 		if ( imapData ) {
 			this.emailAddress ( imapData.imapUserName )
 			this.password ( imapData.imapUserPassword )
-			this.showForm ( false )
-			/**
-			 * 		start connect CoNET
-			 */
-			let uu = null
-			this.CoNETConnect( uu = new CoNETConnect1 ( this.emailAddress (), isKeypairBeSign, !conetImapAccount.test ( imapData.imapUserName ) ? !imapData.confirmRisk: false, account, function ( err ) {
-				self.CoNETConnect ( uu = null )
-				if ( err ) {
-					return self.showForm ( true )
-				}
-				
-			}))
 		}
 
 		this.emailAddress.subscribe ( function ( newValue ) {

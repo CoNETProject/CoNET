@@ -286,7 +286,7 @@ const infoDefine = [
             currentAnnualPlan: ['月度订阅','年度订阅'],
             MonthBandwidthTitle:'月度代理服務器限额：',
             dayBandwidthTitle:'毎日限额：',
-            upgradeTitle:'升级订阅',
+            upgradeTitle:'升级',
             accountOptionButton: '账户选项',
             paymentProcessing:'正在通讯中...',
             cantUpgradeMonthly: '年度计划不可降级为月度计划。请先终止您当前订阅的年度计划，再重新申请此月度订阅',
@@ -445,7 +445,8 @@ const infoDefine = [
             step2_detail2: '在权限选项里，选勾“允许档案文件执行”。',
             step3:'退出旧版本CoNET后，双击CoNET文件执行安装',
             exit: '退出CoNET',
-            tryAgain:'再次尝试'
+            tryAgain:'再次尝试',
+            refresh:'刷新页面'
         },
 
         imapInformation: {
@@ -463,7 +464,7 @@ const infoDefine = [
             smtpServer: 'SMTP服务器设定',
             smtpServerInput: 'SMTP服务器IP或域名',
             emailServerPassword: '邮箱密码(推荐使用应用专用密码)',
-            imapAccountConform: '<p><dt>警告：</dt></p>当您按下提交按钮时，意味着您已经确认：这个邮箱并不是您常用的邮箱，这是为了使用CoNET系统而特别申请的临时邮箱，您同意承担由此带来的风险，并授权CoNET系统可以使用这个Email邮箱传输信息!',
+            imapAccountConform: function ( iamp, account ) { return `<p class="ui small header brown">警告：</p><p class="grey">当您按下提交按钮时，意味着您已经确认【<B class="red">${ iamp }</B>】是为了使用CoNET系统而特别申请的临时邮箱，您同意承担由此带来的风险，并授权CoNET系统可以使用这个Email邮箱传输信息!</p><p class="grey" >CoNET平台将会向CoNET發送包含以下信息的email：【<B class="red">${ iamp }</B>】及APP密碼，註冊【<B class="red">${ account }</B>】郵箱地址，使用語言，時區，加密公鑰。</p><p class="grey">同时您也同意并授权CoNET可以向您的注册邮箱【<B class="red">${ account }</B>】发送CoNET有关服务，促销，账户及其他信息。</p>`},
             agree: '我已经了解风险，并愿意继续',
             imapOtherCheckError: '不能连接到Email服务器，有可能您设定的服务器名称或IP，通讯端口号有误，请检查您的服务器详细设定！',
             CertificateError: 'Email服务器提示的证书不能被系统信任！您的Email服务器有可能是一个仿冒的，您如果想继续，请在下面详细设定里选择【允许连接到不被信任证书的Email服务器】，但您的Email登陆信息有可能泄漏给此服务器！',
@@ -481,6 +482,8 @@ const infoDefine = [
                 /* 2 */'邮件服务器SMTP连接成功',
                 /* 3 */'CoNET客户端向CoNET系统发出联机请求Email。和CoNET联机需要额外的时间，请耐心等待。',
                 /* 4 */'成功连接CoNET',
+                /* 5 */'邮件服务器IMAP测试成功',
+                /* 6 */'邮件服务器SMTP测试成功',
             ],
             imapResultTitle:'IMAP服务器CoNET通讯评分：',
             testSuccess: 'email服务器连接试验成功！',
@@ -489,7 +492,7 @@ const infoDefine = [
             proxyPortError: '端口号应该是从1000-65535之间的数字，或此端口号已被其他APP所占用。请尝试其他号码。',
             appPassword:'关于APP密码',
             imapCheckError: [
-                '不能连接到邮件服务器，有可能您所在网络不支持邮件通讯，请检查您的网络',
+                '不能连接到邮件服务器，有可能您没有互联网，或所在网络不支持邮件IMAP通讯，请检查您的网络',
                 '邮件服务器提示用户名或密码错误，请仔细检查您的用户名和密码！ ',
                 '邮件服务器证书错误！您所在网络可能存在网络中间人攻击，请换网络环境后再尝试。 ',
                 '邮件服务器发送邮件错误，这通常是您使用的密码是普通密码所致，请换用APP密码后再次尝试',
@@ -585,7 +588,7 @@ const infoDefine = [
 
         emailConform: {
             activeViewTitle:'验证您的密钥',
-            info1_1: `您的密钥还未完成验证，CoNET已向您的密钥邮箱发送了一封加密邮件，请检查您的 【`,
+            info1_1: `您的密钥还未完成验证，请点击[发送验证Email]按钮，并检查您的 【`,
             info1_2: `】 邮箱。如果存在多封CoNET的邮件时，请选择最后一封信件。请打开信件并复制邮件内容。如果您还未收到CoNET的邮件，请检查您的密钥邮箱是否准确，或者您可以删除您现有的密钥，重新生成新密钥。`,
             info2: '请复制从“-----BEGIN PGP MESSAGE----- （开始，一直到）-----END PGP MESSAGE-----” 结束的完整内容，粘贴在此输入框中。',
             emailTitle: '感谢您使用CoNET服务',
@@ -596,7 +599,7 @@ const infoDefine = [
             buttom1_2: 'CoNET团队',
             conformButtom: '验 证',
             requestReturn: ['错误！您的请求被拒绝，这可能是您在短时间内多次请求所致，请稍后再试','CoNET已发送激活邮件！'],
-            reSendRequest:'重发验证Email',
+            reSendRequest:'发送验证Email',
             formatError: [
                 '内容格式错误，请复制从“-----BEGIN PGP MESSAGE----- （开始，一直到）-----END PGP MESSAGE-----” 结束的完整内容，粘贴在此输入框中。 ',
                 '提供的内容不能被解密，请确认这是在您收到的最后一封从CoNET发送过来的激活信。如果还是没法完成激活，请删除您的密钥重新生成和设定。 ',
@@ -608,21 +611,21 @@ const infoDefine = [
                 '用来通讯的Email设定有错误，请检查IMAP设定后重试，或CoNET不支持此Email类型',
                 '您所选区域不能够连结，请稍候再试',
                 '您的IMAP邮箱发信发生错误。请退出CoNET重试。如果持续发生此故障，您的IMAP帐号有可能被锁住，需要登陆您的IMAP邮箱网站解锁操作。 ',
-                'CoNET核心程序发生错误，请刷新网页或退出后重启CoNET！',
-                '您是高手，不用我多说了。'
+                '页面会话已过期，请刷新页面以继续，或退出后重新启动CoNET。',
+                'CoNET平台故障，请重新启动CoNET。'
             ],
             activeing: '正在通讯中'
         },
 
         QTGateRegion: {
-            title: '代理服务器区域',
+            title: '高品质定制代理服务器区域',
             speedTest: '代理服务器速度测试：',
             error: [],
             pingError:'代理服务区域速度检测发生错误，请退出CoNET，以管理员身份再次打开CoNET后，再执行速度检测！',
             connectQTGate:'正在获得代理服务器区域信息...',
             available: '服务中',
             unavailable: '准备中',
-            requestPortNumber: 'Q梯代理通讯端口',
+            requestPortNumber: '指定代理服务器通讯端口',
             proxyDomain: '域名解释全程使用CoNET代理服务器端',
             setupCardTitle: '使用连接技术:',
             MultipleGateway: '同时并发使用代理数',
@@ -648,13 +651,13 @@ const infoDefine = [
                 'CoNET独创明码HTTP混淆流量加密通讯技术，能够隐藏变换您的IP地址高速通讯，隐身和保护隐私，抗干扰和超強防火墙穿透能力。缺点是需要使用您的IP来直接连结代理服务器。如果您只是需要自由访问互联网，则推荐使用本技术。',
                 '域名解释使用CoNET代理服务器端，可以防止域名服务器缓存污染，本选项不可修改。',
                 '互联网数据全程使用CoNET代理，可以匿名上网隐藏您的互联网形踪。',
-                '只有当您的本地网络不能够到达您希望访问的目标时，才使用CoNET代理服务器代为连结目标主机，本选项可以节省您的CoNET流量。',
+                '只有当您的本地网络不能够到达您希望访问的目标时，才使用CoNET代理服务器代为连结目标主机，本选项可以加速网速，但失去隐私保护。',
                 '通过本地缓存浏览纪录，当您再次访问目标服务器时可以增加访问速度，减少网络流量，缓存浏览纪录只针对非加密技术的HTTP浏览有效。CoNET使用强加密技术缓存浏览纪录，确保您的隐私不被泄漏。',
                 '不保存缓存信息。',
                 '设置缓存有效时间，您可以及时更新服务器数据,单位为小时。',
                 '本地Proxy服务器，其他手机电脑和IPad等可通过连结此端口来使用CoNET服务。请设定为3001至65535之间的数字。',
                 '通过设置PATH链接路径可以简单给您的Proxy服务器增加安全性，拒绝没有提供PATH的访问者使用您的Proxy服务器。',
-                '同时捆绑使用代理线路数，可以有效降低大流量集中在一个代理服务线路上，容易造成网络监控者注意的风险。',
+                '同时使用多条代理线路数，可以有效降低大流量集中在一个代理服务线路，降低被网络监控者发现的风险。此选项仅供收费会员使用。',
                 '指定同Q梯代理进行通讯使用的端口号，通过此设置可以规避您所在网段被通讯屏蔽的端口。'
                 ]
             
@@ -922,7 +925,7 @@ const infoDefine = [
             monthResetDay:'月レセット日：',
 
             dayBandwidthTitle:'日制限：',
-            upgradeTitle:'プランをアップグレード',
+            upgradeTitle:'アプグランド',
             accountOptionButton: 'アカウトオプション',
             DowngradeTitle:'ダウングレードオプション',
             cancelPlan:'キャンセルプラン',
@@ -1203,7 +1206,8 @@ const infoDefine = [
             step2_detail2: 'アクセス権にポログラムとして実行可能をチェック',
             step3:'旧バージョンCoNETを退出して、新しいCoNETバージョンをダブクリックしてインストールをします。',
             exit: '旧CoNETを退出',
-            tryAgain:'もう一度'
+            tryAgain:'もう一度',
+            refresh:'リロードページ'
         },
 
         topWindow: {
@@ -1225,7 +1229,7 @@ const infoDefine = [
             smtpServer: 'SMTP設定',
             smtpServerInput: 'SMTPサーバー名又はIP',
             emailServerPassword: 'Emailパスワード(アプリパスワードお勧め)',
-            imapAccountConform: '<p><dt>以下の事項を確認してから送信ボタンを押してください：</dt></p>このEmailアカンウトはあなたのよく使っているEmailアカンウトと違って、CoNETシステムを使用するのために、一時的新たに作ったEmailアカンウトです。あなたはCoNETにこのEmailアカンウトのフールアクセス権にすることが了承しました。',
+            imapAccountConform: function ( iamp, account ) { return `<p class="ui small header brown">以下の事項をよく確認してから、送信ボタンを押してください：</p><p>このEmailアカンウト「<B class="red">${ iamp }</B>」はあなたがCoNETシステムを使用するのために、一時的新たに作ったEmailアカンウトです。あなたはCoNETにこのEmailアカンウトのアクセス権にすることが了承しました。</p><p>以下の内容をCoNETへ送信することを了承すること：メールアカウント「<B class="red">${ iamp }</B>」とAPPパスワード、ユーザー登録メール「<B class="red">${ account }</B>」、使う言語、タイムゾーン、パブリックキー。</p><p>あなたはCoNETに「<B class="red">${ account }</B>」へCoNETに関わるシステム情報、支払い、アカンウト、販促などを送信することを了承と認可をします。</p>` },
             agree:'私はそのリスクが了承して続きする',
             imapOtherCheckError: 'Emailサーバーに接続ができませんでした。Emailサーバー名又はIPアドレス又は通信ポート番号に間違いがあります、詳細設定で再チェックをしてください。',
             CertificateError: 'Emailサーバーに提示したセキュリティ証明書は信頼できないものです。続くをしたい場合は、詳細設定の中の「セキュリティ証明書信頼でき無くとも接続をする」を選択してください。その場合はあなたのEmailインフォメーションを漏れる可能性があります。',
@@ -1243,6 +1247,7 @@ const infoDefine = [
                 /* 2 */'emailサーバへSMTP接続しました',
                 /* 3 */'CoNETクライアントは接続要請のメールをCoNETシステムへ送信しました、接続を完了するまで時間がかかるのためしばらくお待ちおください。',
                 /* 4 */'CoNETへ接続しました',
+                /* 5 */'emailサーバへIMAP接続しました'
 
             ],
             imapResultTitle:'IMAPサーバCoNET評価：',
@@ -1252,7 +1257,7 @@ const infoDefine = [
             proxyPortError: 'ポート番号は1000から65535までの数字です。又はこのポート番号は他のアプリが使っています。他の番号にチェンジしてください。',
             appPassword:'APPパスワードについて',
             imapCheckError: [
-                'Emailサーバーに接続ができませんでした。所在しているネットワークはメール通信プロトコルがサポートしておりません。ネット環境をチェンジしてもう一回してみてください。',
+                'Emailサーバーに接続ができませんでした。ネットワークがオフラインか、所在しているネットワークはメール通信プロトコルがサポートしておりません。ネット環境をチェンジしてもう一回してみてください。',
                 'Emailサーバはログインエラーが提示しました。ユーザー名とパスワードを再チェックしてください。',
                 'Emailサーバーに提示したセキュリティ証明書は信頼できないものです。中間者攻撃があるネット環境にいるあもしれないです。ネット環境をチェンジしてもう一回してみてください。',
                 'メール送信の際にエラーが発生しました。そのようなエラーは多分パスワードをAPPパスワードではなく、普通のパースワードを使った模様です。APPパスワードをチェックしてもう一回してみてください。',
@@ -1349,8 +1354,8 @@ const infoDefine = [
         emailConform: {
             activeViewTitle:'鍵ペア検証',
             requestReturn: ['エラー発生しました、それは短時間内多数の請求をしたことです。','検証メールを発送しました。'],
-            info1_1:`鍵ペア検証は未完成です。CoNETは宛先 「`,
-            info1_2: `」 に検証メールをしました。メールボックスをチェックしてください。CoNETから多数メールの場合は、最後のを選んでください。CoNETからのメールが見つからない場合は鍵ペアを生成するメールアドレスを正しいかどうかダブチェックしてください。または鍵ペアを削除して新しい鍵ペアを再作成をしてください。`,
+            info1_1:`鍵ペア検証は未完成です。「検証Emailを発行」を押してからメールボクス「`,
+            info1_2: `」をチェックしてください。CoNETから多数メールの場合は、最後のを選んでください。CoNETからのメールが見つからない場合は、鍵ペアを生成するメールアドレスを正しいかどうか、ダブチェックしてください。または鍵ペアを削除して新しい鍵ペアを再作成をしてください。`,
             info2: 'コピーするのは「-----BEGIN PGP MESSAGE-----」から「-----END PGP MESSAGE-----」まで全ての内容をしてください。',
             emailTitle: 'CoNETをご利用頂いて誠に有難うございます',
             emailDetail1: '',
@@ -1359,7 +1364,7 @@ const infoDefine = [
             bottom1_1: '以上',
             bottom1_2: 'CoNETチームより',
             conformButtom: '検 証',
-            reSendRequest:'検証Emailを再発行',
+            reSendRequest:'検証Emailを発行',
             formatError: [
                 'フォーマットエラー、コピーするのは「-----BEGIN PGP MESSAGE-----」から「-----END PGP MESSAGE-----」まで全ての内容をしてください。',
                 'この内容で暗号化解除ができませんでした。鍵ペアEmailアカンウトメールボックス再検査し、CoNETから最後のを選んでください。または鍵ペアを削除して、鍵ペア再発行してください。',
@@ -1371,18 +1376,18 @@ const infoDefine = [
                 '通信用IMAPの設定にエラーがあるか又はそのタープのIMAPアカンウトがCoNETサポートしません。よくチェックしてもう一回試しにしてください。',
                 '選択していたゲットウェーエリアは只今接続不能になっております、後ほどもう一度試しにしてください。',
                 'IMAPアカウトでEMAIL送信する際エラーが発生しました、一回退出し、起動して見てくださいね。重複発生した場合はIMAPアカウトのウェーブページでアカウトをアンロック操作を必要かもしれない。',
-                'CoNETコアーにエラーが発生したした。ページをリフレッシュか、CoNETを退出してから再起動してください。',
-                'アララーー、あなたには負けるそ。'
+                'ページセッションが終了しました。続行するにはページを更新するか、またCoNETを再起動してください',
+                'CoNETプラットフォームが故障になったと思いますが、CoNETを再起動してください'
             ],
             activeing: '通信中'
         },
 
         QTGateRegion: {
-            title: 'ゲットウェイエリア',
+            title: '高品質カスタマーゲートウェイサービスエリア',
             speedTest: 'スピードテスト：',
             available: 'サービス中',
             unavailable: '準備しています',
-            requestPortNumber: 'サーバーとの通信ポート:',
+            requestPortNumber: 'ゲートウェイサーバーとの通信ポート:',
             proxyDomain:'ドメイン検索はCoNETゲットウェイ側に依頼します。',
             setupCardTitle: '接続技術:',
             MultipleGateway: '並列使うゲットウェイ数',
@@ -1411,7 +1416,7 @@ const infoDefine = [
                 'CoNETオリジナル技術のトラフィックをHTTPに偽装した暗号化通信技術です。あなたのIPを使ってゲットウェイに直接接続することで、高速通信とプライバシー、強くファイヤウォールをうまくすり抜けることができます。インターネット自由アクセスのためにCoNETを使うことになら、これをおすすめです。',
                 'ドメイン検索をCoNETゲットウェイ側にすることで DNS cache pollution を防ぐことができます。この選択は必要です。',
                 '全てインターネットデータをCoNETゲットウェイに通じてすることで、匿名でインターネットアクセスします。',
-                'ローカルネットワークが目標サーバに到達不能な際に、CoNETゲットウェイ通じてします。このことでCoNETデータ通信量節約することができます。',
+                'ローカルネットワークが目標サーバに到達不能な際に、CoNETゲットウェイ通じてします。このことはネットスピードがアップできますが、プライバシーが無くなります。',
                 'アクセスしたWebサイトを一時ファイルに保持することで、高速レスポンスが利用可能となります、CoNETはいつも暗号化したデータを本機に保存します。但し暗号化通信には不対応です。',
                 'キャッシュを保存しません。',
                 'キャッシュ有効期限の設定によって、いつもサーバ側の最新情報を入手することができます。単位は時間です。',
@@ -1419,7 +1424,7 @@ const infoDefine = [
                 'ローカルプロキシサーバーが他のデバイスをこのポートに接続によってCoNETデータの通信を利用可能です。3001から65535の間の数字を入れてください。',
 
                 'ローカルポロックPATHを指定することで、あなたのローカルポロックサーバを簡単セキュリティを与えられます。無断使用を禁止することができます。',
-                '同時に使うゲットウェイ数目を指定します。この技術はネットワークの大流量をいくつかのIPアドレスに分散して、監視者から逃げられます。',
+                '同時に使うゲットウェイ数目を指定します。この技術はネットワークの大流量をいくつかのIPアドレスに分散して、監視者から逃げられます。この機能は有料会員しかのです。',
                 'CoNETゲットウェーとの通信ポート番号を指定します。あなた所在するネットワークの制限された通信ポートから避けることができます。'
             ]
         },
@@ -1534,7 +1539,7 @@ const infoDefine = [
             MonthBandwidthTitle:'Gateway Bandwidth：',
             dayBandwidthTitle:'Day limited：',
             bandwidthBalance:'Bandwidth remaining: ',
-            upgradeTitle: 'Upgrade account plan',
+            upgradeTitle: 'Upgrade',
             accountOptionButton: 'Account option',
             planPrice: 'Plan price：',
             monthResetDay:'Monthly reset day: ',
@@ -1866,7 +1871,8 @@ const infoDefine = [
             step2_detail2: 'Check allow executing file as program in Permissions tab.',
             step3:'Exit old version of CoNET and double click the new CoNET file to run install.',
             exit: 'Exit CoNET',
-            tryAgain:'Try again'
+            tryAgain:'Try again',
+            refresh:'Refresh page.'
         },
 
         imapInformation: {
@@ -1884,7 +1890,7 @@ const infoDefine = [
             smtpServerInput: 'SMTP server name or IP address',
             emailServerPassword: 'Email account password ( app password )',
             Error_portNumber: 'Port number should be from 1 to 65535.',
-            imapAccountConform: '<p><dt>By clicking submit you are agreeing to:</dt></p>This email is a temporary account for use with CoNET services. CoNET may have full access to this account in use of CoNET’s services.',
+            imapAccountConform: function ( imap, account ) { return `<p class="ui small header brown">By clicking submit you are agreeing to:</p><p class="grey">This [<B class="red">${ imap }</B>] email is a temporary account for use with CoNET services. CoNET may have full access to this account in use of CoNET’s services.</p><p>CoNET platform will send a email include: [<B class="red">${ imap }</B>] & APP password, email [<B class="red">${ account }</B>] address, public key, timezone, used language.</p><p>You may receive emails from CoNET.</p>`},
             agree: `I understand and agree to continue.`,
             imapOtherCheckError: 'Cannot connect to email server! Server name, IP address or Port number may have a mistake. Please check the details of your email setup!',
             CertificateError: 'Certificate for this email server is not trusted. Please select "Keep connected even if certificate is not trusted" in settings if you still want to connect. Your email login information maybe leaked to this email server!',
@@ -1902,6 +1908,7 @@ const infoDefine = [
                 /* 2 */'Connected to email server with SMTP.',
                 /* 3 */'Please wait a moment, connecting to CoNET network.',
                 /* 4 */'Connected to CoNET',
+                /* 5 */'Connected to email server with IMAP'
 
             ],
             imapResultTitle: 'IMAP Server CoNET Communication Rating: ',
@@ -1911,7 +1918,7 @@ const infoDefine = [
             proxyPortError: 'Port number should be a number from 1000 to 65535. Or this port is being used by another process. Please try another port number.',
             appPassword:'About APP password.',
             imapCheckError: [
-                /* 0 */'Cannot connect to email server! Your network may not support email protocol.',
+                /* 0 */'Cannot connect to email server! Your network may offline or do not support IMAP protocol.',
                 /* 1 */'Invalid login username or password! Please check username and password.',
                 /* 2 */'Certificate for this email server is not trusted. You may have Man-in-the-middle attack in your network. Try again when chenged network.',
                 /* 3 */'Sent mail error. It may happened when you use normail password. Check your mail APP password.',
@@ -2007,7 +2014,7 @@ const infoDefine = [
         emailConform: {
             activeViewTitle: 'Active your keypair.',
             emailTitle: 'Welcome to CoNET.',
-            info1_1: 'Please complete key pair verification. A verification email from CoNET has been sent. Please check your [',
+            info1_1: `Please complete key pair verification. Click the button 'Request verification email' to request mail. Please check your [`,
             info1_2: '] mailbox. If you received more then one email from CoNET, please choose the newest email. If you not find the email, please double check your key pair email address. If you have an error, you may delete your key pair and generate a new key pair.',
             info2: 'Copy all content from [-----BEGIN PGP MESSAGE-----] ... to [-----END PGP MESSAGE-----]. Paste into this text box.',
             emailDetail1: 'Dear ',
@@ -2017,7 +2024,7 @@ const infoDefine = [
             bottom1_2: 'The CoNET team',
             requestReturn: ['ERROR! CoNET system refuse your request, may be you did request repeatedly, please try again late.','Verification mail has been sent.'],
             conformButtom: 'Confirm',
-            reSendRequest:'Request another verification email',
+            reSendRequest:'Request verification email',
             formatError: [
                         'Format error! Copy all content from [-----BEGIN PGP MESSAGE-----] ... to [-----END PGP MESSAGE-----]. Paste into this text box.',
                         'Oops. Find the lasest mail from CoNET in your key pair email mailbox. Or delete this key pair and rebuild new key pair please.',
@@ -2029,15 +2036,15 @@ const infoDefine = [
                         'Your transfer email account may not be working, please check the IMAP account. Or your IMAP accout may not support CoNET system.',
                         'Selected region is unavailable, try again later.',
                         'Your IMAP account recieved an error. Please restart CoNET and try again. If the error is not fixed, You may need check your IMAP account setting to enable third party IMAP applications.',
-                        'CoNET coresystem error! Refresh page or restart CoNET plesee.',
-                        'Oooooops! How are you today?'
+                        'The page session has expired! Refresh page or restart CoNET plesee.',
+                        'Sorry looks CoNET platform failure, please restart CoNET.'
                     ],
 
             activeing: 'sending...'
         },
 
         QTGateRegion: {
-            title: 'Gateway area',
+            title: 'Advanced private custom gateway service area.',
             available: 'Available',
             speedTest: 'Speed test：',
             unavailable: 'Unavailable',
@@ -2052,7 +2059,7 @@ const infoDefine = [
             clearCache: 'Delete all cache now',
             localPort:'Local proxy port number:',
             localPath:'HTTP/HTTPS conect path name:',
-            requestPortNumber: 'Gateway port number:',
+            requestPortNumber: 'Gateway server port number:',
             GlobalIp: 'Global IP:',
             option: 'option',
             pingError:'CoNET gateway area speed check error! Please exit CoNET and reopen CoNET as administrator. Then do check speed again.',
@@ -2071,13 +2078,13 @@ const infoDefine = [
                 'Recommended for high speed open internet access. iOPN uses CoNET’s “Quiet” technology to obfuscate encrypted data traffic to look like normal HTTP communications. iOPN offer security and protection of privacy while allowing access to the open internet.',
                 'Use CoNET’s gateway for domain search to get the right IP address from DNS cache. This is default.', 
                 'Transfer all internet data over OPN.', 
-                'Transfer select data over OPN. Only when unable to connect to certain servers. This may save data on your account transfer limits.',
+                'Transfer select data over OPN. Only when unable to connect to certain servers. Network access may speed up but lost your privacy.',
                 'Web cache (or HTTP cache) is an used for the temporary storage (caching) of web documents, to reduce bandwidth usage, server load, and perceived lag. CoNET always encrypts all web cache data. This does not work for HTTPS connections.',
                 'Do not use web cache.', 
                 'By setting the cache expiration date, you can always obtain the latest information on the server side.',
                 'Local proxy server port number is provided for other devices to use CoNET’s OPN connection. Please set a number from 3001 to 65535.',
                 'Local proxy server http/https access can secure your server.',
-                'The number of gateways to use. This will further help to obfuscate traffic by using multiple servers.',
+                'The number of gateways to use. This will further help to obfuscate traffic by using multiple servers. This is available for subscription only.',
                 'This is your current CoNET gateway port number, You may change the port number if current one is blocked on your network.'
             ],
             connectQTGate: 'Connecting, Retrieving CoNET gateway information...'
@@ -2198,7 +2205,7 @@ const infoDefine = [
             planPrice: '訂閱價格：',
             MonthBandwidthTitle:'月度代理伺服器限額：',
             dayBandwidthTitle:'每日限額：',
-            upgradeTitle:'升級您的訂閱',
+            upgradeTitle:'升級',
             accountOptionButton: '賬戶選項',
             paymentSuccess:'您的訂閱已經完成，數據流量限制已經被更新。祝您網絡衝浪愉快。',
             qtgateTeam: 'CoNET開發團隊敬上',
@@ -2473,7 +2480,8 @@ const infoDefine = [
             step2_detail2: '在權限選項裡，選勾“允許檔案文件執行”。',
             step3:'退出舊版本CoNET後，雙擊CoNET文件執行安裝',
             exit: '退出CoNET',
-            tryAgain:'再次嘗試'
+            tryAgain:'再次嘗試',
+            refresh:'刷新頁面'
         },
 
         imapInformation: {
@@ -2491,7 +2499,7 @@ const infoDefine = [
             smtpServerInput: 'SMTP伺服器設定',
             Error_portNumber: '連接埠應該是從1-65535之間的數字',
             emailServerPassword: '郵箱密碼(推薦使用應用專用密碼)',
-            imapAccountConform: '<p><dt>警告：</dt></p>當您按下提交按鈕時，意味著您已經確認：這個郵箱並不是您常用的郵箱，這是為了使用CoNET網絡而特別申請的臨時郵箱，您同意承擔由此帶來的風險，並授權CoNET網絡可以使用這個Email郵箱傳輸信息!',
+            imapAccountConform: function ( iamp, account ) { return `<p class="ui small header brown">警告：</p><p class="grey">當您按下提交按鈕時，意味著您已經確認【<B class="red">${ iamp }</B>】是為了使用CoNET系統而特別申請的臨時郵箱，您同意承擔由此帶來的風險，並授權CoNET系統可以使用這個Email郵箱傳輸信息!</p><p class="grey" >CoNET平台將會向CoNET發送包含以下信息的email：【<B class="red">${ iamp }</B>】及APP密碼，註冊【<B class="red">${ account }</B>】郵箱地址，使用語言，時區，加密公鑰。 </p><p class="grey">同時您也同意並授權CoNET可以向您的註冊郵箱【<B class="red">${ account }</B>】發送CoNET有關服務，促銷，賬戶及其他信息。 </p>`},
             agree:'我已經了解風險，並願意繼續',
             imapOtherCheckError: '不能連接到Email伺服器，有可能您設定的伺服器名稱或IP，通訊連接埠有誤，請檢查您的伺服器詳細設定！',
             CertificateError: 'Email伺服器提示的證書不能被系統信任！您的Email伺服器有可能是一個仿冒的，您如果想繼續，請在詳細設定裡選擇【允許連接到不被信任證書的Email伺服器】，但您的Email登陸信息有可能洩漏給此伺服器！',
@@ -2509,6 +2517,7 @@ const infoDefine = [
                 /* 2 */'邮件伺服器SMTP連接成功',
                 /* 3 */'CoNET客户端向CoNET系统发出联机请求Email。和CoNET联机需要额外的时间，请耐心等待。',
                 /* 4 */'成功連接CoNET',
+                /* 5 */'邮件伺服器IMAP連接成功'
 
             ],
             imapResultTitle: 'IMAP伺服器CoNET通訊評分：',
@@ -2518,7 +2527,7 @@ const infoDefine = [
             proxyPortError: '連接埠應該是從1000-65535之間的數字，或此端口已被其他APP所占用，請再嘗試其他號碼。',
             appPassword:'關於APP密碼',
             imapCheckError: [
-                '不能连接到郵件伺服器，有可能您所在網絡不支持郵件通訊，請檢查您的網絡',
+                '不能连接到郵件伺服器，有可能您沒有互聯網，或所在網絡不支持郵件IMAP通訊，請檢查您的網絡',
                 '郵件伺服器提示用户名或密码错误，请仔细检查您的用户名和密码！',
                 '郵件伺服器證書錯誤！您所在網絡可能存在網絡中間人攻擊，請換網絡環境後再嘗試。',
                 '郵件伺服器發送郵件錯誤，這通常是您使用的密碼是普通密碼所致，請換用APP密碼後再次嘗試',
@@ -2614,12 +2623,12 @@ const infoDefine = [
         emailConform: {
             activeViewTitle:'驗證您的密鑰',
             emailTitle: '感謝您使用CoNET服務',
-            info1_1: '您的密鑰還未完成驗證，CoNET已向您的密鑰郵箱發送了一封加密郵件，請檢查您的【',
+            info1_1: '您的密鑰還未完成驗證，請點擊按鈕[發送驗證Email]，並檢查您的【',
             info1_2: '】郵箱。如果存在多封CoNET的郵件時，請選擇最後一封信件。請打開信件並複制郵件內容。如果您還未收到CoNET的郵件，請檢查您的密鑰郵箱是否準確，或者您可以刪除您現有的密鑰，重新生成新的密鑰。',
             info2: '複制內容從“-----BEGIN PGP MESSAGE----- （ 開始，一直到 ）----- END PGP MESSAGE-----” 結束的完整內容，粘貼到此輸入框中',
             emailDetail1: '尊敬的 ',
             emailDetail1_1: '',
-            reSendRequest:'再次發送驗證Email',
+            reSendRequest:'發送驗證Email',
             requestReturn: ['錯誤！您的請求被拒絕，這可能是您在短時間內多次請求所致，請稍後再試','CoNET系統已發送激活郵件！'],
             emailDetail2: '這是您的CoNET帳號激活密碼，請複制下列框內的全部內容:',
             bottom1_1:'此致',
@@ -2635,15 +2644,15 @@ const infoDefine = [
                             '用來通訊的Email設定有錯誤，請檢查IMAP設定後重試，或CoNET網絡不支持此Email類型',
                             '您所選區域不能夠連結，請稍候再試',
                             '您的IMAP郵箱發信發生錯誤。請退出CoNET重試。如果持續發生此故障，您的IMAP帳號有可能被鎖住，需要登陸您的IMAP郵箱網站解鎖操作。',
-                            'CoNET核心程序發生錯誤，請刷新頁面，或退出後重新啟動CoNET。',
-                            '嗯，高手過招身手非凡啊！'
+                            '頁面會話已過期，請刷新頁面以繼續，或退出後重新啟動CoNET。',
+                            'CoNET平台故障，請重新啟動CoNET。'
         
                         ],
             activeing: '正在通訊中'
         },
 
         QTGateRegion: {
-            title: '代理伺服器區域',
+            title: '高品質訂製代理伺服器區域',
             available: '服務中',
             speedTest: '代理伺服器速度測試',
             unavailable: '準備中',
@@ -2657,7 +2666,7 @@ const infoDefine = [
             proxyDataCache_detail: ['本地緩存','不緩存'],
             dataViaGateway: '全部互聯網數據通過CoNET代理伺服器',
             cacheDatePlaceholder: '緩存失效時間',
-            requestPortNumber: 'Q梯代理通訊連接埠',
+            requestPortNumber: '代理伺服器通訊連接埠',
             clearCache: '立即清除所有緩存',
             GlobalIp: '本機互聯網IP地址:',
             option: '高級設置',
@@ -2675,13 +2684,13 @@ const infoDefine = [
                 'CoNET獨創HTTP明碼強加密混淆流量代理技術，能夠隱藏變換您的IP地址高速通訊，隐身和保护隐私，抗干擾超強防火牆穿透能力。缺點是需要使用您的IP來直接連結代理伺服器。如果您只是需要自由訪問互聯網，則推薦使用本技術。',
                 '域名解釋使用CoNET代理伺服器端，可以防止域名伺服器緩存污染，本選擇不可修改。',
                 '互聯網數據全程使用CoNET代理，可以匿名上網隱藏您的互聯網形踪。',
-                '只有當本地網絡不能夠到達您希望訪問的目標時，才使用CoNET代為您連結目標伺服器，本選項可以節省您的CoNET流量。',
+                '只有當本地網絡不能夠到達您希望訪問的目標時，才使用CoNET代為您連結目標伺服器，本選項可以加速網速，但無隱私。',
                 '通過本地緩存瀏覽紀錄，當您再次訪問目標伺服器時可以增加訪問速度，減少網絡流量，緩存瀏覽記錄只針對非加密技術的HTTP瀏覽有效。CoNET使用強加密技術緩存瀏覽紀錄，確保您的隱私不被洩漏',
                 '不保存緩存信息。',
                 '設置緩存有效時間，您可以及時更新伺服器數據，單位為小時。',
                 '本地Proxy服务器，其他手机电脑和IPad等可通過连结此端口來使用CoNET服务。請設定為3001至65535之間的數字',
                 '通過設置PATH鏈接路徑可以簡單給您的Proxy伺服器增加安全性，拒絕沒有提供PATH的訪問者使用您的Proxy伺服器。',
-                '同時捆綁使用代理線路數，可以有效降低大流量集中在一個代理服務線路上，容易造成網絡監控者註意的風險。',
+                '同時使用多條代理線路數，可以有效降低大流量集中在一個代理服務線路，降低被網絡監控者發現的風險。此選項僅供收費會員使用。',
                 '指定同Q梯代理進行通訊使用的連接埠，通過此設置可以規避您所在網段被通訊屏蔽的連接埠。'
             ]
         },
@@ -2730,3 +2739,310 @@ const infoDefine = [
 const linkClick = function ( url: string ) {
     return window.open ( url, '_blank')
 }
+const QTGateRegionsSetup: IQTGateRegionsSetup[] = [
+    {
+        title: '@OPN'
+    },
+    {
+        title: 'iOPN'
+    }
+]
+const _QTGateRegions: QTGateRegions[] = [
+    {
+        icon: 'india',
+        content: ['班加罗尔','バンガロール','Bangalore','班加羅爾'],
+        meta: ['亚洲・印度','アジア・インド','India. Asia.','亞洲・印度'],
+        description: ['','','',''],
+        canVoe: ko.observable(false),
+        canVoH: ko.observable(true),
+        available: ko.observable(false),
+        selected: ko.observable ( false ),
+        showExtraContent: ko.observable ( false ),
+        QTGateRegionsSetup: QTGateRegionsSetup,
+        qtRegion: 'Asia.Bangalore',
+        error: ko.observable(-1),
+        showRegionConnectProcessBar: ko.observable ( false ),
+        showConnectedArea: ko.observable ( false ),
+        ping: ko.observable ( -2 ),
+        downloadSpeed: ko.observable (-2)
+
+    },{
+        icon: 'singapore',
+        content: ['新加坡','シンガポール','Singapore','新加坡'],
+        meta: ['亚洲・新加坡','アジア・シンガポール','Singapore. Asia.','亞洲・新加坡'],
+        description: ['','','',''],
+        canVoe: ko.observable(false),
+        canVoH: ko.observable(true),
+        available: ko.observable(false),
+        selected: ko.observable ( false ),
+        showExtraContent: ko.observable ( false ),
+        QTGateRegionsSetup: QTGateRegionsSetup,
+        qtRegion: 'singapore',
+        error: ko.observable(-1),
+        showRegionConnectProcessBar: ko.observable ( false ),
+        showConnectedArea: ko.observable ( false ),
+        ping: ko.observable ( -2 ),
+        downloadSpeed: ko.observable (-2)
+    },{
+        icon: 'japan',
+        content: ['东京','東京','Tokyo','東京'],
+        meta: ['亚洲・日本','アジア・日本','Japan. Asia.','亞洲・日本'],
+        description: ['','','',''],
+        canVoe: ko.observable(false),
+        canVoH: ko.observable(true),
+        available: ko.observable(false),
+        selected: ko.observable ( false ),
+        showExtraContent: ko.observable ( false ),
+        QTGateRegionsSetup: QTGateRegionsSetup,
+        qtRegion: 'tokyo',
+        error: ko.observable(-1),
+        showRegionConnectProcessBar: ko.observable ( false ),
+        showConnectedArea: ko.observable ( false ),
+        ping: ko.observable ( -2 ),
+        downloadSpeed: ko.observable (-2)
+    },{
+        icon: 'france',
+        content: ['巴黎','パリ','Paris','巴黎'],
+        meta: ['欧洲・法国','ヨーロッパ・フランス','France. Europe.','歐洲・法國'],
+        description: ['','','',''],
+        canVoe: ko.observable(false),
+        canVoH: ko.observable(true),
+        available: ko.observable(false),
+        selected: ko.observable ( false ),
+        showExtraContent: ko.observable ( false ),
+        QTGateRegionsSetup: QTGateRegionsSetup,
+        qtRegion: 'paris',
+        error: ko.observable(-1),
+        showRegionConnectProcessBar: ko.observable ( false ),
+        showConnectedArea: ko.observable ( false ),
+        ping: ko.observable ( -2 ),
+        downloadSpeed: ko.observable (-2)
+    }
+    /*
+    ,{
+        icon: 'netherlands',
+        content: ['阿姆斯特丹1','アムステルダム1','Amsterdam1','阿姆斯特丹1'],
+        meta: ['欧洲・荷兰','ヨーロッパ・オランダ','Netherlands. Europe.','歐洲・荷蘭'],
+        description: ['','','',''],
+        canVoe: ko.observable(true),
+        canVoH: ko.observable(true),
+        available: ko.observable(false),
+        selected: ko.observable ( false ),
+        showExtraContent: ko.observable ( false ),
+        QTGateRegionsSetup: QTGateRegionsSetup,
+        qtRegion: 'amsterdam1',
+        error: ko.observable(-1),
+        showRegionConnectProcessBar: ko.observable ( false ),
+        showConnectedArea: ko.observable ( false ),
+        ping: ko.observable ( -2 ),
+        downloadSpeed: ko.observable (-2)
+    }
+    */
+    ,{
+        icon: 'netherlands',
+        content: ['阿姆斯特丹','アムステルダム','Amsterdam','阿姆斯特丹'],
+        meta: ['欧洲・荷兰','ヨーロッパ・オランダ','Netherlands. Europe.','歐洲・荷蘭'],
+        description: ['','','',''],
+        canVoe: ko.observable(false),
+        canVoH: ko.observable(true),
+        available: ko.observable(false),
+        selected: ko.observable ( false ),
+        showExtraContent: ko.observable ( false ),
+        QTGateRegionsSetup: QTGateRegionsSetup,
+        qtRegion: 'amsterdam',
+        error: ko.observable(-1),
+        showRegionConnectProcessBar: ko.observable ( false ),
+        showConnectedArea: ko.observable ( false ),
+        ping: ko.observable ( -2 ),
+        downloadSpeed: ko.observable (-2)
+    },{
+        icon: 'germany',
+        content: ['法兰克福','フランクフルト','Frankfurt','法蘭克福'],
+        meta: ['欧洲・德国','ヨーロッパ・ドイツ','Germany. Europe.','歐洲・德國'],
+        description: ['','','',''],
+        canVoe: ko.observable(false),
+        canVoH: ko.observable(true),
+        available: ko.observable(false),
+        selected: ko.observable ( false ),
+        showExtraContent: ko.observable ( false ),
+        QTGateRegionsSetup: QTGateRegionsSetup,
+        qtRegion:'frankfurt',
+        error: ko.observable(-1),
+        showRegionConnectProcessBar: ko.observable ( false ),
+        showConnectedArea: ko.observable ( false ),
+        ping: ko.observable ( -2 ),
+        downloadSpeed: ko.observable (-2)
+
+    },{
+        icon: 'united kingdom',
+        content: ['爱尔兰','アイルランド','Ireland','愛爾蘭'],
+        meta: ['欧洲・英国','ヨーロッパ・英国','United Kingdom. Europe.','歐洲・英國'],
+        description: ['','','',''],
+        canVoe: ko.observable(false),
+        canVoH: ko.observable(true),
+        available: ko.observable(false),
+        selected: ko.observable ( false ),
+        showExtraContent: ko.observable ( false ),
+        QTGateRegionsSetup: QTGateRegionsSetup,
+        qtRegion: 'Ireland',
+        error: ko.observable(-1),
+        showRegionConnectProcessBar: ko.observable ( false ),
+        showConnectedArea: ko.observable ( false ),
+        ping: ko.observable ( -2 ),
+        downloadSpeed: ko.observable (-2)
+    },{
+        icon: 'united kingdom',
+        content: ['伦敦','ロンドン','London','倫敦'],
+        meta: ['欧洲・英国','ヨーロッパ・英国','United Kingdom. Europe.','歐洲・英國'],
+        description: ['','','',''],
+        canVoe: ko.observable(false),
+        canVoH: ko.observable(true),
+        available: ko.observable(false),
+        selected: ko.observable ( false ),
+        showExtraContent: ko.observable ( false ),
+        QTGateRegionsSetup: QTGateRegionsSetup,
+        qtRegion: 'London',
+        error: ko.observable(-1),
+        showRegionConnectProcessBar: ko.observable ( false ),
+        showConnectedArea: ko.observable ( false ),
+        ping: ko.observable ( -2 ),
+        downloadSpeed: ko.observable (-2)
+    },{
+        icon: 'australia',
+        content: ['悉尼','シドニー','Sydney','悉尼'],
+        meta: ['澳洲・澳大利亚','オーストラリア','Australia.','澳洲・澳大利亚'],
+        description: ['','','',''],
+        canVoe: ko.observable(false),
+        canVoH: ko.observable(true),
+        available: ko.observable(false),
+        selected: ko.observable ( false ),
+        showExtraContent: ko.observable ( false ),
+        QTGateRegionsSetup: QTGateRegionsSetup,
+        qtRegion: 'Sydney',
+        error: ko.observable(-1),
+        showRegionConnectProcessBar: ko.observable ( false ),
+        showConnectedArea: ko.observable ( false ),
+        ping: ko.observable ( -2 ),
+        downloadSpeed: ko.observable (-2)
+    },{
+        icon: 'united states',
+        content: ['纽约','ニューヨーク','New York City','紐約'],
+        meta: ['北美洲东海岸・美国','北アメリカ東海岸・アメリカ','USA. North American Eastern.','北美洲東海岸・美國'],
+        description: ['','','',''],
+        canVoe: ko.observable(false),
+        canVoH: ko.observable(true),
+        available: ko.observable(false),
+        selected: ko.observable ( false ),
+        showExtraContent: ko.observable ( false ),
+        QTGateRegionsSetup: QTGateRegionsSetup,
+        qtRegion: 'new-york-city',
+        error: ko.observable(-1),
+        showRegionConnectProcessBar: ko.observable ( false ),
+        showConnectedArea: ko.observable ( false ),
+        ping: ko.observable ( -2 ),
+        downloadSpeed: ko.observable (-2)
+
+    },{
+        icon: 'canada',
+        content: ['多伦多','トロント','Toronto','多倫多'],
+        meta: ['北美洲东海岸・加拿大','北アメリカ東海岸・カナダ','Canada. North American Eastern.','北美洲東海岸・加拿大'],
+        description: ['','','',''],
+        canVoe: ko.observable(false),
+        canVoH: ko.observable(true),
+        available: ko.observable(false),
+        selected: ko.observable ( false ),
+        showExtraContent: ko.observable ( false ),
+        QTGateRegionsSetup: QTGateRegionsSetup,
+        qtRegion: 'toronto',
+        error: ko.observable(-1),
+        showRegionConnectProcessBar: ko.observable ( false ),
+        showConnectedArea: ko.observable ( false ),
+        ping: ko.observable ( -2 ),
+        downloadSpeed: ko.observable (-2)
+    },{
+        icon: 'united states',
+        content: ['旧金山','サンフランシスコ','San Francisco','舊金山'],
+        meta: ['北美洲西海岸・美国・旧金山','北アメリカ西海岸・アメリカ','USA. North American Western.','北美洲西海岸・美國'],
+        description: ['','','',''],
+        canVoe: ko.observable(true),
+        canVoH: ko.observable(true),
+        available: ko.observable(false),
+        selected: ko.observable ( false ),
+        showExtraContent: ko.observable ( false ),
+        QTGateRegionsSetup: QTGateRegionsSetup,
+        qtRegion: 'francisco',
+        error: ko.observable(-1),
+        showRegionConnectProcessBar: ko.observable ( false ),
+        showConnectedArea: ko.observable ( false ),
+        ping: ko.observable ( -2 ),
+        downloadSpeed: ko.observable (-2)
+    },{
+        icon: 'hong kong',
+        content: ['香港','香港','Hong Kong','香港'],
+        meta: ['亚洲・中国','アジア・中国','China. Asia.','亞洲・中國'],
+        description: ['','','',''],
+        canVoe: ko.observable(false),
+        canVoH: ko.observable(true),
+        available: ko.observable(false),
+        selected: ko.observable ( false ),
+        showExtraContent: ko.observable ( false ),
+        QTGateRegionsSetup: QTGateRegionsSetup,
+        qtRegion: 'HK',
+        error: ko.observable(-1),
+        showRegionConnectProcessBar: ko.observable ( false ),
+        showConnectedArea: ko.observable ( false ),
+        ping: ko.observable ( -2 ),
+        downloadSpeed: ko.observable (-2)
+    },{
+        icon: 'china',
+        content: ['上海市','上海市','Shanghai','上海市'],
+        meta: ['亚洲・中国','アジア・中国','China. Asia.','亞洲・中國'],
+        description: ['','','',''],
+        canVoe: ko.observable(false),
+        canVoH: ko.observable(true),
+        available: ko.observable(false),
+        selected: ko.observable ( false ),
+        showExtraContent: ko.observable ( false ),
+        QTGateRegionsSetup: QTGateRegionsSetup,
+        qtRegion: 'shanghai',
+        error: ko.observable(-1),
+        showRegionConnectProcessBar: ko.observable ( false ),
+        showConnectedArea: ko.observable ( false ),
+        ping: ko.observable ( -2 ),
+        downloadSpeed: ko.observable (-2)
+    },{
+        icon: 'china',
+        content: ['北京市','北京市','Beijing','北京市'],
+        meta: ['亚洲・中国','アジア・中国','China. Asia.','亞洲・中國'],
+        description: ['','','',''],
+        canVoe: ko.observable(false),
+        canVoH: ko.observable(true),
+        available: ko.observable(false),
+        selected: ko.observable ( false ),
+        showExtraContent: ko.observable ( false ),
+        QTGateRegionsSetup: QTGateRegionsSetup,
+        qtRegion: 'beijing',
+        error: ko.observable(-1),
+        showRegionConnectProcessBar: ko.observable ( false ),
+        showConnectedArea: ko.observable ( false ),
+        ping: ko.observable ( -2 ),
+        downloadSpeed: ko.observable (-2)
+    },{
+        icon: 'china',
+        content: ['无锡市','無錫市','Wuxi','無錫市'],
+        meta: ['亚洲・中国江苏省','アジア・中国江蘇省','Jiangsu China. Asia.','亞洲・中國江蘇省'],
+        description: ['','','',''],
+        canVoe: ko.observable(false),
+        canVoH: ko.observable(true),
+        available: ko.observable(false),
+        selected: ko.observable ( false ),
+        showExtraContent: ko.observable ( false ),
+        QTGateRegionsSetup: QTGateRegionsSetup,
+        qtRegion: 'Wuxi',
+        error: ko.observable(-1),
+        showRegionConnectProcessBar: ko.observable ( false ),
+        showConnectedArea: ko.observable ( false ),
+        ping: ko.observable ( -2 ),
+        downloadSpeed: ko.observable (-2)
+    }
+]

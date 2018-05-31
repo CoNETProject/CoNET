@@ -19,7 +19,7 @@
  *      @param return <string>  Valid = '' Err = errorMessage
  */
 const insideChinaEmail = /(\@|\.)(sina|sohu|qq|126|163|tom)\.com|(\.|\@)yeah\.net/i;
-const getNickName = (email) => {
+const getNickName = function (email) {
     var ret = '';
     if (email.length) {
         ret = email.split('@')[0];
@@ -47,7 +47,7 @@ class EmailValidator {
 }
 const testVal = new IsNullValidator();
 const testEmail = new EmailValidator();
-const checkEmail = (email) => {
+const checkEmail = function (email) {
     if (testVal.isAcceptable(email)) {
         return 'required';
     }
@@ -75,14 +75,15 @@ class keyPairGenerateForm {
         this.message_keyPairGenerateSuccess = ko.observable(false);
         this.showKeyPairForm = ko.observable(true);
         this.showKeyInfomation = ko.observable(false);
-        this.SystemAdministratorEmailAddress.subscribe(newValue => {
-            return this.checkEmailAddress(newValue);
+        const self = this;
+        this.SystemAdministratorEmailAddress.subscribe(function (newValue) {
+            return self.checkEmailAddress(newValue);
         });
-        this.SystemAdministratorNickName.subscribe(newValue => {
-            return this.checkNickname(newValue);
+        this.SystemAdministratorNickName.subscribe(function (newValue) {
+            return self.checkNickname(newValue);
         });
-        this.systemSetup_systemPassword.subscribe(newValue => {
-            return this.checkPassword(newValue);
+        this.systemSetup_systemPassword.subscribe(function (newValue) {
+            return self.checkPassword(newValue);
         });
     }
     checkEmailAddress(email) {
@@ -147,9 +148,9 @@ class keyPairGenerateForm {
         let percent = 1;
         $('.keyPairProcessBar').progress('reset');
         const timeSet = 10000;
-        const doingProcessBar = () => {
-            clearTimeout(this.doingProcessBarTime);
-            this.doingProcessBarTime = setTimeout(() => {
+        const doingProcessBar = function () {
+            clearTimeout(self.doingProcessBarTime);
+            self.doingProcessBarTime = setTimeout(function () {
                 $('.keyPairProcessBar').progress({
                     percent: percent++
                 });
@@ -157,7 +158,7 @@ class keyPairGenerateForm {
                     return doingProcessBar();
             }, timeSet);
         };
-        socketIo.once('newKeyPairCallBack', keyPair => {
+        socketIo.once('newKeyPairCallBack', function (keyPair) {
             self.stopDoingProcessBar();
             self.keyPairGenerateFormMessage(true);
             if (!keyPair) {
@@ -166,7 +167,7 @@ class keyPairGenerateForm {
             self.exit(keyPair);
             return self.message_keyPairGenerateSuccess(true);
         });
-        socketIo.emit('NewKeyPair', sendData);
+        socketIo.emit11('NewKeyPair', sendData);
         return doingProcessBar();
     }
     CloseKeyPairGenerateFormMessage() {

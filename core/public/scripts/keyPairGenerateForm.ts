@@ -19,14 +19,16 @@
  *      @param return <string>  Valid = '' Err = errorMessage
  */
 const insideChinaEmail = /(\@|\.)(sina|sohu|qq|126|163|tom)\.com|(\.|\@)yeah\.net/i
-const getNickName = ( email: string ) => {
-    var ret = '';
+
+const getNickName = function ( email: string ) {
+    var ret = ''
     if ( email.length ){
-        ret = email.split ('@')[0];
-        ret = ret.charAt (0).toUpperCase () + ret.slice(1);
+        ret = email.split ('@')[0]
+        ret = ret.charAt (0).toUpperCase () + ret.slice(1)
     }
-    return ret;
+    return ret
 }
+
 class IsNullValidator implements StringValidator {
     isAcceptable ( s: string ) {
         if ( s === undefined ) {
@@ -48,7 +50,7 @@ class EmailValidator implements StringValidator {
 
 const testVal = new IsNullValidator()
 const testEmail = new EmailValidator()
-const checkEmail = ( email: string ) => {
+const checkEmail = function ( email: string ) {
     
     if ( testVal.isAcceptable ( email )) {
        return 'required'
@@ -61,6 +63,7 @@ const checkEmail = ( email: string ) => {
     
     return ''
 }
+
 class keyPairGenerateForm {
 	public EmailAddressError = ko.observable ( false )
 	public SystemAdministratorEmailAddress = ko.observable ('')
@@ -101,12 +104,13 @@ class keyPairGenerateForm {
 			this.SystemAdministratorNickName ( getNickName ( email ))
 		}
 
-		if ( insideChinaEmail.test ( email ) ) {
+		if ( insideChinaEmail.test ( email )) {
 			this.showInsideFireWallEmail ( true )
 		}
 		
 		return true
 	}
+
 	private checkNickname ( nickname: string ) {
 		this.NickNameError ( false )
 		if ( !nickname || !nickname.length ) {
@@ -115,6 +119,7 @@ class keyPairGenerateForm {
 		}
 		return true
 	}
+
 	private checkPassword ( password: string ) {
 		this.passwordError(false)
 		if ( !password || password.length < 5 ) {
@@ -133,14 +138,15 @@ class keyPairGenerateForm {
 	}
 
 	constructor ( private exit: ( keyPair ) => void ) {
-		this.SystemAdministratorEmailAddress.subscribe ( newValue => {
-			return this.checkEmailAddress ( newValue )
+		const self = this
+		this.SystemAdministratorEmailAddress.subscribe ( function ( newValue ) {
+			return self.checkEmailAddress ( newValue )
 		})
-		this.SystemAdministratorNickName.subscribe ( newValue => {
-			return this.checkNickname ( newValue )
+		this.SystemAdministratorNickName.subscribe ( function ( newValue ) {
+			return self.checkNickname ( newValue )
 		})
-		this.systemSetup_systemPassword.subscribe ( newValue => {
-			return this.checkPassword ( newValue )
+		this.systemSetup_systemPassword.subscribe ( function ( newValue ) {
+			return self.checkPassword ( newValue )
 		})
 	}
 	public form_AdministratorEmail_submit () {
@@ -162,9 +168,9 @@ class keyPairGenerateForm {
 		let percent = 1
 		$('.keyPairProcessBar').progress ('reset')
 		const timeSet = 10000
-		const doingProcessBar = () => {
-			clearTimeout ( this.doingProcessBarTime )
-			this.doingProcessBarTime = setTimeout (() => {
+		const doingProcessBar = function () {
+			clearTimeout ( self.doingProcessBarTime )
+			self.doingProcessBarTime = setTimeout ( function () {
 				$('.keyPairProcessBar').progress ({
 					percent: percent++
 				})
@@ -174,7 +180,7 @@ class keyPairGenerateForm {
 		}
 
 		
-		socketIo.once ( 'newKeyPairCallBack', keyPair => {
+		socketIo.once ( 'newKeyPairCallBack', function ( keyPair ) {
 			self.stopDoingProcessBar ()
 			self.keyPairGenerateFormMessage ( true )
 			if ( !keyPair ) {
@@ -184,7 +190,7 @@ class keyPairGenerateForm {
 			return self.message_keyPairGenerateSuccess ( true )
 		})
 
-		socketIo.emit ( 'NewKeyPair', sendData ) 
+		socketIo.emit11 ( 'NewKeyPair', sendData ) 
 		
 		return doingProcessBar ()
 	}

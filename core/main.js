@@ -22,6 +22,5 @@ exports.start = (cmd, _test) => {
     const localServer = new localWebServer_1.default(cmd, _test);
 };
 if (_start) {
-    exports.start(() => {
-    }, false);
+    exports.start(null, false);
 }

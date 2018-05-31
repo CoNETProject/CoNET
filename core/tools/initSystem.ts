@@ -27,6 +27,7 @@ import * as Https from 'https'
 import * as Net from 'net'
 import * as Nodemailer from 'nodemailer'
 import { StringDecoder } from 'string_decoder'
+import { DH_CHECK_P_NOT_SAFE_PRIME } from 'constants';
 /**
  * 		define
  */
@@ -253,10 +254,11 @@ export const emitConfig = ( config: install_config, passwordOK: boolean ) => {
 		iterations: config.iterations,
 		connectedImapDataUuid: config.connectedImapDataUuid
 	}
+	ret.keypair.passwordOK = false 
 	return ret
 }
 
-export const saveConfig = ( config: install_config, CallBack ) =>{
+export const saveConfig = ( config: install_config, CallBack ) => {
 	return Fs.writeFile ( configPath, JSON.stringify ( config ), CallBack )
 }
 
@@ -311,8 +313,6 @@ export const newKeyPair = ( emailAddress: string, nickname: string, password: st
 		aead_protect: true,
 		aead_protect_version: 4
 	}
-
-	console.log ( Util.inspect ( option ))
 	return OpenPgp.generateKey ( option ).then (( keypair: { publicKeyArmored: string, privateKeyArmored: string }) => {
 		
 		const ret: keyPair = {
@@ -492,7 +492,9 @@ const doUrl = ( url: string, CallBack) => {
 		return CallBack ( err )
 	})
 }
+
 const myIpServerUrl = [ 'https://ipinfo.io/ip', 'https://icanhazip.com/', 'https://diagnostic.opendns.com/myip', 'http://ipecho.net/plain', 'https://www.trackip.net/ip' ]
+
 export const myIpServer = ( CallBack ) => {
 	let ret = false
 	Async.each ( myIpServerUrl, ( n, next ) => {
@@ -547,7 +549,7 @@ const _smtpVerify = ( imapData: IinputData, CallBack: ( err?: Error ) => void ) 
 }
 
 export const smtpVerify = ( imapData: IinputData, CallBack: ( err? ) => void ) => {
-	
+	console.log (`doing smtpVerify!`)
 	let testArray: IinputData[] = null
 	let _ret = false
 	let err1 = null
@@ -602,6 +604,7 @@ export const smtpVerify = ( imapData: IinputData, CallBack: ( err? ) => void ) =
 }
 
 export const getPbkdf2 = ( config: install_config, passwrod: string, CallBack ) => {
+	
 	return Crypto.pbkdf2 ( passwrod, config.salt, config.iterations, config.keylen, config.digest, CallBack )
 }
 
@@ -666,10 +669,21 @@ export const readImapData = ( savedPasswrod, config: install_config, CallBack ) 
 	}
 	return Async.waterfall ([
 		next => Fs.access ( imapDataFileName, next ),
-		( acc, next ) => getPbkdf2 ( config, savedPasswrod, next ),
+		( acc, next ) => {
+			/**
+			 * 		support old nodejs 
+			 */
+			
+			let _next = acc
+			if ( typeof _next !== 'function') {
+				//console.trace (` _next !== 'function' [${ typeof _next}]`)
+				_next = next
+			}
+			getPbkdf2 ( config, savedPasswrod, _next )
+		},
 		( data: Buffer, next ) => {
 			return options.privateKeys[0].decrypt ( data.toString( 'hex' )).then ( keyOk => {
-				console.log (`options.privateKey.decrypt success!`, keyOk )
+				
 				if ( !keyOk ) {
 					return next ( new Error ('key password not OK!'))
 				}
@@ -685,7 +699,12 @@ export const readImapData = ( savedPasswrod, config: install_config, CallBack ) 
 			if ( err ) {
 				return CallBack ( err )
 			}
-			options.message = OpenPgp.message.readArmored ( data.toString ())
+			try {
+				options.message = OpenPgp.message.readArmored ( data.toString ())
+			} catch ( ex ) {
+				return CallBack ( ex )
+			}
+			
 			return OpenPgp.decrypt ( options ).then ( data => {
 				if ( data.signatures && data.signatures[0] && data.signatures[0].valid ) {
 					return CallBack ( null, data.data )
@@ -704,7 +723,7 @@ export const encryptMessage = ( openKeyOption: OpenPgp.option_KeyOption, message
 		publicKeys: openKeyOption.publicKeys,
 		data: message
 	}
-	console.log (`encryptMessage `, message )
+	//console.log (`encryptMessage `, message )
 	return OpenPgp.encrypt ( option ).then ( ciphertext => {
 		return CallBack ( null, ciphertext.data )
 	}).catch ( CallBack )
@@ -714,8 +733,14 @@ export const decryptoMessage = ( openKeyOption: OpenPgp.option_KeyOption, messag
 	const option: OpenPgp.decrypto_option = {
 		privateKeys: openKeyOption.privateKeys,
 		publicKeys: openKeyOption.publicKeys,
-		message: OpenPgp.message.readArmored ( message )
+		message: null
 	}
+	try {
+		option.message = OpenPgp.message.readArmored ( message )
+	} catch ( ex ) {
+		return CallBack ( ex )
+	}
+	
 	return OpenPgp.decrypt ( option ).then ( data => {
 		
 		if ( data.signatures && data.signatures.length && data.signatures.findIndex ( n => { return n.valid }) > -1 ) {
@@ -794,4 +819,35 @@ export const sendCoNETConnectRequestEmail = ( imapData: IinputData, openKeyOptio
 		}
 	], CallBack )
 
+}
+
+const testPingTimes = 5
+
+export const testPing = ( hostIp: string, CallBack ) => {
+	let pingTime = 0
+	const test = new Array ( testPingTimes )
+	test.fill ( hostIp )
+	console.log ( `start testPing [${ hostIp }]`)
+	return Async.eachSeries ( test, ( n, next ) => {
+		const netPing = require ('net-ping')
+		const session = netPing.createSession ()
+		session.pingHost ( hostIp, ( err, target, sent, rcvd ) => {
+			
+			session.close ()
+			if ( err ) {
+				console.log (`session.pingHost ERROR, ${ err.message }`)
+				return next ( err )
+			}
+			const ping = rcvd.getTime () - sent.getTime ()
+			pingTime += ping
+			return next ()
+		})
+	}, err => {
+		if ( err ) {
+			return CallBack ( new Error ('ping error'))
+		}
+
+		return CallBack ( null, Math.round ( pingTime / testPingTimes ))
+	})
+	
 }

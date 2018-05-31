@@ -27,7 +27,7 @@ class keyPairPassword {
                 return this.showPasswordError();
             }
             this.passwordChecking(true);
-            return socketIo.emit('checkPemPassword', this.systemSetup_systemPassword(), function (err, _imapData) {
+            return socketIo.emit11('checkPemPassword', this.systemSetup_systemPassword(), function (err, _imapData) {
                 self.passwordChecking(false);
                 if (err) {
                     return self.showPasswordError();
