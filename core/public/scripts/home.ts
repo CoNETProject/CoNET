@@ -126,6 +126,7 @@ const appList = [
         liked: ko.observable ( false ),
         commentCount: ko.observable(),
         titleColor: '#0066cc',
+        css: '',
         comeSoon: false,
         show: true,
         click: ( view: view_layout.view ) => { return view.CoGateClick () },
@@ -137,6 +138,7 @@ const appList = [
         commentCount: ko.observable(0),
         titleColor: '#006600',
         comeSoon: true,
+        css: '',
         show: true,
         image: '/images/CoMsg.png',
         click: ( view: view_layout.view ) => { return },
@@ -147,6 +149,7 @@ const appList = [
         commentCount: ko.observable(0),
         titleColor: '#990000',
         comeSoon: true,
+        css: '',
         show: true,
         image: '/images/CoBox.png',
         click: ( view: view_layout.view ) => { return },
@@ -157,6 +160,7 @@ const appList = [
         commentCount: ko.observable(0),
         titleColor: '#09b83e',
         comeSoon: true,
+        css: '',
         show: true,
         image: '/images/coMail.png',
         click: ( view: view_layout.view ) => { return },
@@ -168,6 +172,7 @@ const appList = [
         commentCount: ko.observable(0),
         titleColor: 'grey',
         comeSoon: true,
+        css: '',
         show: true,
         image: '/images/coNews.png',
         click: ( view: view_layout.view ) => { return },
@@ -179,6 +184,7 @@ const appList = [
         commentCount: ko.observable(0),
         titleColor: '#09b83e',
         comeSoon: false,
+        css: '',
         show: true,
         image: '/images/512x512.png',
         click: ( view: view_layout.view ) => { return },
@@ -189,6 +195,7 @@ const appList = [
         commentCount: ko.observable(0),
         titleColor: '#4885ed',
         comeSoon: true,
+        css: '',
         show: true,
         image: '/images/Google__G__Logo.svg',
         click: ( view: view_layout.view ) => { return },
@@ -199,14 +206,39 @@ const appList = [
         commentCount: ko.observable(0),
         titleColor: '#00aced',
         comeSoon: false,
+        css: '',
         show: true,
         image: '/images/Twitter_Logo_Blue.svg',
         click: ( view: view_layout.view ) => { 
             const { shell } = require ( 'electron' )
             event.preventDefault ()
             return shell.openExternal ( `http://${ view.localServerConfig().localIpAddress }:2000/Twitter` )
-        },
+        }
+    },
+    {
+        name: 'CoYoutube',
+        likeCount: ko.observable (0),
+        liked: ko.observable (false),
+        titleColor: '#00aced',
+        comeSoon: true,
+        css: 'width: 67em;height: 3em;max-width: 10em!important;',
+        show: true,
+        image: '/images/1024px-YouTube_Logo_2017.svg.png',
+        click: ( view: view_layout.view ) => { return },
+    },
+    {
+        name: 'CoYoutube',
+        likeCount: ko.observable (0),
+        liked: ko.observable (false),
+        titleColor: '#00aced',
+        comeSoon: true,
+        css: '',
+        show: true,
+        image: '/images/wallet.png',
+        click: ( view: view_layout.view ) => { return },
+
     }
+    
 ]
 
 module view_layout {

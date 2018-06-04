@@ -151,21 +151,21 @@ block jumbotron1
 			<!-- ko if: showForm -->
 			.card.centered.raised( style = " width: 100%;" )
 				.content.imapSetupForm( data-bind = "if: showForm ")
-						.ui.segment.teal
-							p( data-bind = "html: infoDefine [ $root.languageIndex() ].imapInformation.infomation ")
-							p( data-bind = "html: infoDefine[ $root.languageIndex() ].imapInformation.tempImapAccount")
-						form.ui.form.fluid
-							.two.fields
-								.field.required( data-bind = " css: { error: emailAddressShowError ()}")
-									.ui.left.icon.input
-										i.icon.outline.mail
-										input( data-bind = " value : emailAddress, css:{ 'activating element inline': emailAddressShowError() }, attr: { tabindex: 1, placeholder: infoDefine [ $root.languageIndex() ].home_index_view.imapEmailAddress, 'data-content' : emailAddressShowError() ? infoDefine[ $root.languageIndex() ].error_message.EmailAddress[ EmailAddressErrorType() ]: null }" type = "text")
-								.field.required
-									.passwdInput.ui.input( data-bind = " css: { 'left icon': !password().length, 'action': password().length }")
-										i.icon.privacy( data-bind = " visible: !password().length ")
-										input( data-bind = " textInput: password, attr: { placeholder: infoDefine [ $root.languageIndex() ].imapInformation.emailServerPassword, tabindex: 2 }" type = "password" )
-										button.ui.icon.button.positive( data-bind = " visible: password().length, click: imapAccountGoCheckClick" )
-											i.icon.angle.right
+					.ui.segment.teal
+						p( data-bind = "html: infoDefine [ $root.languageIndex() ].imapInformation.infomation ")
+						p( data-bind = "html: infoDefine[ $root.languageIndex() ].imapInformation.tempImapAccount")
+					form.ui.form.fluid
+						.two.fields
+							.field.required( data-bind = " css: { error: emailAddressShowError ()}")
+								.ui.left.icon.input
+									i.icon.outline.mail
+									input( data-bind = " value : emailAddress, css:{ 'activating element inline': emailAddressShowError() }, attr: { tabindex: 1, placeholder: infoDefine [ $root.languageIndex() ].home_index_view.imapEmailAddress, 'data-content' : emailAddressShowError() ? infoDefine[ $root.languageIndex() ].error_message.EmailAddress[ EmailAddressErrorType() ]: null }" type = "text")
+							.field.required
+								.passwdInput.ui.input( data-bind = " css: { 'left icon': !password().length, 'action': password().length }")
+									i.icon.privacy( data-bind = " visible: !password().length ")
+									input( data-bind = " textInput: password, attr: { placeholder: infoDefine [ $root.languageIndex() ].imapInformation.emailServerPassword, tabindex: 2 }" type = "password" )
+									button.ui.icon.button.positive( data-bind = " visible: password().length, click: imapAccountGoCheckClick" )
+										i.icon.angle.right
 			<!-- /ko -->
 			//-	if: showForm
 
@@ -268,7 +268,7 @@ block jumbotron1
 			<!-- /ko -->
 			//-	if: CoNETConnect
 
-	section.CoContent.content( data-bind = " if: CoGate ")
+	section.CoContent.content( data-bind = " if: CoGate() && !keyPairSign()")
 		<!-- ko if: CoGateClass -->
 		<!-- ko with: CoGateClass -->
 		<!-- ko if: showCards && ! CoGateAccount() && !CoGateRegion() -->
@@ -661,7 +661,7 @@ block jumbotron1
 
 		<!-- /ko -->
 		<!-- /ko -->
-	
+	//-		AppList 
 	section.AppList.CoContent.content( data-bind="visible: AppList() && !CoGate() ")
 		.CoGateCards( style="max-width: 60em;")
 			h2.ui.header.AppListHeader( data-bind="text: infoDefine[ languageIndex() ].thirdParty.information" style="color: white;")
@@ -678,7 +678,7 @@ block jumbotron1
 							.content
 								p(data-bind="text: infoDefine[ $root.languageIndex() ].thirdParty.dimmer[$index()]")
 						.image.AppCardImageArea
-							img.ui.centered.tiny.image.AppCardImage( data-bind = "attr:{ src: image }" style="width: 6em;height: 6em;")
+							img.ui.centered.tiny.image.AppCardImage( data-bind = "attr: { src: image, style: css }" style="width: 6em;height: 6em;")
 					.content
 						//-span.right.floated
 							i.heart.red.like.icon( data-bind="css: { outline: !liked()}")

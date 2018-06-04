@@ -668,7 +668,7 @@ const infoDefine = [
         thirdParty: {
             comesoon: '即将推出',
             information: 'CoNET平台',
-            app: ['Co定制代理', 'CoChat', 'Co云存储', 'Co邮件', 'Co新闻频道', 'CoNET定制业务', 'Co谷歌', 'Co推特'],
+            app: ['Co定制代理', 'CoChat', 'Co云存储', 'Co邮件', 'Co新闻频道', 'CoNET定制业务', 'Co谷歌', 'Co推特', 'Co油管', 'Co加密货币钱包'],
             qtgateGateway: 'CoNET提供的高質量上網技術iOPN和@OPN，在CoNET全球16個區域，當場定制您專屬的代理服務器，變換您的IP地址隱身無障礙的訪問互聯網',
             dimmer: [
                 '高質量定制代理服務器，讓您隱身安全不受注意的網上沖浪。 ',
@@ -843,7 +843,7 @@ const infoDefine = [
             comesoon: 'まもなく登場します。',
             information: 'CoNETプラットフォーム',
             qtgateGateway: 'CoNETご提供する高品質カスタムゲットウェイサービス、グローバルに１６区域とCoNET独自のiOPNと@OPN技術により、貴方のIPアドレスをカバーして、静かに無障害にインターネットの世界へ可能です。',
-            app: ['CoGate', 'CoMsg', 'CoBox', 'CoMail', 'CoNews', 'Coカスタム', 'Co for', 'Co for'],
+            app: ['CoGate', 'CoMsg', 'CoBox', 'CoMail', 'CoNews', 'Coカスタム', 'Co for', 'Co for', 'Co for', 'Coウォレット'],
             dimmer: [
                 '高品質カスタムゲットウェイサービス、自由になるインターネットの世界へ',
                 'ツイートスタイルの匿名ソーシャルメディア',
@@ -1449,7 +1449,7 @@ const infoDefine = [
             information: 'CoNET Platform',
             comesoon: 'Come soon.',
             qtgateGateway: 'CoGate gateway service. High speed, total privacy, ultra secure and easy to use. Your gateway to a secure and open internet.',
-            app: ['CoGate', 'CoMsg', 'CoBox', 'CoMail', 'CoNews', 'Co Custom', 'Co for', 'Co for'],
+            app: ['CoGate', 'CoMsg', 'CoBox', 'CoMail', 'CoNews', 'Co Custom', 'Co for', 'Co for', 'Co for', 'CoWallet'],
             dimmer: [
                 'Advanced private custom gateway service',
                 'Private and secure, decentralized Tweet style social media',
@@ -2087,7 +2087,7 @@ const infoDefine = [
         thirdParty: {
             information: 'CoNET平台',
             comesoon: '即將登場',
-            app: ['CoGate', 'CoChat', 'Co云存储', 'Co邮箱', 'Co新闻频道', 'CoNet業務訂製', 'Co谷歌', 'Co推特'],
+            app: ['CoGate', 'CoChat', 'Co云存储', 'Co邮箱', 'Co新闻频道', 'CoNet業務訂製', 'Co谷歌', 'Co推特', 'Co for', 'Co加密貨幣錢包'],
             qtgateGateway: 'CoNET提供的高質量上網技術iOPN和@OPN，在CoNET全球16個區域，當場定制您專屬的代理服務器，變換您的IP地址隱身無障礙的訪問互聯網',
             dimmer: [
                 '高質量定制代理服務器，讓您隱身安全不受注意的網上沖浪。',

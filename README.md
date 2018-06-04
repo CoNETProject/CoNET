@@ -63,4 +63,4 @@ CoNET核心網絡管理雲由於沒有對外服務的IP地址，從互聯網角�
 - CoNET Platform for iOS (come soon), CoNETプラットフォーム for iOS (開発中), iOS的CoNET平台開發中
 - CoNET Platform for Android (come soon), CoNETプラットフォーム for Android (開発中), 安卓系統的CoNET平台開發中
 
-![http protocol](/resources/CoPlatform1.png?raw=true)
+![http protocol](/resources/CoPlatform2.png?raw=true)
