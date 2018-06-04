@@ -40,7 +40,7 @@ export default class extends Imap.imapPeer {
 	private commandCallBackPool: Map <string, requestPoolData > = new Map ()
 	private CoNETConnectReady = false
 	public connectStage = -1
-	private alreadyExit = false
+	public alreadyExit = false
 	private ignorePingTimeout = false
 	private timeOutWhenSendConnectRequestMail: NodeJS.Timer = null
 
@@ -79,10 +79,21 @@ export default class extends Imap.imapPeer {
 					this.Ping ()
 					return console.log ( `doing wait ping ready!` )
 				}
+
+				//		donot need ping send signal ready!
+				this.connectStage = 4
+				this.sockerServer.emit ( 'tryConnectCoNETStage', null, 4, this.cmdResponse ? false : true  )
 				return CallBack ()
 				
 		}
-		this.destroy ()
+		console.log (`checkConnect need destroy `)
+		if ( this.wImap && this.wImap.imapStream && this.wImap.imapStream.writable  ) {
+			console.log ( `checkConnect this.wImap GOOD! `)
+		} else {
+			console.log ( `checkConnect this.rImap GOOD! `)
+		}
+
+		this.destroy ( 3 )
 		return CallBack ( new Error ( 'checkConnect no connect!' ))
 		
 	}
@@ -110,17 +121,12 @@ export default class extends Imap.imapPeer {
 
 		this.newMail = ( ret: QTGateAPIRequestCommand ) => {
 			//		have not requestSerial that may from system infomation
-			saveLog ( 'clearTimeout timeOutWhenSendConnectRequestMail !', true )
+			
 			clearTimeout ( this.timeOutWhenSendConnectRequestMail )
 			if ( ! ret.requestSerial ) {
-				console.trace (`CoNETConnect.ts newMail Error !ret.requestSerial`, ret )
-				
-				if ( this.cmdResponse && typeof this.cmdResponse === 'function') {
-					return this.cmdResponse ( ret )
-				}
-				
+				return this.cmdResponse ( ret )
 			}
-			saveLog ( `on newMail command [${ ret.command }] have requestSerial [${ ret.requestSerial }]`, true )
+			
 			const poolData = this.commandCallBackPool.get ( ret.requestSerial )
 	
 			if ( ! poolData || typeof poolData.CallBack !== 'function' ) {
@@ -161,7 +167,12 @@ export default class extends Imap.imapPeer {
 	}
 
 	public request ( command: QTGateAPIRequestCommand, CallBack ) {
-
+		command.requestTimes = command.requestTimes || 0
+		command.requestTimes ++
+		if ( command.requestTimes > 3 ) {
+			saveLog( `request command [${ command.command }] did too many times!`, true )
+			return CallBack ( new Error ( `CoNET looks offline!`))
+		}
 		Async.waterfall ([
 			next => Tool.myIpServer ( next ),
 			( ip, next ) => this.checkConnect ( next ),
@@ -171,7 +182,7 @@ export default class extends Imap.imapPeer {
 					const poolData: requestPoolData = {
 						CallBack: CallBack,
 						timeout: setTimeout (() => {
-							console.log (`request command [${ command.command }] timeout! do again`)
+							saveLog (`request command [${ command.command }] timeout! do again`, true )
 							this.commandCallBackPool.delete ( command.requestSerial )
 							return this.request ( command, CallBack )
 						}, requestTimeOut )
@@ -199,6 +210,7 @@ export default class extends Imap.imapPeer {
 	public tryConnect1 () {
 		
 		this.connectStage = 1
+		console.trace (`tryConnect1`)
 		this.sockerServer.emit ( 'tryConnectCoNETStage', null, this.connectStage = 1 )
 		return Tool.myIpServer (( err, localIpAddress ) => {
 			if ( err ) {
@@ -211,8 +223,10 @@ export default class extends Imap.imapPeer {
 				//	 wait long time to get response from CoNET
 				console.log (`this.doNetSendConnectMail = true`)
 
-			} 
+			}
+			console.log ( `doing checkConnect `)
 			return this.checkConnect ( err => {
+				console.log (`tryConnect1 success!`)
 				if ( err ) {
 					return this.exit1 ( err )
 				}

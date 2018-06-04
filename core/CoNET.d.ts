@@ -238,12 +238,50 @@ interface iTransferData {
     isAnnual: boolean
     paidID: string[]
     automatically: boolean
+    promo?: string[]
+    promoPrice?: number
 }
+
+interface multipleGateway {
+    gateWayIpAddress: string
+    gateWayPort: number
+    dockerName: string
+    password: string
+}
+
 
 interface QTGate_DnsAddress {
 	dnsName: string,
 	ipv4: string,
 	url: string
+}
+
+interface IConnectCommand {
+    region: string
+    account: string
+    imapData: IinputData
+    connectType: number
+    transferData?: iTransferData
+    error?: number
+    dockerName?: string
+    randomPassword?: string
+    runningDocker?: string
+    AllDataToGateway?: boolean
+    fingerprint: string
+    gateWayIpAddress: string
+    gateWayPort?: number
+    totalUserPower?: number
+    requestContainerEachPower?: number
+    connectPeer?: string
+    requestRegions?: string[]
+    multipleGateway?: multipleGateway[]
+    requestMultipleGateway?: number
+    containerUUID?: string
+    peerUuid?: string
+    localServerIp?: string
+    localServerPort: string
+    webWrt?: boolean
+    requestPortNumber: string
 }
 
 interface QTGateAPIRequestCommand {
@@ -255,6 +293,7 @@ interface QTGateAPIRequestCommand {
     Args: any[]
     fingerprint?: string
     dataTransfer?: iTransferData
+    requestTimes?: number
 }
 
 interface QTGateCommand {
@@ -289,4 +328,47 @@ interface QTGateRegions {
     showConnectedArea: KnockoutObservable < boolean >
     ping: KnockoutObservable <number >
     downloadSpeed: KnockoutObservable <number >
+}
+
+interface domainData {
+	dns: dnsAddress[]
+	expire: number
+}
+interface dnsAddress {
+	address: string
+	family: number
+	expire: Date
+	connect: Date []
+}
+
+interface VE_IPptpStream {
+    type?: string;
+    buffer: string;
+    host: string;
+    port: number;
+    cmd: number;
+    ATYP: number;
+    uuid?: string;
+    length?:number;
+    randomBuffer?: Buffer
+    ssl: boolean
+}
+
+interface proxyServerInfo {
+    serverAddress: string
+    serverPort: number
+    password: string
+    allToGateway: boolean
+    localPort: number
+}
+interface iQTGatePayment {
+    cardNumber?: string
+    cardExpirationYear?: string
+    cardPostcode?: string
+    cardcvc?: string
+    tokenID?: string
+    isAnnual: boolean
+    plan: string
+    Amount: number
+    autoRenew: boolean
 }

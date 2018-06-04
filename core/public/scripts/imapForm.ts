@@ -163,6 +163,7 @@ const getImapSmtpHost = function ( _email: string ) {
 }
 
 const conetImapAccount = /^qtgate_test\d\d?@icloud.com$/i
+
 class keyPairSign {
 	public signError = ko.observable ( false )
 	public conformButtom = ko.observable ( false )
@@ -243,7 +244,6 @@ class CoNETConnect {
 		const self = this
 		if ( !confirmRisk ) {
 			this.showSendImapDataWarning ( true )
-			
 		} else {
 			this.imapConform ()
 		}
@@ -276,6 +276,7 @@ class CoNETConnect {
 
 			return this.ready ( null, showCoGate )
 		}
+
 		$('.keyPairProcessBar').progress ({
 			percent: processBarCount += 33
 		})

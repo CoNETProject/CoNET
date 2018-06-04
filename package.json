@@ -1,6 +1,6 @@
 {
   "name": "conet",
-  "version": "1.0.30",
+  "version": "1.0.31",
   "license": "MIT",
   "description": "CoNET",
   "repository": {
@@ -24,6 +24,7 @@
     "node-uuid": "^1.4.8",
     "nodemailer": "^4.6.5",
     "openpgp": "^3.0.11",
+    "portastic": "^1.0.1",
     "pug": "^2.0.3",
     "raw-socket": "^1.6.0",
     "socket.io": "^2.1.1"

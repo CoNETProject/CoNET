@@ -99,6 +99,95 @@ const initPopupArea = () => {
         inline: inline
     });
 };
+const appList = [
+    {
+        name: 'CoGate',
+        likeCount: ko.observable(0),
+        liked: ko.observable(false),
+        commentCount: ko.observable(),
+        titleColor: '#0066cc',
+        comeSoon: false,
+        show: true,
+        click: (view) => { return view.CoGateClick(); },
+        image: '/images/CoGate.png'
+    }, {
+        name: 'CoMsg',
+        likeCount: ko.observable(0),
+        liked: ko.observable(false),
+        commentCount: ko.observable(0),
+        titleColor: '#006600',
+        comeSoon: true,
+        show: true,
+        image: '/images/CoMsg.png',
+        click: (view) => { return; },
+    }, {
+        name: 'CoBox',
+        likeCount: ko.observable(0),
+        liked: ko.observable(false),
+        commentCount: ko.observable(0),
+        titleColor: '#990000',
+        comeSoon: true,
+        show: true,
+        image: '/images/CoBox.png',
+        click: (view) => { return; },
+    }, {
+        name: 'CoMail',
+        likeCount: ko.observable(0),
+        liked: ko.observable(false),
+        commentCount: ko.observable(0),
+        titleColor: '#09b83e',
+        comeSoon: true,
+        show: true,
+        image: '/images/coMail.png',
+        click: (view) => { return; },
+    },
+    {
+        name: 'coNews',
+        likeCount: ko.observable(0),
+        liked: ko.observable(false),
+        commentCount: ko.observable(0),
+        titleColor: 'grey',
+        comeSoon: true,
+        show: true,
+        image: '/images/coNews.png',
+        click: (view) => { return; },
+    },
+    {
+        name: 'CoCustom',
+        likeCount: ko.observable(0),
+        liked: ko.observable(false),
+        commentCount: ko.observable(0),
+        titleColor: '#09b83e',
+        comeSoon: false,
+        show: true,
+        image: '/images/512x512.png',
+        click: (view) => { return; },
+    }, {
+        name: 'CoGoogle',
+        likeCount: ko.observable(0),
+        liked: ko.observable(false),
+        commentCount: ko.observable(0),
+        titleColor: '#4885ed',
+        comeSoon: true,
+        show: true,
+        image: '/images/Google__G__Logo.svg',
+        click: (view) => { return; },
+    }, {
+        name: 'CoTweet',
+        likeCount: ko.observable(0),
+        liked: ko.observable(false),
+        commentCount: ko.observable(0),
+        titleColor: '#00aced',
+        comeSoon: false,
+        show: true,
+        image: '/images/Twitter_Logo_Blue.svg',
+        click: (view) => {
+            const { shell } = require('electron');
+            event.preventDefault();
+            return shell.openExternal(`http://${view.localServerConfig().localIpAddress}:2000/Twitter`);
+        },
+    }
+];
 var view_layout;
 (function (view_layout) {
     class view {
@@ -128,6 +217,7 @@ var view_layout;
             this.showCoGateButton = ko.observable(false);
             this.showCoGate = ko.observable(false);
             this.CoNETConnect = ko.observable(null);
+            this.AppList = ko.observable(false);
             this.socketListen();
         }
         systemError() {
@@ -150,10 +240,6 @@ var view_layout;
                     this.connectToCoNET(false);
                     this.connectedCoNET(true);
                     if (this.keyPair().verified) {
-                        if (this.showCoGate()) {
-                            this.showCoGateButton(true);
-                            return this.CoGateClick();
-                        }
                     }
                 }
             }
@@ -226,6 +312,11 @@ var view_layout;
             socketIo.on('init', function (err, config) {
                 return self.initConfig(config);
             });
+            socketIo.on('CoNET_offline', () => {
+                self.modalContent(infoDefine[this.languageIndex()].emailConform.formatError[5]);
+                $('#CoNETError').modal('setting', 'closable', false).modal('show');
+                return self.CoNETLocalServerError(true);
+            });
             socketIo.emit11('init');
         }
         //          change language
@@ -269,7 +360,7 @@ var view_layout;
             this.showKeyPair(false);
             if (this.CoGate()) {
                 let uu = this.CoGateClass();
-                if (uu.doingCommand) {
+                if (uu.doingCommand || uu.CoGateRegion()) {
                     return;
                 }
                 this.CoGate(false);
@@ -287,22 +378,16 @@ var view_layout;
             return remote.app.quit();
         }
         showKeyInfoClick() {
-            if (this.showKeyPair()) {
-                if (this.CoNETConnect() !== null && !this.CoGate()) {
-                    this.CoGateClass(new CoGateClass());
-                    this.CoGate(true);
-                }
-                return this.showKeyPair(false);
-            }
             this.showKeyPair(true);
             this.CoGate(false);
+            this.AppList(false);
             let uu = this.CoGateClass();
             return this.CoGateClass(uu = null);
         }
         imapSetupClassExit(_imapData) {
             const self = this;
             let uu = null;
-            return this.CoNETConnect(uu = new CoNETConnect(_imapData.imapUserName, this.keyPair().verified, _imapData.confirmRisk, this.keyPair().email, function (err, showCoGate) {
+            return this.CoNETConnect(uu = new CoNETConnect(_imapData.imapUserName, this.keyPair().verified, _imapData.confirmRisk, this.keyPair().email, function ConnectReady(err, showCoGate) {
                 if (err) {
                     self.CoNETConnect(uu = null);
                     return self.imapSetup(uu = new imapForm(_imapData.account, null, function (imapData) {
@@ -314,6 +399,14 @@ var view_layout;
                 if (showCoGate) {
                     return self.CoGateClick();
                 }
+                self.AppList(true);
+                $('.dimmable').dimmer({ on: 'hover' });
+                $('.comeSoon').popup({
+                    on: 'focus',
+                    movePopup: false,
+                    position: 'top left',
+                    inline: true
+                });
             }));
         }
         reFreshLocalServer() {
@@ -325,6 +418,18 @@ var view_layout;
                 return self.refresh();
             });
             socketIo.connect();
+        }
+        homeClick() {
+            this.AppList(true);
+            this.CoGate(false);
+            this.showKeyPair(false);
+            $('.dimmable').dimmer({ on: 'hover' });
+            $('.comeSoon').popup({
+                on: 'focus',
+                movePopup: false,
+                position: 'top left',
+                inline: true
+            });
         }
     }
     view_layout.view = view;
