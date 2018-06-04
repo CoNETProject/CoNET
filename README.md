@@ -13,7 +13,7 @@ DDos Attack, Connecting Reset, Restrictive and Filtering, Surveillance, SSL man-
 
 在今天互聯網上存在的DDoS攻撃，連結被重置，受限制或被攔截，網絡監控，中間人攻擊，偷窺隱私及IP黑名單等，所有問題都指向一個原因：IP地址。
 
-![http protocol](/resources/CoNET_refraction1.png?raw=true)
+![http protocol](/resources/conet.png?raw=true)
 
 ### The CoNET is a anonymous refraction network that allows people to improve their security, privacy and freedom on the Internet.
 ![http protocol](/resources/CoNET_refraction1.png?raw=true)
