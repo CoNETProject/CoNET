@@ -6,14 +6,14 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/qtgate/conet/badge.svg?targetFile=package.json)](https://snyk.io/test/github/qtgate/conet?targetFile=package.json)
 
 ### Internet problems, インターネットの問題, 互聯網問題
-![http protocol](/resources/ip_address.png?raw=true)
+[![CoNET video](/resources/CoNETVideo.png?raw=true)](http://www.youtube.com/watch?v=RPKsYLI-4jU)
 DDos Attack, Connecting Reset, Restrictive and Filtering, Surveillance, SSL man-in-the-middle attack, censorship, IP address Blacklists, all problems in Internet is because the IP address.
 
 インターネット上DDoS攻撃、コネクション・リセット、制限又は遮断された自由なしのインターネット、ネット監視と窃視、中間者攻撃、IPブラックリストなどあらゆる問題の根源はIPアドレスであります。
 
 在今天互聯網上存在的DDoS攻撃，連結被重置，受限制或被攔截，網絡監控，中間人攻擊，偷窺隱私及IP黑名單等，所有問題都指向一個原因：IP地址。
 
-![http protocol](/resources/conet.png?raw=true)
+![http protocol](/resources/CoNETVideo.png?raw=true)
 
 ### The CoNET is a anonymous refraction network that allows people to improve their security, privacy and freedom on the Internet.
 ![http protocol](/resources/CoNET_refraction1.png?raw=true)
