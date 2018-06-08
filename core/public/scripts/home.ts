@@ -28,8 +28,7 @@ const InitKeyPair = function () {
 	}
 	return keyPair
 }
-
-const socketIo = io ({ reconnectionAttempts: 5, timeout: 500, autoConnect: true })
+const url = 'https://api.github.com/repos/QTGate/QTGate-Desktop-Client/releases/latest'
 
 socketIo.emit11 = function ( eventName: string, ...args ) {
     
@@ -108,7 +107,7 @@ const makeKeyPairData = function ( view: view_layout.view, keypair: keypair ) {
     keypair.showDeleteKeyPairNoite = ko.observable ( false )
 }
 
-const initPopupArea = () => {
+const initPopupArea = function () {
     const popItem = $( '.activating.element' ).popup('hide')
     const inline = popItem.hasClass ('inline')
     return popItem.popup({
@@ -126,10 +125,12 @@ const appList = [
         liked: ko.observable ( false ),
         commentCount: ko.observable(),
         titleColor: '#0066cc',
-        css: '',
+        css: 'width: 6em;height: 6em;display: block;',
         comeSoon: false,
         show: true,
-        click: ( view: view_layout.view ) => { return view.CoGateClick () },
+        click: function ( view: view_layout.view ) { 
+            return view.CoGateClick () 
+        },
         image: '/images/CoGate.png'
     },{
         name: 'CoMsg',
@@ -138,10 +139,10 @@ const appList = [
         commentCount: ko.observable(0),
         titleColor: '#006600',
         comeSoon: true,
-        css: '',
+        css: 'width: 6em;height: 6em;display: block;',
         show: true,
         image: '/images/CoMsg.png',
-        click: ( view: view_layout.view ) => { return },
+        click: function ( view: view_layout.view ) { return },
     },{
         name: 'CoBox',
         likeCount: ko.observable (0),
@@ -149,10 +150,10 @@ const appList = [
         commentCount: ko.observable(0),
         titleColor: '#990000',
         comeSoon: true,
-        css: '',
+        css: 'width: 6em;height: 6em;display: block;',
         show: true,
         image: '/images/CoBox.png',
-        click: ( view: view_layout.view ) => { return },
+        click: function ( view: view_layout.view ) { return },
     },{
         name: 'CoMail',
         likeCount: ko.observable (0),
@@ -160,10 +161,10 @@ const appList = [
         commentCount: ko.observable(0),
         titleColor: '#09b83e',
         comeSoon: true,
-        css: '',
+        css: 'width: 6em;height: 6em;display: block;',
         show: true,
         image: '/images/coMail.png',
-        click: ( view: view_layout.view ) => { return },
+        click: function ( view: view_layout.view ) { return },
     },
     {
         name: 'coNews',
@@ -172,10 +173,10 @@ const appList = [
         commentCount: ko.observable(0),
         titleColor: 'grey',
         comeSoon: true,
-        css: '',
+        css: 'width: 6em;height: 6em;display: block;',
         show: true,
         image: '/images/coNews.png',
-        click: ( view: view_layout.view ) => { return },
+        click: function ( view: view_layout.view ) { return },
     },
     {
         name: 'CoCustom',
@@ -184,10 +185,10 @@ const appList = [
         commentCount: ko.observable(0),
         titleColor: '#09b83e',
         comeSoon: false,
-        css: '',
+        css: 'width: 6em;height: 6em;display: block;',
         show: true,
         image: '/images/512x512.png',
-        click: ( view: view_layout.view ) => { return },
+        click: function ( view: view_layout.view ) { return },
     },{
         name: 'CoGoogle',
         likeCount: ko.observable (0),
@@ -195,10 +196,10 @@ const appList = [
         commentCount: ko.observable(0),
         titleColor: '#4885ed',
         comeSoon: true,
-        css: '',
+        css: 'width: 6em;height: 6em;display: block;',
         show: true,
         image: '/images/Google__G__Logo.svg',
-        click: ( view: view_layout.view ) => { return },
+        click: function ( view: view_layout.view ) { return },
     },{
         name: 'CoTweet',
         likeCount: ko.observable (0),
@@ -206,13 +207,12 @@ const appList = [
         commentCount: ko.observable(0),
         titleColor: '#00aced',
         comeSoon: false,
-        css: '',
+        css: 'width: 6em;height: 6em;display: block;',
         show: true,
         image: '/images/Twitter_Logo_Blue.svg',
-        click: ( view: view_layout.view ) => { 
-            const { shell } = require ( 'electron' )
-            event.preventDefault ()
-            return shell.openExternal ( `http://${ view.localServerConfig().localIpAddress }:2000/Twitter` )
+        click: function ( view: view_layout.view ) { 
+            
+            return window.open ('/twitter', '_blank')
         }
     },
     {
@@ -221,10 +221,10 @@ const appList = [
         liked: ko.observable (false),
         titleColor: '#00aced',
         comeSoon: true,
-        css: 'width: 67em;height: 3em;max-width: 10em!important;',
+        css: 'width: 6em;height: 6em;display: block;',
         show: true,
         image: '/images/1024px-YouTube_Logo_2017.svg.png',
-        click: ( view: view_layout.view ) => { return },
+        click: function ( view: view_layout.view ) { return },
     },
     {
         name: 'CoYoutube',
@@ -232,10 +232,10 @@ const appList = [
         liked: ko.observable (false),
         titleColor: '#00aced',
         comeSoon: true,
-        css: '',
+        css: 'width: 6em;height: 6em;display: block;',
         show: true,
         image: '/images/wallet.png',
-        click: ( view: view_layout.view ) => { return },
+        click: function ( view: view_layout.view ) { return },
 
     }
     
@@ -269,6 +269,9 @@ module view_layout {
         public showCoGate = ko.observable (false)
         public CoNETConnect: KnockoutObservable < CoNETConnect > = ko.observable ( null )
         public AppList = ko.observable ( false )
+        public CoGateRegionStoped = ko.observable ( false )
+        public imapData: IinputData = null
+        public newVersion = ko.observable ( '' )
         
         public systemError () {
             this.modalContent ( infoDefine[ this.languageIndex() ].emailConform.formatError [ 10 ] )
@@ -292,10 +295,6 @@ module view_layout {
                 if ( stage === 4 ) {
                     this.connectToCoNET ( false )
                     this.connectedCoNET ( true )
-                    if ( this.keyPair().verified ) {
-                        
-                        
-                    }
                     
                 }
                 
@@ -342,7 +341,7 @@ module view_layout {
                     self.showKeyPair ( false )
                     initPopupArea ()
                     let uu = null
-                    self.imapSetup ( uu = new imapForm ( config.account, null, ( imapData: IinputData ) => {
+                    self.imapSetup ( uu = new imapForm ( config.account, null, function ( imapData: IinputData ) {
                         self.imapSetup ( uu = null )
                         return self.imapSetupClassExit ( imapData )
                     }))
@@ -353,7 +352,7 @@ module view_layout {
             }
             this.localServerConfig ( config )
             this.afterInitConfig ()
-           
+            
         }
 
         private clearImapData () {
@@ -382,14 +381,30 @@ module view_layout {
             })
             
             socketIo.on ( 'init', function ( err, config: install_config ) {
-                
+                $.getJSON ( url )
+                .done ( function ( json ) {
+                    if ( ! json ) {
+                        return
+                    }
+                    const localVersion = 'v'+config.version
+                    if ( json.tag_name <= localVersion ) {
+                        return
+                    }
+                    self.newVersion ( json.tag_name )
+                    
+                })
                 return self.initConfig ( config )
             })
 
-            socketIo.on ( 'CoNET_offline', () => {
-                self.modalContent ( infoDefine[ this.languageIndex() ].emailConform.formatError [ 5 ] )
+            socketIo.on ( 'CoNET_offline', function () {
+                self.modalContent ( infoDefine [ self.languageIndex() ].emailConform.formatError [ 5 ] )
                 $( '#CoNETError').modal ('setting', 'closable', false ).modal ( 'show' )
                 return self.CoNETLocalServerError ( true )
+            })
+
+            socketIo.on ( 'disconnectClick', function ( region ) {
+                self.CoGateRegionStoped ( true )
+                
             })
             
     
@@ -398,6 +413,7 @@ module view_layout {
     
         constructor () {
             this.socketListen ()
+            
         }
         
         //          change language
@@ -460,7 +476,7 @@ module view_layout {
                 return this.CoGateClass ( uu = null )
 
             }
-            this.CoGateClass ( new CoGateClass ( ))
+            this.CoGateClass ( new CoGateClass ( conetImapAccount.test ( this.imapData.imapUserName )))
             this.CoGate ( true )
         }
 
@@ -485,6 +501,7 @@ module view_layout {
         public imapSetupClassExit ( _imapData: IinputData ) {
             const self = this
             let uu = null
+            this.imapData = _imapData
             return this.CoNETConnect ( uu = new CoNETConnect ( _imapData.imapUserName, this.keyPair().verified, _imapData.confirmRisk, this.keyPair().email, 
             function ConnectReady ( err, showCoGate ) {
                 if ( err ) {

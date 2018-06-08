@@ -33,8 +33,8 @@ const saveLog = ( err: {} | string, _console = false ) => {
 	})
 }
 const timeOutWhenSendConnectRequestMail = 1000 * 60
-const commandRequestTimeOutTime = 1000 * 15
-const requestTimeOut = 1000 * 30
+const commandRequestTimeOutTime = 1000 * 10
+const requestTimeOut = 1000 * 10
 
 export default class extends Imap.imapPeer {
 	private commandCallBackPool: Map <string, requestPoolData > = new Map ()
@@ -106,7 +106,7 @@ export default class extends Imap.imapPeer {
 		console.log (`exit1 cancel already Exit [${ err }]`)
 	}
 
-	constructor ( public imapData: IinputData, private sockerServer: SocketIo.Server, private openKeyOption: OpenPgp.option_KeyOption, public doNetSendConnectMail: boolean,
+	constructor ( public imapData: IinputData, private sockerServer: SocketIo.Server, private openKeyOption, public doNetSendConnectMail: boolean,
 		private cmdResponse: ( cmd: QTGateAPIRequestCommand ) => void, public _exit: ( err ) => void ) {
 		super ( imapData, imapData.clientFolder, imapData.serverFolder, ( encryptText: string, CallBack ) => {
 			
@@ -166,7 +166,7 @@ export default class extends Imap.imapPeer {
 
 	}
 
-	public request ( command: QTGateAPIRequestCommand, CallBack ) {
+	public requestCoNET ( command: QTGateAPIRequestCommand, CallBack ) {
 		command.requestTimes = command.requestTimes || 0
 		command.requestTimes ++
 		if ( command.requestTimes > 3 ) {
@@ -184,7 +184,7 @@ export default class extends Imap.imapPeer {
 						timeout: setTimeout (() => {
 							saveLog (`request command [${ command.command }] timeout! do again`, true )
 							this.commandCallBackPool.delete ( command.requestSerial )
-							return this.request ( command, CallBack )
+							return this.requestCoNET ( command, CallBack )
 						}, requestTimeOut )
 					}
 					this.commandCallBackPool.set ( command.requestSerial, poolData )

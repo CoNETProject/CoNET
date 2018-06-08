@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
- import * as Async from 'async'
+import * as Async from 'async'
 import * as Fs from 'fs'
 import * as Stream from 'stream'
 

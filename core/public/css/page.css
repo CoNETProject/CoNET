@@ -1,16 +1,4 @@
-@media screen and ( min-width: 800px ) {
 
-}
-@media screen and ( max-width: 801px ) {
-	
-}
-
-@media only screen and (min-width: 992px) {
-  
-}
-@media only screen and ( max-width: 1144px ) {
-
-}
 
 body {
 	background: rgba(101,226,245,1);
@@ -182,7 +170,7 @@ body {
 	color: yellowgreen!important;
  }
  .QTGateGatewayCardHeader {
-	color: rgba(255,0,0,0.5)!important;
+	color: rgba(255,0,0,0.2)!important;
  
  }
  .plans {
@@ -338,9 +326,243 @@ ul.plan-features {
 	font-style: italic;
 	padding-left: 0.5em;
 	font-size: smaller;
-  }
-  .amount {
+}
+.amount {
 	font-size: large;
 	font-weight: bold;
 	color: darkslategray;
+}
+.unavailable {
+	background-color: rgba(0,0,0,.03)!important;
+	opacity: 0.4
+ }
+
+@media only screen and ( max-width: 1144px ) {
+	.TimelinesView {
+	 background-color: white;
+	 padding: 0em;
+	 padding-top: 4em;
+	}
+	#QTGateStartScreen {
+	 display: block;
+   }
+	#QTGateStartScreen-Device {
+	  display: none;
+	}
+	#TimelinesView {
+	 max-width:100%;
+	 margin: 0px auto;
+	}
+	.itemContent {
+	 max-width: 90%;
+	}
+ }
+ @media only screen and (min-width: 992px) {
+   
+ }
+ 
+ @media screen and ( max-width: 801px ) {
+   .TimelinesView {
+	background-color: white;
+	padding: 0em;
+	padding-top: 4em;
+   }
+   #QTGateStartScreen-Device {
+	 display: block;
+   }
+   #QTGateStartScreen {
+	 display: none;
+   }
+   #TimelinesView {
+	max-width:100%;
+	margin: 0px auto;
+   }
+   .itemContent {
+	max-width: 90%;
+   }
+ }
+ 
+ @media screen and ( min-width: 800px ) {
+   #QTGateStartScreen {
+	 display: block;
+   }
+   #QTGateStartScreen-Device {
+	 display: none;
+   }
+   .TimelinesView {
+	 background-color: #e6ecf0;
+	 padding: 4em;
+   }
+   #TimelinesView {
+	 max-width:590px;
+	 margin: 0px auto;
+   }
+   .itemContent {
+	 max-width:530px;
+   }
+ }
+ .flapLeft, .flapeRight {
+   position: relative;
+   cursor: pointer;
+ }
+ 
+ .flapLeft i:hover, .flapeRight i:hover {
+   background: rgba(255,255,255,0.4);
+ }
+ .flapLeft i, .flapeRight i {
+   color:grey;
+   position: absolute;
+   margin-top: -1em;
+ }
+ .tweetTrashButton {
+	cursor: pointer;
+	 color: grey;
+ }
+ .tweetTrashButton:hover {
+   color: red;
+ }
+ .tweetPhotoButton{
+	 background: transparent!important;
+	 color: rgba(0, 0, 0, 0.2);
+	 cursor: pointer;
+	 right: 0.5em;
+	 margin-top: 2.5em;
+ }
+ .tweetPhotoButton:hover {
+   color: rgba(0, 0, 0, 0.6);
+ 
+ }
+ .newTweetCloseButton{
+   color: rgba(0, 0, 0, 0.2)!important;
+   cursor: pointer;
+   position: absolute;
+   top: 0.3em;
+   right: 0.3em;
+ }
+ .newTweetCloseButton:hover {
+ color: rgba(0, 0, 0, 0.6)!important;
+ 
+ }
+ .approveButtons {
+   position: absolute;
+ }
+ .ui.modal {
+   top: 15em;
+   width: 600px;
+ }
+ #QTGateStartScreen{
+   height: 100%;
+ }
+ #QTGateStartScreen .VideoBox{
+   display: block;
+   width: 600px;
+ }
+ #QTGateStartScreen .VideoBox .iframe {
+   width: 550px;
+   height: 310px;
+   overflow: hidden;
+   border-radius: 25px;
+ }
+ #QTGateStartScreen-Drive{
+   height: 100%;
+ }
+ #QTGateStartScreen-Drive .VideoBox{
+   display: block;
+ 
+ }
+ #QTGateStartScreen-Drive .VideoBox .iframe {
+   overflow: hidden;
+   border-radius: 25px;
+ }
+ .AppCardTop {
+	max-width: 11em!important;
+ }
+ .AppCardImageArea {
+   background: white!important;
+ }
+ .AppCardImage {
+	 max-width: 6em!important;
+ }
+ .templateImapAccount {
+	color: blue;
+ }
+ .closeIcon {
+	position: absolute;
+    top: 1em;
+    right: 1em;
+ }
+
+ .localIP {
+	position: relative;
+	left: 19em;
+	top: 7.8em;
+	color: blue;
+  
   }
+  
+  .localIPPort {
+	position: relative;
+	left: 3.9em;
+	top: 8.8em;
+	color: blue;
+  
+  }
+  .localNetwork {
+	position: relative;
+	left: 3.9em;
+	top: 8.8em;
+	color: blue;
+  }
+
+
+.WindowsUseInfoLocalServerIp {
+	position: relative;
+	left: 10.4em;
+	top: 12.5em;
+	color: blue;
+  }
+  .WindowsUseInfoPort{
+	position: relative;
+	left: -1.9em;
+	top: 16.5em;
+	color: blue;
+  }
+  .firefoxUseLocalIp{
+	position: relative;
+	left: 4.5em;
+	top: 32.2em;
+	color: blue;
+  }
+  .firefoxUseLocalPort{
+	position: relative;
+	left: -10.6em;
+	top: 33.3em;
+	color: blue;
+  }
+  
+  
+  .iOSUseInfoLocalServerIp{
+	position: relative;
+	left: 2em;
+	top: 12.6em;
+	color: blue;
+  }
+  .iOSUseInfoPort{
+	position: relative;
+	left: -13.1em;
+	top: 13.7em;
+	color: blue;
+  }
+  .androidUseInfoLocalServerIp{
+	position: relative;
+	left: 6em;
+	top: 7.7em;
+	color: blue;
+  }
+  .androidUseInfoPort{
+	position: relative;
+	left: -9.1em;
+	top: 8.8em;;
+	color: blue;
+  }
+  

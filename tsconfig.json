@@ -1,17 +1,18 @@
 {
 	"compilerOptions": {
 		"module": "commonjs",
-		"sourceMap": false,
 		"allowJs": true,
-		"target": "es2017"
+		"target":"es2017"
 	},
 	"include": [
-		"core/**/*.ts"
+		"core/*.ts",
+		"core/public/scripts/*.ts"
 	],
 	"exclude": [
-		"*.d.ts",
-		"core/public/css/**/",
-		"core/public/images/**/",
-		"core/views/**/"
-	]
+	],
+	"typeAcquisition":{
+		"include": [
+			"code/CoNET.d.ts"
+		]
+	}
 }

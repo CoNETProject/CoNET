@@ -49,7 +49,7 @@ exports.QTGateTemp = Path.join(exports.QTGateFolder, 'tempfile');
 exports.QTGateVideo = Path.join(exports.QTGateTemp, 'videoTemp');
 exports.ErrorLogFile = Path.join(exports.QTGateFolder, 'systemError.log');
 exports.CoNETConnectLog = Path.join(exports.QTGateFolder, 'CoNETConnect.log');
-exports.imapDataFileName = Path.join(exports.QTGateFolder, 'imapData.pem');
+exports.imapDataFileName1 = Path.join(exports.QTGateFolder, 'imapData.pem');
 exports.CoNET_Home = Path.join(__dirname);
 exports.CoNET_PublicKey = Path.join(exports.CoNET_Home, '3C272D2E.pem');
 exports.LocalServerPortNumber = 3000;
@@ -57,6 +57,7 @@ exports.configPath = Path.join(exports.QTGateFolder, 'config.json');
 const packageFilePath = Path.join('..', '..', 'package.json');
 exports.packageFile = require(packageFilePath);
 exports.QTGateSignKeyID = /3acbe3cbd3c1caa9/i;
+exports.twitterDataFileName = Path.join(exports.QTGateFolder, 'twitterData.pem');
 exports.checkFolder = (folder, CallBack) => {
     Fs.access(folder, err => {
         if (err) {
@@ -146,14 +147,6 @@ exports.InitConfig = () => {
     };
     return ret;
 };
-const getBitLength = (key) => {
-    const algorithm = key.primaryKey.getAlgorithmInfo();
-    return algorithm.bits;
-};
-const getKeyId = (key) => {
-    const algorithm = key.primaryKey.getAlgorithmInfo();
-    return algorithm.algorithm;
-};
 exports.getNickName = (str) => {
     const uu = str.split('<');
     return uu[0];
@@ -189,7 +182,6 @@ exports.getKeyPairInfo = (publicKey, privateKey, password, CallBack) => {
     const ret = InitKeyPair();
     ret.publicKey = publicKey;
     ret.privateKey = privateKey;
-    ret.keyLength = getBitLength(privateKey1);
     ret.nikeName = exports.getNickName(user.userId.userid);
     ret.createDate = privateKey1.primaryKey.created.toDateString();
     ret.email = exports.getEmailAddress(user.userId.userid);
@@ -564,11 +556,11 @@ exports.makeGpgKeyOption = (config, passwrod, CallBack) => {
         }).catch(CallBack);
     });
 };
-exports.saveImapData = (imapConnectData, config, password, CallBack) => {
-    if (!imapConnectData) {
-        return Fs.unlink(exports.imapDataFileName, CallBack);
+exports.saveEncryptoData = (fileName, data, config, password, CallBack) => {
+    if (!data) {
+        return Fs.unlink(fileName, CallBack);
     }
-    const _data = JSON.stringify(imapConnectData);
+    const _data = JSON.stringify(data);
     const options = {
         data: _data,
         publicKeys: OpenPgp.key.readArmored(config.keypair.publicKey).keys,
@@ -580,12 +572,12 @@ exports.saveImapData = (imapConnectData, config, password, CallBack) => {
         }
         return options.privateKeys[0].decrypt(data.toString('hex')).then(keyOK => {
             return OpenPgp.encrypt(options).then(ciphertext => {
-                return Fs.writeFile(exports.imapDataFileName, ciphertext.data, { encoding: 'utf8' }, CallBack);
+                return Fs.writeFile(fileName, ciphertext.data, { encoding: 'utf8' }, CallBack);
             }).catch(CallBack);
         }).catch(CallBack);
     });
 };
-exports.readImapData = (savedPasswrod, config, CallBack) => {
+exports.readEncryptoFile = (filename, savedPasswrod, config, CallBack) => {
     if (!savedPasswrod || !savedPasswrod.length || !config || !config.keypair || !config.keypair.createDate) {
         return CallBack(new Error('readImapData no password or keypair data error!'));
     }
@@ -595,7 +587,7 @@ exports.readImapData = (savedPasswrod, config, CallBack) => {
         privateKeys: OpenPgp.key.readArmored(config.keypair.privateKey).keys
     };
     return Async.waterfall([
-        next => Fs.access(exports.imapDataFileName, next),
+        next => Fs.access(filename, next),
         (acc, next) => {
             /**
              * 		support old nodejs
@@ -619,7 +611,7 @@ exports.readImapData = (savedPasswrod, config, CallBack) => {
             });
         },
         next => {
-            Fs.readFile(exports.imapDataFileName, 'utf8', next);
+            Fs.readFile(filename, 'utf8', next);
         }
     ], (err, data) => {
         if (err) {

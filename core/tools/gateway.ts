@@ -63,6 +63,8 @@ export default class gateWay {
 	private userAgent = null
 	private currentGatewayPoint = 0
 	private currentgateway: multipleGateway
+	public RemoteServerDistroyed = false 
+	
 	
 	private request ( str: string, gateway: IConnectCommand ) {
 		return Buffer.from ( otherRequestForNet ( str, gateway.gateWayIpAddress, gateway.gateWayPort, this.userAgent ), 'utf8' )
@@ -102,6 +104,9 @@ export default class gateWay {
 		_socket.once ( 'end', () => {
 			//console.log ( `_socket.once end!` )
 		})
+		_socket.once ('error', err => {
+			return CallBack ( err )
+		})
 
 		httpBlock.once ( 'error', err => {
 			console.log (`httpBlock.on error`, err )
@@ -109,16 +114,28 @@ export default class gateWay {
 			return CallBack ( err )
 		})
 
-		decrypt.once ( 'err', err=> {
-
-		} )
+		decrypt.once ( 'err', err => {
+			CallBack ( err )
+		})
 		encrypt.pipe ( _socket ).pipe ( httpBlock ).pipe ( decrypt ).pipe ( finish )
 
 	}
 
 	public requestGetWay ( id: string, uuuu: VE_IPptpStream, userAgent: string, socket: Net.Socket ) {
+		
+		//			remote server was stoped
+		if ( this.RemoteServerDistroyed ) {
+			console.log (`requestGetWay this.RemoteServerDistroyed === true !`)
+			return socket.end ( res._HTTP_404 )
+		}
 		this.userAgent = userAgent
 		const gateway = this.getCurrentGateway ()
+
+		//		remote gateway error
+		if ( !gateway ) {
+			return socket.end ( res._HTTP_404 )
+		}
+
 		const decrypt = new Compress.decryptStream ( gateway.randomPassword )
 		const encrypt = new Compress.encryptStream ( gateway.randomPassword, 3000, ( str: string ) => {
 			return this.request ( str, gateway )
@@ -127,11 +144,12 @@ export default class gateWay {
 		const httpBlock = new Compress.getDecryptClientStreamFromHttp ()
 
 		httpBlock.once ( 'error', err => {
+
 			socket.end ( res._HTTP_404 )
 		})
 
 		encrypt.once ( 'end', () =>{
-			console.log (`encrypt.once end` )
+			//console.log (`encrypt.once end` )
 			socket.end ( res._HTTP_404 )
 		})
 
@@ -150,7 +168,8 @@ export default class gateWay {
 			
 		})
 
-		_socket.once ('error', err => {
+		_socket.once ( 'error', err => {
+
 			socket.end ( res._HTTP_404 )
 		})
 
@@ -159,6 +178,6 @@ export default class gateWay {
 		})
 
 		encrypt.pipe ( _socket ).pipe ( httpBlock ).pipe ( decrypt ).pipe ( socket ).pipe ( encrypt )
-		console.log (`new requestGetWay use gateway[${ gateway.gateWayIpAddress }: ${ gateway.gateWayPort || 80 }]`)
+		//console.log ( `new requestGetWay use gateway[${ gateway.gateWayIpAddress }: ${ gateway.gateWayPort || 80 }]`)
 	}
 }

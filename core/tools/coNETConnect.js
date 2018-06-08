@@ -16,8 +16,8 @@ const saveLog = (err, _console = false) => {
     });
 };
 const timeOutWhenSendConnectRequestMail = 1000 * 60;
-const commandRequestTimeOutTime = 1000 * 15;
-const requestTimeOut = 1000 * 30;
+const commandRequestTimeOutTime = 1000 * 10;
+const requestTimeOut = 1000 * 10;
 class default_1 extends Imap.imapPeer {
     constructor(imapData, sockerServer, openKeyOption, doNetSendConnectMail, cmdResponse, _exit) {
         super(imapData, imapData.clientFolder, imapData.serverFolder, (encryptText, CallBack) => {
@@ -124,7 +124,7 @@ class default_1 extends Imap.imapPeer {
         }
         console.log(`exit1 cancel already Exit [${err}]`);
     }
-    request(command, CallBack) {
+    requestCoNET(command, CallBack) {
         command.requestTimes = command.requestTimes || 0;
         command.requestTimes++;
         if (command.requestTimes > 3) {
@@ -142,7 +142,7 @@ class default_1 extends Imap.imapPeer {
                         timeout: setTimeout(() => {
                             saveLog(`request command [${command.command}] timeout! do again`, true);
                             this.commandCallBackPool.delete(command.requestSerial);
-                            return this.request(command, CallBack);
+                            return this.requestCoNET(command, CallBack);
                         }, requestTimeOut)
                     };
                     this.commandCallBackPool.set(command.requestSerial, poolData);

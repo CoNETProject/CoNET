@@ -30,8 +30,13 @@ const Imap = require("./tools/imap");
 const coNETConnect_1 = require("./tools/coNETConnect");
 const Crypto = require("crypto");
 const ProxyServer = require("./tools/proxyServer");
+const Jimp = require("jimp");
+const UploadFile = require("./tools/uploadFile");
+const Twitter_text = require("twitter-text");
 let logFileFlag = 'w';
 const conetImapAccount = /^qtgate_test\d\d?@icloud.com$/i;
+const tweetImageMaxWidth = 1024;
+const tweetImageMaxHeight = 512;
 const saveLog = (err) => {
     if (!err) {
         return;
@@ -101,22 +106,43 @@ class localServer {
         this.pingChecking = false;
         this.regionV1 = null;
         this.connectCommand = null;
+        this.dataTransfer = null;
         this.proxyServer = null;
         this.whiteIpList = [];
         this.domainBlackList = [];
         this.domainPool = new Map();
+        this.twitterDataInit = false;
+        this.twitterData = [];
+        this.doingCreateTweetData = false;
         this.expressServer.set('views', Path.join(__dirname, 'views'));
         this.expressServer.set('view engine', 'pug');
         this.expressServer.use(cookieParser());
         this.expressServer.use(Express.static(Tool.QTGateFolder));
         this.expressServer.use(Express.static(Path.join(__dirname, 'public')));
         this.expressServer.get('/', (req, res) => {
-            res.render('home', { title: 'home' });
+            res.render('home', { title: 'home', proxyErr: false });
+        });
+        this.expressServer.get('/twitter', (req, res) => {
+            console.log(`get twitter`);
+            res.render('twitter', { title: 'CoNET for Twitter' });
+        });
+        this.expressServer.get('/proxyErr', (req, res) => {
+            console.log(`get /proxyErr`);
+            res.render('home', { title: 'CoNET for Twitter', proxyErr: true });
+        });
+        this.expressServer.get('/doingUpdate', (req, res) => {
+            res.json();
+            const { ver } = req.query;
+            saveLog(`/doingUpdate res.query = [${ver}]`);
+            this.config.newVersion = ver;
+            this.config.newVerReady = true;
+            return Tool.saveConfig(this.config, err => {
+            });
         });
         this.expressServer.get('/Wrt', (req, res) => {
             let globalIp = '';
             if (this.connectCommand && this.connectCommand.length) {
-                globalIp = this.connectCommand[0].localServerIp;
+                globalIp = this.connectCommand[0].localServerIp[0];
             }
             else {
                 console.log(`Wrt doing Tool.myIpServer`);
@@ -163,7 +189,7 @@ class localServer {
     tryConnectCoNET(socket) {
         //		have CoGate connect
         if (this.connectCommand && this.connectCommand.length) {
-            socket.emit('tryConnectCoNETStage', 4, true);
+            socket.emit('tryConnectCoNETStage', -1, 4, true);
             setTimeout(() => {
                 socket.emit('QTGateGatewayConnectRequest', null, this.connectCommand);
             }, 200);
@@ -197,7 +223,7 @@ class localServer {
         const makeConnect = (sendMail) => {
             if (!this.imapConnectData.sendToQTGate || sendMail) {
                 this.imapConnectData.sendToQTGate = true;
-                Tool.saveImapData(this.imapConnectData, this.config, this.savedPasswrod, () => { });
+                Tool.saveEncryptoData(Tool.imapDataFileName1, this.imapConnectData, this.config, this.savedPasswrod, () => { });
                 this.socketServer.emit('tryConnectCoNETStage', null, 3);
                 return Tool.sendCoNETConnectRequestEmail(this.imapConnectData, this.openPgpKeyOption, this.config.version, this.keyPair.publicKey, (err) => {
                     if (err) {
@@ -217,7 +243,7 @@ class localServer {
         }
         return this.CoNETConnectCalss.tryConnect1();
     }
-    sendrequest(socket, cmd, CallBack) {
+    sendRequest(socket, cmd, CallBack) {
         if (!this.openPgpKeyOption) {
             console.log(`sendrequest keypair error! !this.config [${!this.config}] !this.keyPair[${!this.keyPair}] !this.keyPair.passwordOK [${!this.keyPair.passwordOK}]`);
             return CallBack(1);
@@ -227,8 +253,9 @@ class localServer {
             this.tryConnectCoNET(socket);
             return CallBack(0);
         }
-        saveLog(`sendrequest send [${cmd.command}]`);
-        return this.CoNETConnectCalss.request(cmd, (err, res) => {
+        saveLog(`sendRequest send [${cmd.command}]`);
+        cmd.requestSerial = Crypto.randomBytes(8).toString('hex');
+        return this.CoNETConnectCalss.requestCoNET(cmd, (err, res) => {
             saveLog(`request response [${cmd.command}]`);
             if (err) {
                 this.socketServer.emit('CoNET_offline');
@@ -242,6 +269,12 @@ class localServer {
         if (!/^[0-9]*$/.test(portNum.toString()) || !num || num < 3000 || num > 65535) {
             return socket.emit('checkPort', true);
         }
+        if (this.proxyServer && this.proxyServer.port) {
+            console.log(`this.proxyServer = true, typeof this.proxyServer.port = [${typeof this.proxyServer.port}] typeof portNum = [${typeof portNum}]`);
+            if (portNum.toString() === this.proxyServer.port)
+                return socket.emit('checkPort', true, this.proxyServer.port);
+        }
+        console.log(`this.proxyServer && this.proxyServer.port = [${this.proxyServer && this.proxyServer.port}] typeof this.proxyServer [${typeof this.proxyServer}] `);
         return findPort(portNum, (err, kk) => {
             saveLog(`check port [${typeof portNum}] got back kk [${typeof kk}]`);
             if (kk !== portNum) {
@@ -253,36 +286,17 @@ class localServer {
     makeOpnConnect(arg) {
         const uu = arg[0];
         saveLog(`makeOpnConnect arg = ${JSON.stringify(arg)}`);
-        ProxyServer.proxyServer;
-        return this.proxyServer = new ProxyServer.proxyServer(this.whiteIpList, this.domainPool, uu.localServerPort, 'pac', 5000, arg, 50000, true, this.domainBlackList);
-    }
-    stopGetwayConnect(sendToCoNET) {
-        if (this.connectCommand && this.connectCommand.length) {
-            this.connectCommand = null;
+        if (this.proxyServer && typeof this.proxyServer.reNew === 'function') {
+            console.log(`find this.proxyServer && typeof this.proxyServer.reNew === 'function'`);
+            return this.proxyServer.reNew(arg);
         }
-        if (this.proxyServer && typeof this.proxyServer.exit === 'function') {
-            console.log(`this.proxyServer = null`);
-            this.proxyServer.exit();
-            this.proxyServer = null;
-        }
-        if (sendToCoNET) {
-            const com = {
-                command: 'stopGetwayConnect',
-                Args: null,
-                error: null,
-                requestSerial: null
-            };
-            return this.CoNETConnectCalss.request(com, null);
-        }
+        this.proxyServer = new ProxyServer.proxyServer(this.whiteIpList, this.domainPool, uu.localServerPort, 'pac', 5000, arg, 50000, true, this.domainBlackList, uu.localServerIp[0], Tool.LocalServerPortNumber);
+        console.log(`this.proxyServer = new ProxyServer.proxyServer! this.proxyServer && this.proxyServer.port = [${this.proxyServer && this.proxyServer.port}]`);
     }
     requestConnectCoGate(socket, cmd) {
         //const arg = [{"account":"peter1@conettech.ca","imapData":{"imapPortNumber":"993","smtpPortNumber":587,"imapServer":"imap-mail.outlook.com","imapIgnoreCertificate":false,"smtpIgnoreCertificate":false,"imapSsl":true,"smtpSsl":false,"imapUserName":"proxyviaemai@outlook.com","imapUserPassword":"ajuwrcylbrobvykn","account":"Peter1@CoNETTech.ca","smtpServer":"smtp-mail.outlook.com","smtpUserName":"proxyviaemai@outlook.com","smtpUserPassword":"ajuwrcylbrobvykn","email":"Peter1@CoNETTech.ca","imapTestResult":true,"language":"en","timeZoneOffset":420,"serverFolder":"1f4953ea-6ffe-4e58-bf46-fd7a52867a41","clientFolder":"7b6b9c13-2a30-4682-adcb-751b0643020f","randomPassword":"8a510536516b92d361f94fb624310b","clientIpAddress":"172.218.175.40","requestPortNumber":null},"gateWayIpAddress":"51.15.192.239","region":"paris","connectType":2,"localServerPort":"3001","AllDataToGateway":true,"error":-1,"fingerprint":"052568B9D9742E64C6C0A5D288C08CEAC728A0D9","localServerIp":"172.218.175.40","multipleGateway":[{"gateWayIpAddress":"51.15.192.239","gateWayPort":80,"dockerName":"scaleway-decdbb5e-bb23-4e15-8d46-544d245fcab3","password":"cb5ea121c8fa2a00e91535f921184ce8"}],"requestPortNumber":80,"requestMultipleGateway":1,"webWrt":true,"connectPeer":"ddkjksi32bjsaclbkvf","totalUserPower":2,"transferData":{"account":"peter1@conettech.ca","availableDayTransfer":102400000,"usedMonthlyOverTransfer":0,"productionPackage":"free","transferDayLimit":102400000,"transferMonthly":1024000000,"startDate":"2018-04-25T00:00:00.000Z","availableMonthlyTransfer":1024000000,"resetTime":"2018-06-02T17:17:24.288Z","usedDayTransfer":0,"timeZoneOffset":420,"usedMonthlyTransfer":0,"power":1,"isAnnual":false,"expire":"2018-05-24T00:00:00.000Z","customsID":"","paidID":[],"automatically":false},"requestContainerEachPower":2,"peerUuid":"703145fc-740c-43b6-b1c8-aca935602bd7","containerUUID":"4c6c0c5b-73f9-4fb9-9bcb-c7bc6d05fe8a","runningDocker":"scaleway-decdbb5e-bb23-4e15-8d46-544d245fcab3","dockerName":"scaleway-decdbb5e-bb23-4e15-8d46-544d245fcab3","gateWayPort":80,"randomPassword":"cb5ea121c8fa2a00e91535f921184ce8"}]
         //this.connectCommand = arg
         //socket.emit ( 'QTGateGatewayConnectRequest', null, this.connectCommand )
-        if (!this.CoNETConnectCalss || typeof this.CoNETConnectCalss.request !== 'function') {
-            console.log(`on QTGateGatewayConnectRequest !this.CoNETConnectCalss `);
-            return saveLog(`socket.on ( 'getAvaliableRegion') but !this.QTClass `);
-        }
         if (this.connectCommand) {
             return socket.emit('QTGateGatewayConnectRequest', null, this.connectCommand);
         }
@@ -295,7 +309,7 @@ class localServer {
                 error: null,
                 requestSerial: Crypto.randomBytes(8).toString('hex')
             };
-            return this.CoNETConnectCalss.request(com, (err, res) => {
+            return this.sendRequest(socket, com, (err, res) => {
                 //		no error
                 if (err) {
                     return console.log(`on QTGateGatewayConnectRequest CoNETConnectCalss.request return error`, err);
@@ -319,7 +333,8 @@ class localServer {
                     return saveLog(`on QTGateGatewayConnectRequest Tool.myIpServer return no data!`);
                 }
                 saveLog(`on QTGateGatewayConnectRequest Tool.myIpServer return localHostIP [${data}]`);
-                cmd.localServerIp = data;
+                cmd.globalIpAddress = data;
+                cmd.localServerIp = Tool.getLocalInterface();
                 return request();
             });
         }
@@ -356,7 +371,7 @@ class localServer {
                     serverFolder: Uuid.v4(),
                     randomPassword: Uuid.v4(),
                     uuid: Uuid.v4(),
-                    confirmRisk: conetImapAccount.test(emailAddress),
+                    confirmRisk: false,
                     clientIpAddress: null,
                     ciphers: null,
                     sendToQTGate: false
@@ -371,7 +386,7 @@ class localServer {
             }
             if (!this.imapConnectData.confirmRisk) {
                 this.imapConnectData.confirmRisk = true;
-                return Tool.saveImapData(this.imapConnectData, this.config, this.savedPasswrod, err => {
+                return Tool.saveEncryptoData(Tool.imapDataFileName1, this.imapConnectData, this.config, this.savedPasswrod, err => {
                     return this.tryConnectCoNET(socket);
                 });
             }
@@ -383,10 +398,9 @@ class localServer {
             const com = {
                 command: 'requestActivEmail',
                 Args: [],
-                error: null,
-                requestSerial: Crypto.randomBytes(8).toString('hex')
+                error: null
             };
-            return this.sendrequest(socket, com, (err, res) => {
+            return this.sendRequest(socket, com, (err, res) => {
                 console.log(`requestActivEmail sendrequest callback! `);
                 return socket.emit('requestActivEmail', err, res);
             });
@@ -423,7 +437,7 @@ class localServer {
                     requestSerial: Crypto.randomBytes(8).toString('hex')
                 };
                 console.log(Util.inspect(com));
-                return this.sendrequest(socket, com, (err, data) => {
+                return this.sendRequest(socket, com, (err, data) => {
                     if (err) {
                         return socket.emit('checkActiveEmailSubmit', err);
                     }
@@ -444,10 +458,13 @@ class localServer {
         });
         socket.on('getAvaliableRegion', CallBack1 => {
             CallBack1();
-            if (!this.CoNETConnectCalss || typeof this.CoNETConnectCalss.request !== 'function') {
-                console.log(`this.CoNETConnectCalss `);
-                socket.emit('getAvaliableRegion', null, 0);
-                return saveLog(`socket.on ( 'getAvaliableRegion') but !this.QTClass `);
+            if (this.connectCommand && this.connectCommand.length) {
+                console.log(`getAvaliableRegion have this.connectCommand `);
+                //socket.emit ('getAvaliableRegion', this.regionV1, this.dataTransfer, this.config )
+                socket.emit('getAvaliableRegion', this.regionV1, this.dataTransfer, this.config);
+                return setTimeout(() => {
+                    return socket.emit('QTGateGatewayConnectRequest', -1, this.connectCommand);
+                }, 500);
             }
             const com = {
                 command: 'getAvaliableRegion',
@@ -455,16 +472,17 @@ class localServer {
                 error: null,
                 requestSerial: Crypto.randomBytes(8).toString('hex')
             };
-            console.log(`socket.on ( 'getAvaliableRegion')`);
-            return this.CoNETConnectCalss.request(com, (err, res) => {
+            console.log(`socket.on ( 'getAvaliableRegion') no this.connectCommand`);
+            return this.sendRequest(socket, com, (err, res) => {
                 if (err) {
                     return saveLog(`getAvaliableRegion QTClass.request callback error! STOP [${err}]`);
                 }
                 if (res && res.dataTransfer && res.dataTransfer.productionPackage) {
                     this.config.freeUser = /free/i.test(res.dataTransfer.productionPackage);
                 }
-                saveLog(`getAvaliableRegion got return Args [0] [${JSON.stringify(res.Args[0])}]`);
-                socket.emit('getAvaliableRegion', res.Args[0], res.dataTransfer, this.config);
+                this.dataTransfer = res.dataTransfer;
+                saveLog(`getAvaliableRegion got return Args [2] [${JSON.stringify(res.Args[2])}]`);
+                socket.emit('getAvaliableRegion', res.Args[2], res.dataTransfer, this.config);
                 //		Have gateway connect!
                 //this.saveConfig ()
                 if (res.Args[1]) {
@@ -511,7 +529,7 @@ class localServer {
             }, () => {
                 saveLog(`pingCheck success!`);
                 this.pingChecking = false;
-                return socket.emit('pingCheck');
+                return socket.emit('pingCheckSuccess');
             });
         });
         socket.on('promoCode', (promoCode, CallBack1) => {
@@ -519,11 +537,10 @@ class localServer {
             const com = {
                 command: 'promoCode',
                 error: null,
-                Args: [promoCode],
-                requestSerial: Crypto.randomBytes(8).toString('hex')
+                Args: [promoCode]
             };
             saveLog(`on promoCode`);
-            return this.CoNETConnectCalss.request(com, (err, res) => {
+            return this.sendRequest(socket, com, (err, res) => {
                 saveLog(`promoCode got callBack: [${JSON.stringify(res)}]`);
                 if (err) {
                     socket.emit('promoCode', err);
@@ -548,7 +565,30 @@ class localServer {
         });
         socket.on('disconnectClick', CallBack1 => {
             CallBack1();
-            this.stopGetwayConnect(true);
+            return this.stopGetwayConnect(socket, true, null);
+        });
+        socket.on('cardToken', (payment, CallBack1) => {
+            const com = {
+                command: 'cardToken',
+                error: null,
+                Args: [payment],
+                requestSerial: Crypto.randomBytes(8).toString('hex')
+            };
+            CallBack1();
+            console.log(`socket.on cardToken send to QTGate!`, Util.inspect(com, false, 2, true));
+            return this.sendRequest(socket, com, (err, res) => {
+                saveLog(`cardToken got callBack: [${JSON.stringify(res)}]`);
+                if (err) {
+                    return saveLog(`cardToken got QTClass.request  error!`);
+                }
+                if (res.error === -1) {
+                    saveLog('cancelPlan success!');
+                    this.config.freeUser = false;
+                    Tool.saveConfig(this.config, err => {
+                    });
+                }
+                socket.emit('cardToken', err, res);
+            });
         });
     }
     doingCheckImap(socket) {
@@ -570,9 +610,405 @@ class localServer {
                 return socket.emit('smtpTest', imapErrorCallBack(err.message));
             }
             this.imapConnectData.imapTestResult = true;
-            return Tool.saveImapData(this.imapConnectData, this.config, this.savedPasswrod, err => {
+            return Tool.saveEncryptoData(Tool.imapDataFileName1, this.imapConnectData, this.config, this.savedPasswrod, err => {
                 console.log(`socket.emit ( 'imapTestFinish' )`);
                 socket.emit('imapTestFinish', this.imapConnectData);
+            });
+        });
+    }
+    getTimelines(socket, account, CallBack) {
+        const com = {
+            command: 'twitter_home_timeline',
+            Args: [account],
+            error: null,
+            requestSerial: Crypto.randomBytes(8).toString('hex')
+        };
+        let _return = 0;
+        return this.sendRequest(socket, com, (err, res) => {
+            _return++;
+            if (err) {
+                return CallBack();
+            }
+            if (res.Args && res.Args.length > 0) {
+                let uu = null;
+                try {
+                    uu = JSON.parse(Buffer.from(res.Args[0], 'base64').toString());
+                }
+                catch (ex) {
+                    return saveLog(`getTimelines QTClass.request return JSON.parse Error! _return [ ]`);
+                }
+                return CallBack(null, uu);
+            }
+            if (res.error) {
+                saveLog(`this.localServer.QTClass.request ERROR typeof res.error = ${typeof res.error}`);
+                return CallBack(res.error);
+            }
+        });
+    }
+    getMedia(mediaString, CallBack) {
+        saveLog(` getMedia mediaString = [${mediaString}]`);
+        if (/^http[s]*\:\/\//.test(mediaString)) {
+            return CallBack(null, mediaString);
+        }
+        const files = mediaString.split(',');
+        if (!files || !files.length) {
+            return CallBack(null, '');
+        }
+        //console.log ( files )
+        return Imap.imapGetMediaFile(this.imapConnectData, files[0], CallBack);
+    }
+    getVideo(m, CallBack) {
+        if (!m || !m.QTDownload) {
+            return CallBack();
+        }
+        return this.getMedia(m.QTDownload, (err, data) => {
+            if (data) {
+                const file = Uuid.v4() + '.mp4';
+                const viode = Buffer.from(data, 'base64');
+                return Fs.writeFile(Path.join(Tool.QTGateVideo, file), viode, err => {
+                    m.QTDownload = `/videoTemp/${file}`;
+                    console.log(`save video file: [${file}]`);
+                    return CallBack();
+                });
+            }
+            return CallBack();
+        });
+    }
+    getQuote_status(tweet, CallBack) {
+        saveLog(`doing getQuote_status [${tweet.id_str}]`);
+        if (tweet.quoted_status) {
+            const entities = tweet.quoted_status.extended_entities = tweet.quoted_status.extended_entities || null;
+            if (entities && entities.media && entities.media.length) {
+                console.log(`getTweetMediaData [${entities.media.map(n => { return n.media_url_https; })}]`);
+                return this.getTweetMediaData(tweet.quoted_status.extended_entities.media, CallBack);
+            }
+        }
+        if (tweet.retweeted_status) {
+            const entities = tweet.retweeted_status.extended_entities = tweet.retweeted_status.extended_entities || null;
+            if (entities && entities.media && entities.media.length) {
+                console.log(`getTweetMediaData [${entities.media.map(n => { return n.media_url_https; })}]`);
+                return this.getTweetMediaData(tweet.retweeted_status.extended_entities.media, CallBack);
+            }
+        }
+        return CallBack();
+    }
+    getTweetMediaData(media, CallBack) {
+        const uu = media && media.length && media[0].video_info ? media[0].video_info : null;
+        if (uu && uu.QTDownload) {
+            return this.getVideo(uu, CallBack);
+        }
+        return Async.eachSeries(media, (n, next) => {
+            n.video_info = null;
+            return this.getMedia(n.media_url_https, (err, data) => {
+                if (err) {
+                    return next();
+                }
+                n.media_url_https = data ? `data:image/png;base64,${data}` : n.media_url_https;
+                return next();
+            });
+        }, CallBack);
+    }
+    createTweetData_next(tweet, err, data, CallBack) {
+        saveLog(`createTweetData_next CallBack: data = [${data.map(n => { return n.length; })}]`);
+        tweet.user.profile_image_url_https = `data:image/png;base64,${data[0]}`;
+        if (tweet.retweeted && tweet.retweeted.user) {
+            tweet.retweeted.user.profile_image_url_https = `data:image/png;base64,${data[1]}`;
+        }
+        if (tweet.retweeted_status && tweet.retweeted_status.user) {
+            tweet.retweeted_status.user.profile_image_url_https = `data:image/png;base64,${data[1]}`;
+        }
+        if (!tweet.retweeted_status && tweet.extended_entities && tweet.extended_entities.media && tweet.extended_entities.media.length) {
+            return this.getTweetMediaData(tweet.extended_entities.media, err => {
+                return this.getQuote_status(tweet, CallBack);
+            });
+        }
+        return this.getQuote_status(tweet, CallBack);
+    }
+    getTimelinesNext(socket, account, max_id, CallBack) {
+        delete account['twitter_verify_credentials'];
+        const com = {
+            command: 'twitter_home_timelineNext',
+            Args: [account, max_id],
+            error: null,
+            requestSerial: Crypto.randomBytes(8).toString('hex')
+        };
+        return this.sendRequest(socket, com, (err, res) => {
+            if (err) {
+                return CallBack();
+            }
+            if (res.Args && res.Args.length > 0) {
+                let uu = null;
+                try {
+                    uu = JSON.parse(Buffer.from(res.Args[0], 'base64').toString());
+                }
+                catch (ex) {
+                    return saveLog(`getTimelines QTClass.request return JSON.parse Error!`);
+                }
+                return CallBack(null, uu);
+            }
+            if (res.error) {
+                saveLog(`this.localServer.QTClass.request ERROR typeof res.error = ${typeof res.error}`);
+                return CallBack(res.error);
+            }
+        });
+    }
+    createTweetData(tweet, CallBack) {
+        /*
+        if ( this.doingCreateTweetData ) {
+            return this.tweetTimeLineDataPool.push ({
+                post: tweet,
+                CallBack: CallBack
+            })
+        }
+        this.doingCreateTweetData = true
+        */
+        if (!tweet) {
+            saveLog(`createTweetData got Null tweet data `);
+            return CallBack(new Error('have no tweet data!'));
+        }
+        const action = [
+            next => this.getMedia(tweet.user.profile_image_url_https, next)
+        ];
+        if (tweet.retweeted && tweet.retweeted.user) {
+            action.push(next => this.getMedia(tweet.retweeted.user.profile_image_url_https, next));
+        }
+        if (tweet.retweeted_status && tweet.retweeted_status.user) {
+            action.push(next => this.getMedia(tweet.retweeted_status.user.profile_image_url_https, next));
+        }
+        return Async.series(action, (err, data) => {
+            return this.createTweetData_next(tweet, err, data, err1 => {
+                this.doingCreateTweetData = false;
+                CallBack(null, tweet);
+                /*
+                if ( this.tweetTimeLineDataPool.length ) {
+                    const uu = this.tweetTimeLineDataPool.shift ()
+                    return this.createTweetData ( uu.post, uu.CallBack )
+                }
+                */
+            });
+        });
+    }
+    getPictureBase64ToTwitter_mediaData(mediaData, CallBack) {
+        const media = mediaData.split(',');
+        const type = media[0].split(';')[0].split(':')[1];
+        const _media = Buffer.from(media[1], 'base64');
+        const ret = {
+            total_bytes: media[1].length,
+            media_type: type,
+            rawData: media[1],
+            media_id_string: null
+        };
+        const uploadDataPool = [];
+        //if ( mediaData.length > maxImageLength) {
+        const exportImage = (_type, img) => {
+            return img.getBuffer(_type, (err, _buf) => {
+                if (err) {
+                    return CallBack(err);
+                }
+                ret.rawData = _buf.toString('base64');
+                ret.total_bytes = _buf.length;
+                return CallBack(null, ret);
+            });
+        };
+        return Jimp.read(_media, (err, image) => {
+            if (err) {
+                return CallBack(err);
+            }
+            const uu = image.bitmap;
+            if (uu.height > uu.width) {
+                image.resize(Jimp.AUTO, tweetImageMaxHeight);
+            }
+            else {
+                image.resize(tweetImageMaxWidth, Jimp.AUTO);
+            }
+            if (/\/PNG/i.test(type)) {
+                return image.deflateStrategy(1, () => {
+                    return exportImage(type, image);
+                });
+            }
+            if (/\/(JPEG|JPG)/i.test(type)) {
+                return image.quality(100, () => {
+                    return exportImage(type, image);
+                });
+            }
+            //		BMP and all other to PNG
+            ret.media_type = 'image/png';
+            return image.deflateStrategy(4, () => {
+                return exportImage(ret.media_type, image);
+            });
+        });
+        //}
+        //return CallBack ( null, ret )
+    }
+    QT_PictureMediaUpload(data, CallBack) {
+        let imageIndex = 0;
+        return Async.eachSeries(data.images, (n, next) => {
+            return Async.waterfall([
+                _next => this.getPictureBase64ToTwitter_mediaData(n, _next),
+                (media, _next) => {
+                    media.media_id_string = Path.join(Tool.QTGateVideo, Uuid.v4());
+                    data.media_data.push(media);
+                    return Fs.writeFile(media.media_id_string, Buffer.from(media.rawData, 'base64'), 'binary', _next);
+                },
+                _next => {
+                    return UploadFile.sendFile3(data.media_data[data.media_data.length - 1].media_id_string, this.CoNETConnectCalss, (err, files) => {
+                        if (err) {
+                            saveLog(`QT_PictureMediaUpload UploadFile.sendFile error: [${err.message}]`);
+                            return _next(err);
+                        }
+                        const media = data.media_data[imageIndex++];
+                        media.media_id_string = files.join(',');
+                        delete media.rawData;
+                        return _next();
+                    });
+                }
+            ], next);
+        }, CallBack);
+    }
+    QT_VideoMediaUpload(data, CallBack) {
+        return UploadFile.sendFile3(Path.join(Tool.QTGateVideo, data.videoFileName), this.CoNETConnectCalss, (err, files) => {
+            if (err) {
+                return CallBack(err);
+            }
+            saveLog(`QT_VideoMediaUpload got files ${files}`);
+            data.videoFileName = files.join(',');
+            return CallBack();
+        });
+    }
+    postTweetViaQTGate(socket, account, postData, Callback) {
+        const post = err => {
+            if (err) {
+                saveLog(`postTweetViaQTGate post got error: [${err.message}] `);
+                return Callback(err);
+            }
+            delete account['twitter_verify_credentials'];
+            delete postData.images;
+            const com = {
+                command: 'twitter_post',
+                Args: [account, postData],
+                error: null,
+                requestSerial: Crypto.randomBytes(10).toString('hex')
+            };
+            /*
+            Imap.imapGetMediaFilesFromString ( this.localServer.QTClass.imapData, postData.videoFileName, QTGateVideo, ( err1, data ) => {
+                if ( err1 ) {
+                    saveLog ( `Imap.imapGetMediaFilesFromString got error [${ err }]`)
+                }
+                saveLog ( `Imap.imapGetMediaFilesFromString success! [${ data }]`)
+            })
+            */
+            return this.sendRequest(socket, com, Callback);
+        };
+        if (postData.images && postData.images.length) {
+            return this.QT_PictureMediaUpload(postData, post);
+        }
+        if (postData.videoFileName) {
+            return this.QT_VideoMediaUpload(postData, post);
+        }
+        return post(null);
+    }
+    listenAfterTwitterLogin(socket) {
+        socket.on('addTwitterAccount', (addTwitterAccount, CallBack1) => {
+            CallBack1();
+            delete addTwitterAccount['twitter_verify_credentials'];
+            const com = {
+                command: 'twitter_account',
+                Args: [addTwitterAccount],
+                error: null
+            };
+            return this.sendRequest(socket, com, (err, res) => {
+                if (err) {
+                    return socket.emit('addTwitterAccount');
+                }
+                if (res.Args && res.Args.length > 0) {
+                    let uu = null;
+                    try {
+                        uu = JSON.parse(Buffer.from(res.Args[0], 'base64').toString());
+                    }
+                    catch (ex) {
+                        socket.emit('addTwitterAccount');
+                        return saveLog(`getTwitterAccountInfo QTClass.request return JSON.parse Error!`);
+                    }
+                    if (uu && uu.twitter_verify_credentials) {
+                        console.log(`addTwitterAccount ${Util.inspect(uu, false, 2, true)}`);
+                        socket.emit('addTwitterAccount', null, uu);
+                        this.twitterData.push(uu);
+                        return Tool.saveEncryptoData(Tool.twitterDataFileName, this.twitterData, this.config, this.savedPasswrod, err => {
+                            if (err) {
+                                return saveLog(`saveANEWTwitterData got error: ${err.messgae}`);
+                            }
+                        });
+                    }
+                }
+                return socket.emit('addTwitterAccount');
+            });
+        });
+        socket.on('getTimelines', (item, CallBack1) => {
+            CallBack1();
+            delete item['twitter_verify_credentials'];
+            let getTimelinesCount = 0;
+            return this.getTimelines(socket, item, (err, tweets) => {
+                getTimelinesCount++;
+                if (err) {
+                    return saveLog(`socket.on ( 'getTimelines' return [${getTimelinesCount}] error, [${err.message}]`);
+                }
+                saveLog(`doinging createTweetData for count [${getTimelinesCount}]`);
+                return this.createTweetData(tweets, (err, tweet) => {
+                    saveLog(`createTweetData CallBack! [${getTimelinesCount}]`);
+                    if (err) {
+                        return console.log(`getTweetCount error`, err);
+                    }
+                    return socket.emit('getTimelines', tweet);
+                });
+            });
+        });
+        socket.on('mediaFileUpdata', (uploadId, data, part, CallBack1) => {
+            CallBack1();
+            const fileName = Path.join(Tool.QTGateVideo, uploadId);
+            //		the end!
+            const CallBack = err => {
+                return socket.emit('mediaFileUpdata', err);
+            };
+            if (!part) {
+                Fs.writeFile(fileName, data, 'binary', CallBack);
+            }
+            else {
+                Fs.appendFile(fileName, data, 'binary', CallBack);
+            }
+        });
+        socket.on('getTimelinesNext', (item, maxID, CallBack1) => {
+            CallBack1();
+            return this.getTimelinesNext(socket, item, maxID, (err, tweets) => {
+                if (err) {
+                    return socket.emit('getTimelinesNext', err);
+                }
+                if (tweets) {
+                    return this.createTweetData(tweets, (err, tweet) => {
+                        return socket.emit('getTimelines', tweet);
+                    });
+                }
+            });
+        });
+        socket.on('twitter_postNewTweet', (account, postData, CallBack1) => {
+            CallBack1();
+            if (!account || !postData.length) {
+                return console.log('on twitter_postNewTweet but format error!');
+            }
+            return this.postTweetViaQTGate(socket, account, postData[0], (err, data) => {
+                return socket.emit('twitter_postNewTweet', err);
+            });
+        });
+        socket.on('getTwitterTextLength', (twitterText, CallBack1) => {
+            return CallBack1();
+            return socket.emit('getTwitterTextLength', Twitter_text.parseTweet(twitterText));
+        });
+        return socket.on('saveAccounts', (twitterAccounts, CallBack1) => {
+            CallBack1();
+            this.twitterData = twitterAccounts;
+            return Tool.saveEncryptoData(Tool.twitterDataFileName, this.twitterData, this.config, this.savedPasswrod, err => {
+                if (err) {
+                    return saveLog(`saveTwitterData error [${err.message ? err.message : ''}]`);
+                }
             });
         });
     }
@@ -626,7 +1062,7 @@ class localServer {
                 },
                 (option_KeyOption, next) => {
                     this.openPgpKeyOption = option_KeyOption;
-                    return Tool.readImapData(password, this.config, next);
+                    return Tool.readEncryptoFile(Tool.imapDataFileName1, password, this.config, next);
                 }
             ], (err, data) => {
                 if (err) {
@@ -712,13 +1148,66 @@ class localServer {
                 });
             });
         });
+        socket.on('password', (password, Callback1) => {
+            Callback1();
+            if (!this.config.keypair || !this.config.keypair.publicKey) {
+                console.log(`password !this.config.keypair`);
+                return socket.emit('password', true);
+            }
+            if (!password || password.length < 5) {
+                console.log(`! password `);
+                return socket.emit('password', true);
+            }
+            if (this.savedPasswrod && this.savedPasswrod.length) {
+                if (this.savedPasswrod !== password) {
+                    console.log(`savedPasswrod !== password `);
+                    return socket.emit('password', true);
+                }
+            }
+            this.listenAfterTwitterLogin(socket);
+            if (this.twitterDataInit) {
+                return socket.emit('password', null, this.twitterData);
+            }
+            this.twitterDataInit = true;
+            return Tool.readEncryptoFile(Tool.twitterDataFileName, password, this.config, (err, data) => {
+                if (data && data.length) {
+                    try {
+                        this.twitterData = JSON.parse(data);
+                    }
+                    catch (ex) {
+                        return socket.emit('password', true);
+                    }
+                    return socket.emit('password', null, this.twitterData);
+                }
+                return socket.emit('password', true);
+            });
+        });
+    }
+    stopGetwayConnect(socket, sendToCoNET, region) {
+        if (this.connectCommand && this.connectCommand.length) {
+            region = this.connectCommand[0].region;
+            this.connectCommand = this.dataTransfer = null;
+        }
+        if (this.proxyServer && typeof this.proxyServer.exit === 'function') {
+            console.log(`this.proxyServer = null`);
+            this.proxyServer.exit();
+        }
+        if (sendToCoNET) {
+            const com = {
+                command: 'stopGetwayConnect',
+                Args: null,
+                error: null
+            };
+            return this.sendRequest(socket, com, (err, retCmd) => {
+                return socket.emit('disconnectClick', region);
+            });
+        }
     }
     catchUnSerialCmd(cmd) {
         switch (cmd.command) {
             //		
             case 'containerStop': {
-                this.socketServer.emit('containerStop');
-                return this.stopGetwayConnect(false);
+                return this.stopGetwayConnect(this.socketServer, false, cmd.region);
             }
             default: {
                 if (this.cmdResponse && typeof this.cmdResponse === 'function') {

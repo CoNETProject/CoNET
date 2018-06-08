@@ -200,7 +200,7 @@ export const tryConnectHost = ( hostname: string, hostIp: domainData, port: numb
 	}
 
 	if ( gateway || ! hostIp ) {
-		return CallBack ( new Error ('useGateWay!'), data )
+		return CallBack ( new Error ( 'useGateWay!'), data )
 	}
 
 	const now = new Date ().getTime ()
@@ -261,7 +261,7 @@ const isSslFromBuffer = ( buffer ) => {
 }
 
 const httpProxy = ( clientSocket: Net.Socket, buffer: Buffer, useGatWay: boolean, ip6: boolean, connectTimeOut: number,  
-	domainListPool: Map < string, domainData >, gatway: gateWay, checkAgainTime: number, blackDomainList: string[] ) => {
+	domainListPool: Map < string, domainData >, _gatway: gateWay, checkAgainTime: number, blackDomainList: string[], lostManagerServerIP: string , lostManagerServerPort: number ) => {
 
 	const httpHead = new HttpProxyHeader ( buffer )
 	const hostName = httpHead.Url.hostname
@@ -283,15 +283,26 @@ const httpProxy = ( clientSocket: Net.Socket, buffer: Buffer, useGatWay: boolean
 				}
 
 				const id = `[${ clientSocket.remoteAddress.split(':')[3] }:${ clientSocket.remotePort }][${ uuuu.uuid }] `
-				return gatway.requestGetWay ( id, uuuu, userAgent, clientSocket )
+				if ( _gatway && typeof _gatway.requestGetWay === 'function' ) {
+					return _gatway.requestGetWay ( id, uuuu, userAgent, clientSocket )
+				}
+				
 				
 			}
 
-			return clientSocket.end ( res.HTTP_403 )
+			
 		}
-		return
+		return clientSocket.end ( res.HTTP_403 )
+		
 	}
-	console.log (`new http`)
+
+	
+	if ( !_gatway || typeof _gatway.requestGetWay !== 'function') {
+		console.log (`httpProxy !gateWay stop SOCKET res._HTTP_PROXY_302 `)
+		return clientSocket.end ( res._HTTP_PROXY_302 ( lostManagerServerIP, lostManagerServerPort ))
+	}
+
+	console.log ( `new http proxy request`)
 	return checkDomainInBlackList ( blackDomainList, hostName, ( err, result: boolean ) => {
 		
 		if ( result ) {
@@ -303,9 +314,9 @@ const httpProxy = ( clientSocket: Net.Socket, buffer: Buffer, useGatWay: boolean
 		const isIp = Net.isIP ( hostName )
 		const hostIp: domainData = ! isIp ? domainListPool.get ( hostName ) : { dns: [{ family: isIp, address: hostName, expire: null, connect: [] }], expire: null }
         
-        if ( ! hostIp && ! this.useGatWay ) {
+        if ( ! hostIp && ! useGatWay ) {
 
-			return isAllBlackedByFireWall ( hostName,  ip6, gatway, userAgent, domainListPool, ( err, _hostIp ) => {
+			return isAllBlackedByFireWall ( hostName,  ip6, _gatway, userAgent, domainListPool, ( err, _hostIp ) => {
 				if ( err ) {
 					console.log ( `[${ hostName }] Blocked!`)
 					return closeClientSocket ( clientSocket, 504, null )
@@ -380,15 +391,21 @@ export class proxyServer {
 	}
 
 	private getGlobalIp = ( gateWay: gateWay ) => {
-		if ( this.getGlobalIpRunning )
-			return 
+		if ( this.getGlobalIpRunning ) {
+
+			return console.log (`getGlobalIp getGlobalIpRunning === true!, skip!`)
+		}
+			
 		this.getGlobalIpRunning = true
-		saveLog(`doing getGlobalIp!`)
+		saveLog ( `doing getGlobalIp!`)
 		gateWay.hostLookup ( testGatewayDomainName, null, ( err, data ) => {
-			if ( err )
+			this.getGlobalIpRunning = false
+			if ( err ) {
 				return console.log ( 'getGlobalIp ERROR:', err.message )
-			console.log ( data )
-			this.network = true
+			}
+				
+			console.log ( Util.inspect ( data ))
+			
 			this.hostLocalIpv6 ? console.log ( `LocalIpv6[ ${ this.hostLocalIpv6 } ]`) : null
 
 			this.hostLocalIpv4.forEach ( n => {
@@ -400,17 +417,19 @@ export class proxyServer {
 			this.hostGlobalIpV4 ? console.log ( `GlobalIpv4[ ${ this.hostGlobalIpV4 } ]`) : null
 
 			const domain = data
-			if ( ! domain )
+			if ( ! domain ) {
 				return console.log ( `[] Gateway connect Error!` )
-			console.log ( '****************************************' )
+			}
+			this.network = true
+			console.log ( '*************** Gateway connect ready *************************' )
 
 		})
 
 	}
     
 	constructor ( public whiteIpList: string[], public domainListPool: Map < string, domainData >, 
-		private port: string, private securityPath: string,  public checkAgainTimeOut: number, private multipleGateway: IConnectCommand[],
-		public connectHostTimeOut: number, public useGatWay: boolean, public domainBlackList: string[] ) {
+		public port: string, private securityPath: string,  public checkAgainTimeOut: number, private multipleGateway: IConnectCommand[],
+		public connectHostTimeOut: number, public useGatWay: boolean, public domainBlackList: string[], public localhost: string, public managerServerPort: number ) {
 		this.getGlobalIp ( this.gateway )
 		let socks = null
 		this.server = Net.createServer ( socket => {
@@ -419,7 +438,7 @@ export class proxyServer {
 			let agent = 'Mozilla/5.0'
 				//	windows 7 GET PAC User-Agent: Mozilla/5.0 (compatible; IE 11.0; Win32; Trident/7.0)
 
-
+			//		proxy auto setup support
 			socket.once ( 'data', ( data: Buffer ) => {
 				const dataStr = data.toString()
 				if ( /^GET \/pac/.test ( dataStr )) {
@@ -434,20 +453,22 @@ export class proxyServer {
 					console.log ( ret )
 					return socket.end ( ret )
 				}
-
+				
 				switch ( data.readUInt8 ( 0 )) {
+
 					case 0x4:
 						return socks = new Socks.sockt4 ( socket, data, agent, this )
 					case 0x5:
 						return socks = new Socks.socks5 ( socket, agent, this )
 					default:
-						return httpProxy ( socket, data, useGatWay, this.hostGlobalIpV6 ? true : false, connectHostTimeOut, domainListPool, this.gateway, checkAgainTimeOut, domainBlackList )
+						return httpProxy ( socket, data, useGatWay, this.hostGlobalIpV6 ? true : false, connectHostTimeOut, domainListPool, this.gateway,
+							checkAgainTimeOut, domainBlackList, this.localhost, this.managerServerPort )
 				}
 			})
 
 			socket.on ( 'error', err => {
-					socks = null
-				console.log ( `[${ip}] socket.on error`, err.message )
+				socks = null
+				//console.log ( `[${ip}] socket.on error`, err.message )
 			})
 			socket.once ( 'end', () => {
 				socks = null
@@ -468,18 +489,14 @@ export class proxyServer {
 	}
 
 	public exit () {
-		console.log (`proxyServer exit ()`)
-		if ( this.server ) {
-			if ( typeof this.server.close === 'function') {
-				console.log (`proxyServer this.server.close ()`)
-				this.server.close ()
-			}
-			if ( typeof this.server.removeAllListeners === 'function' ) {
-				console.log (`proxyServer this.server.removeAllListeners ()`)
-				this.server.removeAllListeners ()
-			}
-		}
+		console.log (`************ proxyServer on exit ()`)
+		this.gateway = null
+	}
+
+
+	public reNew ( multipleGateway: IConnectCommand[] ) {
 		
+		this.gateway = new gateWay ( this.multipleGateway = multipleGateway  )
 	}
 
 	public changeDocker ( data: IConnectCommand ) {

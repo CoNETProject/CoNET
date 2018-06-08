@@ -61,7 +61,7 @@ export class socks5 {
 		
 		const CallBack = ( err?: Error, _data?: Buffer ) => {
 			if ( err ) {
-				if ( this.proxyServer.useGatWay && _data && _data.length && this.socket.writable ) {
+				if ( this.proxyServer.useGatWay && _data && _data.length && this.socket.writable && this.proxyServer.gateway ) {
 					const uuuu : VE_IPptpStream = {
 						uuid: Crypto.randomBytes (10).toString ('hex'),
 						host: this.host|| this.targetIpV4,
@@ -71,20 +71,25 @@ export class socks5 {
 						port: this.port,
 						ssl: isSslFromBuffer ( _data )
 					}
-					console.log ( Util.inspect ( uuuu ))
+					//console.log ( Util.inspect ( uuuu ))
+					//console.log (`doing gateway.requestGetWay ssl [${ uuuu.ssl }][${ uuuu.host }:${ uuuu.port }] cmd [${ uuuu.cmd }]`)
 					const id = `[${ this.clientIP }:${ this.port }][${ Util.inspect(uuuu) }] `
 					
 					return this.proxyServer.gateway.requestGetWay ( id, uuuu, this.agent, this.socket )
 					
 				}
-				
+				console.log (`SOCK5 ! this.proxyServer.gateway STOP socket`)
 				return this.socket.end ( res.HTTP_403 )
 			}
 			return
 		}
 
 		this.socket.once ( 'data', ( _data: Buffer ) => {
-
+			//			gateway shutdown
+			if ( !this.proxyServer.gateway ) {
+				//console.log (`SOCK5 !this.proxyServer.gateway STOP sokcet! res.HTTP_403`)
+				return this.socket.end ( res._HTTP_PROXY_302( this.proxyServer.localhost, this.proxyServer.managerServerPort ) )
+			}
 			proxyServer.tryConnectHost ( this.host || this.targetIpV4 , this.targetDomainData, this.port, _data, this.socket, false, this.proxyServer.checkAgainTimeOut, 
 				this.proxyServer.connectHostTimeOut, this.proxyServer.useGatWay, CallBack )
 		})
@@ -99,17 +104,21 @@ export class socks5 {
 		} else {
 			this.targetDomainData = { dns: [{ family: 4, address: this.targetIpV4, expire: null, connect: [] }], expire: null }
 		}
-		
+
+		//			gateway shutdown
+		if ( !this.proxyServer.gateway ) {
+			return this.connectStat3 ( retBuffer )
+		}
 		return proxyServer.checkDomainInBlackList ( this.proxyServer.domainBlackList, this.host || this.targetIpV4, ( err, result: boolean ) => {
 			if ( result ) {
-				console.log ( `[${ this.host }] Blocked!`)
+				console.log ( `host [${ this.host }] Blocked!`)
 				retBuffer.REP = Rfc1928.Replies.CONNECTION_NOT_ALLOWED_BY_RULESET
 				return this.closeSocks5 ( retBuffer.buffer )
 			}
 			if ( this.host && !this.proxyServer.useGatWay ) {
 				return proxyServer.isAllBlackedByFireWall ( this.host, false, this.proxyServer.gateway, this.agent, this.proxyServer.domainListPool, ( err, _hostIp ) => {
 					if ( err ) {
-						console.log ( `[${ this.host }] Blocked!`)
+						console.log ( `host [${ this.host }] Blocked!`)
 						retBuffer.REP = Rfc1928.Replies.CONNECTION_NOT_ALLOWED_BY_RULESET
 						return this.closeSocks5 ( retBuffer.buffer )
 					}
@@ -152,7 +161,7 @@ export class socks5 {
 		switch ( this.cmd ) {
 
 			case Rfc1928.CMD.CONNECT: {
-				console.log (`sock5 [${ this.host }]`)
+				//console.log (`sock5 [${ this.host }]`)
 				this.keep = true
 				break
 			}
@@ -177,13 +186,15 @@ export class socks5 {
 			req.REP = Rfc1928.Replies.COMMAND_NOT_SUPPORTED_or_PROTOCOL_ERROR
 			return this.closeSocks5 ( req.buffer )
 		}
-		if ( this.cmd === Rfc1928.CMD.UDP_ASSOCIATE )
-			return console.log ('')
+		if ( this.cmd === Rfc1928.CMD.UDP_ASSOCIATE ) {
+			return console.log ('this.cmd === Rfc1928.CMD.UDP_ASSOCIATE skip!')
+		}
+			
 		return this.connectStat2_after ( req )
 	}
 
 	constructor ( private socket: Net.Socket,private agent: string, private proxyServer: proxyServer.proxyServer ) {
-		console.log (`new socks 5`)
+		//console.log (`new socks 5`)
 		this.socket.once ( 'data', ( chunk: Buffer ) => {
 			return this.connectStat2 ( chunk )
 		})
@@ -232,7 +243,7 @@ export class sockt4 {
 	public connectStat2 () {
 		const CallBack = ( err?: Error, _data?: Buffer ) => {
 			if ( err ) {
-				if ( this.proxyServer.useGatWay && _data && _data.length && this.socket.writable ) {
+				if ( this.proxyServer.useGatWay && _data && _data.length && this.socket.writable && this.proxyServer.gateway ) {
 					const uuuu : VE_IPptpStream = {
 						uuid: Crypto.randomBytes (10).toString ('hex'),
 						host: this.host || this.targetIpV4 ,
@@ -245,7 +256,7 @@ export class sockt4 {
 					const id = `[${ this.clientIP }:${ this.port }][${ uuuu.uuid }] `
 					return this.proxyServer.gateway.requestGetWay ( id, uuuu, this.agent, this.socket )
 				}
-				
+				console.log (`SOCK4 connectStat2 this.proxyServer.gateway === null`)
 				return this.socket.end ( res.HTTP_403 )
 			}
 			return
@@ -253,6 +264,10 @@ export class sockt4 {
 
 		this.socket.once ( 'data', ( _data: Buffer ) => {
 			console.log (`connectStat2 [${ this.host||this.targetIpV4 }]get data `)
+			if ( !this.proxyServer.gateway ) {
+				console.log (`SOCK4 !this.proxyServer.gateway STOP sokcet! res.HTTP_403`)
+				this.socket.end ( res._HTTP_PROXY_302 ( this.proxyServer.localhost, this.proxyServer.managerServerPort ) )
+			}
 			proxyServer.tryConnectHost ( this.host, this.targetDomainData, this.port, _data, this.socket, false, this.proxyServer.checkAgainTimeOut, 
 				this.proxyServer.connectHostTimeOut, this.proxyServer.useGatWay, CallBack )
 		})
@@ -263,6 +278,10 @@ export class sockt4 {
 	public connectStat1 () {
 		if ( this.host ) {
 			this.targetDomainData = this.proxyServer.domainListPool.get ( this.host )
+		}
+		//		gateway server shutdoan
+		if ( !this.proxyServer.gateway ) {
+			return this.connectStat2 ()
 		}
 		return proxyServer.checkDomainInBlackList ( this.proxyServer.domainBlackList, this.host || this.targetIpV4, ( err, result: boolean ) => {
 			if ( result ) {
@@ -287,13 +306,13 @@ export class sockt4 {
 					return this.connectStat2 ()
 				})
 			}
-			console.log (`socks4 ipaddress [${ this.targetIpV4 }]`)
+			console.log ( `socks4 ipaddress [${ this.targetIpV4 }]`)
 			return this.connectStat2 ()
 			
 		})
 	}
 }
-
+/*
 export class UdpDgram {
 	private server: Dgram.Socket = null
 	public port = 0
@@ -306,14 +325,14 @@ export class UdpDgram {
 			this.server.close ()
 		})
 
-		this.server.on ( 'message', ( msg: Buffer, rinfo: Dgram.AddressInfo ) => {
+		this.server.on ( 'message', ( msg: Buffer, rinfo ) => {
 			console.log(`UdpDgram server msg: ${ msg.toString('hex') } from ${ rinfo.address }:${ rinfo.port }`)
 		})
 
 		this.server.once ( 'listening', () => {
 			const address = this.server.address()
 			this.port = address.port
-			console.log ( `server listening ${ address.address }:${ address.port}` )
+			console.log ( `server listening ${ address.address }:${ address.port }` )
 		})
 
 		this.server.bind ({ port: 0 } , ( err, kkk ) => {
@@ -327,3 +346,4 @@ export class UdpDgram {
 		this.createDgram ()
 	}
 }
+*/

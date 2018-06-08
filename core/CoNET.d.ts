@@ -14,6 +14,8 @@
  * limitations under the License.
  */
 
+
+
 interface ReadonlyArray<T> {
     /**
      * Returns the value of the first element in the array where predicate is true, and undefined
@@ -113,7 +115,6 @@ interface WeakSetConstructor {
 }
 declare var WeakSet: WeakSetConstructor;
 
-
 interface imapConnect {
     imapServer: string
     imapUserName: string
@@ -142,30 +143,7 @@ interface keypair {
     showDeleteKeyPairNoite?: KnockoutObservable < boolean >
 }
 
-interface install_config {
-    alreadyInit: boolean
-    multiLogin: boolean
-    firstRun: boolean
-    version: string
-    newVersion?: string
-    newVersionCheckFault?: boolean
-    newVersionDownloadFault?: number
-    newVerReady?: boolean
-    keypair: keypair
-    iterations: number
-    salt?: Buffer
-    keylen?: number
-    localIpAddress: string []
-    digest?: string
-    freeUser: boolean
-    connectedImapDataUuid: string
-    account: string
-    serverGlobalIpAddress: string
-    serverPort: number
-    connectedQTGateServer: boolean          //      true when connect to QTGate network
-    lastConnectType: number
-    
-}
+
 interface StringValidator {
     isAcceptable(s: string): boolean;
 }
@@ -194,6 +172,8 @@ interface regionV1 {
     testHostIp: string
     testUrl: string
     testHost: string
+    freeUser: boolean
+    VoE: boolean
 }
 
 interface IinputData extends imapConnect {
@@ -218,6 +198,13 @@ interface IinputData extends imapConnect {
     sendToQTGate: boolean
 }
 
+interface CoPromo {
+    datePromo: number
+    pricePromo: number
+    promoDetail: string[]
+    promoFor: string[]
+}
+
 interface iTransferData {
     startDate: string
     transferDayLimit: number
@@ -238,8 +225,7 @@ interface iTransferData {
     isAnnual: boolean
     paidID: string[]
     automatically: boolean
-    promo?: string[]
-    promoPrice?: number
+    promo: CoPromo[]
 }
 
 interface multipleGateway {
@@ -278,10 +264,11 @@ interface IConnectCommand {
     requestMultipleGateway?: number
     containerUUID?: string
     peerUuid?: string
-    localServerIp?: string
+    localServerIp?: string[]
     localServerPort: string
     webWrt?: boolean
     requestPortNumber: string
+    globalIpAddress: string
 }
 
 interface QTGateAPIRequestCommand {
@@ -289,11 +276,12 @@ interface QTGateAPIRequestCommand {
     myIpServer?: QTGate_DnsAddress []
     account?: string
 	error: number
-	requestSerial: string
+	requestSerial?: string
     Args: any[]
     fingerprint?: string
     dataTransfer?: iTransferData
     requestTimes?: number
+    region?: string
 }
 
 interface QTGateCommand {
@@ -328,6 +316,7 @@ interface QTGateRegions {
     showConnectedArea: KnockoutObservable < boolean >
     ping: KnockoutObservable <number >
     downloadSpeed: KnockoutObservable <number >
+    freeUser: KnockoutObservable < boolean >
 }
 
 interface domainData {
@@ -372,3 +361,282 @@ interface iQTGatePayment {
     Amount: number
     autoRenew: boolean
 }
+interface twitter_entities_media {
+
+}
+interface twitter_entities_urls {
+    display_url: string
+    expanded_url: string
+    indices: string[]
+    url: string
+}
+interface twitter_entities {
+    hashtags: any[]
+    media: twitter_entities_media[]
+    symbols: any[]
+    urls: twitter_entities_urls[]
+}
+interface tweetCountSummary {
+
+}
+interface twitter_post {
+    order: number
+    contributors: any
+    coordinates: any
+    created_at: string
+    QTGate_created_at: KnockoutComputed< string >
+    entities: any
+    favorite_count:  number
+    favorite_count_ko : KnockoutObservable < number >
+    favorited_ko: KnockoutObservable < boolean >
+    favoritedLoader_ko: KnockoutObservable < boolean >
+    favorited:  boolean
+    geo: any
+    id: number
+    id_str: string
+    in_reply_to_screen_name: any
+    in_reply_to_status_id: any
+    in_reply_to_status_id_str: any
+    in_reply_to_user_id: any
+    in_reply_to_user_id_str: any
+    is_quote_status: boolean
+    quoted_status: twitter_post
+    lang: string
+    full_text: string
+    full_text_split_line: string
+    retweeted_status: twitter_post
+    place: any
+    possibly_sensitive: boolean
+    possibly_sensitive_appealable: boolean
+    retweet_count: number
+    retweeted: twitter_post
+    extended_entities: twitter_extended_entities
+    source: string
+    text: string
+    truncated: boolean
+    user: Twitter_verify_credentials
+    tweetCountSummary: tweetCountSummary
+}
+
+
+interface twitter_size {
+    h: number
+    resize: string
+    w: number
+}
+
+
+interface twitter_media_video_info_variants {
+    bitrate: number
+    content_type: string
+    url: string
+}
+
+
+interface twitter_media_video_info {
+    aspect_ratio: number []
+    duration_millis: number
+    variants: twitter_media_video_info_variants[]
+    QTDownload: string
+}
+
+interface twitter_media {
+    display_url?: string
+    expanded_url?: string
+    id?: number
+    id_str?: string
+    indices?: number []
+    media_url?: string
+    media_url_https?: string
+    sizes?: {
+        large: twitter_size
+        medium: twitter_size
+        small: twitter_size
+        thumb: twitter_size
+    }
+    type?: string        //  photo
+    url?: string
+    video_info: twitter_media_video_info
+}
+
+interface twitter_extended_entities extends twitter_post {
+    media: twitter_media[]
+}
+
+interface twitter_mediaData {
+	total_bytes: number
+	media_type: string
+    rawData: string
+    media_id_string: string
+}
+
+interface twitter_postData {
+    text: string,
+    images: string[],
+    media_data: twitter_mediaData[]
+    videoSize: number
+    videoFileName: string
+}
+
+
+interface twitter_uploadImageInitData_imageObj {
+	image_type: string
+	w: number
+	h: number
+}
+
+interface twitter_uploadImageInitData {
+	media_id: number
+	media_id_string: string
+	size: number
+	expires_after_secs: number
+	image: twitter_uploadImageInitData_imageObj
+}
+
+interface twitter_uploadImageInitData_status_processing_info {
+	state: string					//				in_progress, failed, succeeded
+	check_after_secs: number
+	progress_percent: number
+	error?: {
+		code: number
+		name: string
+		message: string
+	}
+}
+
+interface twitter_uploadImageInitData_status {
+	media_id: number
+	media_id_string: string
+	expires_after_secs: number
+	processing_info: twitter_uploadImageInitData_status_processing_info
+}
+
+interface TwitterAccount {
+    consumer_key: string
+    consumer_secret: string
+    access_token_key: string
+    access_token_secret: string
+    twitter_verify_credentials?: Twitter_verify_credentials
+}
+
+interface Twitter_verify_credentials {
+    id: number
+    id_str: string
+    name: string
+    screen_name: string
+    location: string
+    description: string
+    url: string
+    entities: any
+    protected: boolean
+    followers_count: number
+    friends_count: number
+    listed_count: number
+    created_at: string
+    favourites_count: number
+    utc_offset: number
+    time_zone: string
+    geo_enabled: boolean
+    verified: boolean
+    statuses_count: number
+    lang: string
+    status: Titter_status
+    contributors_enabled: boolean
+    is_translator: boolean
+    is_translation_enabled: boolean
+    profile_background_color: string
+    profile_background_image_url: string
+    profile_background_image_url_https: string
+    profile_background_tile: boolean
+    profile_image_url: string
+    profile_image_url_https: string
+    profile_banner_url: string
+    profile_link_color: string
+    profile_sidebar_border_color: string
+    profile_sidebar_fill_color: string
+    profile_text_color: string
+    profile_use_background_image: boolean
+    has_extended_profile: boolean
+    default_profile: boolean
+    default_profile_image: boolean
+    following: boolean
+    follow_request_sent: boolean
+    notifications: boolean
+    translator_type: string
+
+}
+
+interface Titter_status {
+    created_at: string
+    id: number
+    id_str: string
+    text: string
+    truncated: boolean
+    entities: any
+    source: string
+    in_reply_to_status_id: any
+    in_reply_to_status_id_str: any
+    in_reply_to_user_id: any
+    in_reply_to_user_id_str: any
+    in_reply_to_screen_name: any
+    geo: any
+    coordinates: any
+    place: any
+    contributors: any
+    retweeted_status: Titter_status
+    is_quote_status: boolean
+    retweet_count: number
+    favorite_count: number
+    favorited: boolean
+    retweeted: boolean
+    possibly_sensitive: boolean
+    lang: string
+
+}
+
+
+interface twitter_text_parseTweet {
+    weightedLength: number
+    valid: boolean
+    permillage: number
+    validRangeStart: number
+    validRangeEnd: number
+    displayRangeStart: number
+    displayRangeEnd: number
+}
+
+interface install_config {
+    alreadyInit: boolean
+    multiLogin: boolean
+    firstRun: boolean
+    version: string
+    newVersion?: string
+    newVersionCheckFault?: boolean
+    newVersionDownloadFault?: number
+    newVerReady?: boolean
+    keypair: keypair
+    iterations: number
+    salt?: Buffer
+    keylen?: number
+    localIpAddress: string []
+    digest?: string
+    freeUser: boolean
+    connectedImapDataUuid: string
+    account: string
+    serverGlobalIpAddress: string
+    serverPort: number
+    connectedQTGateServer: boolean          //      true when connect to QTGate network
+    lastConnectType: number
+    
+}
+
+declare namespace SemanticUI {
+
+}
+
+declare namespace SocketIOClient {
+    interface Emitter {
+        emit11
+    }
+}
+

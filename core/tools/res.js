@@ -81,3 +81,7 @@ exports._HTTP_PROXY_200 = `HTTP/1.1 200 Connection Established
 Content-Type: text/html; charset=UTF-8
 
 `;
+exports._HTTP_PROXY_302 = (host, port) => {
+    return `HTTP/1.1 302 Found\n` +
+        `Location: http://${host}:${port}/proxyErr\n\n`;
+};

@@ -1,13 +1,13 @@
 declare const Cleave
 declare const StripeCheckout
-const Stripe_publicKey = 'pk_live_VwEPmqkSAjDyjdia7xn4rAK9'
+const Stripe_publicKey = 'pk_test_eVOSOJHeYmAznyxbZ4durBXh'
 
 class coGateRegion {
 	public QTConnectData = ko.observable ( null )
 	public QTGateConnect1 = ko.observable ('1')
 	public showQTGateConnectOption = ko.observable (false)
 	public QTGateMultipleGateway = ko.observable ( 1 )
-	public QTGateMultipleGatewayPool = ko.observableArray ([1,2,4])
+	public QTGateMultipleGatewayPool = ko.observableArray ([])
 	public isFreeUser = ko.observable ( /free/i.test( this.dataTransfer.productionPackage ))
 	public QTGateGatewayPortError = ko.observable ( false )
 	public requestPortNumber = ko.observable ('80')
@@ -19,10 +19,17 @@ class coGateRegion {
 	public error = ko.observable ( -1 )
 	public CoGateConnerting = ko.observable ( false )
 	public disconnecting = ko.observable ( false )
-	constructor ( public region: QTGateRegions, public dataTransfer: iTransferData, public account: ()=> void, public exit: () => void ) {
+	public localHostIP = ko.observable ( '')
+	public proxyInfoMacOS = ko.observable ( false )
+	public proxyInfoIE = ko.observable ( false )
+	public iOS = ko.observable ( false )
+	public fireFox = ko.observable ( false )
+	public android = ko.observable ( false )
+
+	constructor ( public region: QTGateRegions, public dataTransfer: iTransferData, public account: ()=> void, private isPublicImapAccount: boolean, private exit: () => void ) {
 		const self = this
 
-		socketIo.emit11 ( 'checkPort', '3001', ( err, nextPort ) => {
+		socketIo.emit11 ( 'checkPort', '3001', function ( err, nextPort ) {
 			if ( err ) {
 				self.QTGateLocalProxyPort ( nextPort )
 			}
@@ -63,11 +70,39 @@ class coGateRegion {
 				})
 			}
 
-			return socketIo.emit11 ( 'checkPort', newValue, err => {
+			return socketIo.emit11 ( 'checkPort', newValue, function ( err ) {
 				return self.localProxyPortError ( err )
 			})
 
 		})
+
+		setTimeout ( function () {
+			$('.ui.radio.checkbox.canVoH').checkbox('check').checkbox ({
+				onChecked: function () {
+					self.QTGateConnect1 ('1')
+				}
+				
+			 })
+			 $('.ui.radio.checkbox.canVoe').checkbox().checkbox ({
+				onChecked: function () {
+					if ( self.isPublicImapAccount ) {
+						self.error ( 5 )
+						return $('.ui.radio.checkbox.canVoH').checkbox('check')
+					}
+					self.QTGateConnect1 ('2')
+				}
+				
+			 })
+		}, 50 )
+
+		if ( /p1/i.test ( dataTransfer.productionPackage )) {
+			this.QTGateMultipleGatewayPool ([1,2])
+		} else if ( /p2/i.test ( dataTransfer.productionPackage )) {
+			this.QTGateMultipleGatewayPool ([1,2,4])
+		} else {
+			this.QTGateMultipleGatewayPool ([1])
+		}
+		
 		
 	}
 
@@ -98,6 +133,8 @@ class coGateRegion {
 		}
 		const data1 = connectCommand[0]
 		if ( data1 ) {
+			this.localHostIP ( data1.localServerIp[0] )
+			this.QTGateLocalProxyPort ( data1.localServerPort )
 			//this.QTTransferData ( data1.transferData )
 			return this.QTConnectData ( data1 )
 		}
@@ -120,7 +157,8 @@ class coGateRegion {
 			multipleGateway: [],
 			requestPortNumber: this.requestPortNumber (),
 			requestMultipleGateway: this.QTGateMultipleGateway(),
-			webWrt: this.WebRTCleak ()
+			webWrt: this.WebRTCleak (),
+			globalIpAddress: null
 		}
 		this.CoGateConnerting ( true )
 		
@@ -131,17 +169,73 @@ class coGateRegion {
 		
 	}
 
-	public showUserInfoMacOS () {
-		
+	public showUserInfoMacOS ( infoOS: string ) {
+		this.closeInfo ()
+		switch ( infoOS ) {
+
+			default:
+			case 'macOS' : {
+				return this.proxyInfoMacOS ( true )
+			}
+			case 'WInIE': {
+				return this.proxyInfoIE ( true )
+			}
+			case 'iOS': {
+				return this.iOS ( true )
+			}
+			case 'fireFox': {
+				return this.fireFox ( true )
+			}
+			case 'android': {
+				return this.android ( true )
+			}
+		}
 	}
 	public disconnectClick () {
-		socketIo.emit11 ( 'disconnectClick' )
-
-		this.QTConnectData ( null )
-		this.exit ()
-		
+		const self = this
+		this.disconnecting ( true )
+		socketIo.emit11 ( 'disconnectClick', function () {
+			self.disconnecting ( false )
+			self.QTConnectData ( null )
+			self.exit ()
+			
+		})
 	}
-}
+
+	public closeErrMessage () {
+		this.error ( -1 )
+	}
+
+	public selectConnectTech ( n: number ) {
+		this.QTGateConnect1 ( n.toString() )
+		if ( n === 2 ) {
+			if ( this.isPublicImapAccount ) {
+				this.error ( 5 )
+				this.QTGateConnect1 ('1')
+				
+			}
+
+		}
+		if ( this.QTGateConnect1 () === '1') {
+			$('.radio.checkbox.canVoH').checkbox ('set checked')
+		} else {
+			$('.radio.checkbox.canVoe').checkbox ('set checked')
+		}
+		return false 
+	}
+
+	public exit1 () {
+		this.exit ()
+	}
+
+	public closeInfo () {
+		this.proxyInfoMacOS ( false )
+		this.proxyInfoIE ( false )
+		this.iOS ( false )
+		this.fireFox ( false )
+		this.android ( false )
+	}
+} 
 
 class CoGateClass {
 	public QTGateRegions = ko.observableArray ( _QTGateRegions )
@@ -152,20 +246,27 @@ class CoGateClass {
 	public pingCheckLoading = ko.observable ( false )
 	public pingError = ko.observable ( false )
 	public doingCommand = false
+	public error = ko.observable ( -1 )
 	public freeAccount = ko.observable ( true )
 	public CoGateAccount: KnockoutObservable < CoGateAccount > = ko.observable ( null )
 
-	private getAvaliableRegionCallBack ( region: string [], dataTransfer: iTransferData, config: install_config ) {
+	private getAvaliableRegionCallBack ( region: regionV1 [], dataTransfer: iTransferData, config: install_config ) {
 		this.showCards ( true )
 		this.QTGateRegions().forEach( function ( n ) {
-			const index = region.findIndex ( function ( nn )  { return nn === n.qtRegion })
-			if ( index < 0 )
+			const index = region.findIndex ( function ( nn )  { return nn.regionName === n.qtRegion })
+			if ( index < 0 ) {
+				
 				return n.available( false )
+			}
+			n.freeUser( region[index].freeUser )
+			n.canVoe ( region[index].VoE )
 			return n.available ( true )
 		})
 		this.QTGateRegions.sort ( function ( a, b ) { 
-			if ( a.available() === b.available() )  
+			if ( a.available() === b.available() )   {
 				return 0
+			}
+				
 			if ( b.available() && !a.available() ) {
 				return 1
 			}
@@ -173,8 +274,7 @@ class CoGateClass {
 		})
 		this.reloading ( false )
 		this.doingCommand = false
-		dataTransfer.promo = dataTransfer.promo || ['对折促销月：选择年付费送一年服务','今月中プロモーション：50%オフ、一年払いと次年度フリー','Promotion 50% off:  Annual user will get next free year.','對折促銷月：選擇年付費送一年服務']
-		dataTransfer.promoPrice = 0.5
+		
 		this.QTTransferData ( dataTransfer )
 		this.freeAccount ( /^free$/i.test( dataTransfer.productionPackage ))
 		/*
@@ -202,21 +302,21 @@ class CoGateClass {
 		const self = this
 		this.reloading ( true )
 		this.doingCommand = true
-		socketIo.emit11 ( 'getAvaliableRegion', function ( region: string [], dataTransfer: iTransferData, config: install_config ) {
-			if ( region && region.length ) {
-				return self.getAvaliableRegionCallBack ( region, dataTransfer, config )
-			}
-			
-		})
+		socketIo.emit11 ( 'getAvaliableRegion' )
 	}
 
 	private pingCheckReturn ( region: string, ping: number ) {
 		const index = this.QTGateRegions().findIndex ( function ( n ) { return n.qtRegion === region })
-            if ( index < 0 )
-                return
-            const _reg = this.QTGateRegions()[index]
-            if ( !_reg.available )
-                return
+			if ( index < 0 ) {
+				return
+			}
+			
+                
+            const _reg = this.QTGateRegions()[ index ]
+            if ( !_reg.available ) {
+				return
+			}
+                
             _reg.ping ( ping )
             const fromIInputData = $(`#card-${ _reg.qtRegion.replace('.','-')}`)
             const uu = ping
@@ -227,7 +327,7 @@ class CoGateClass {
             }).rating ('disable')
 	}
 
-	constructor () {
+	constructor ( private isUsedPublicImapAccount: boolean ) {
 		const self = this
 		this.reloadRegion ()
 
@@ -235,27 +335,52 @@ class CoGateClass {
 			return self.pingCheckReturn ( region, ping )
 		})
 
-		socketIo.on ( 'QTGateGatewayConnectRequest', function ( err, cmd: IConnectCommand[] ) {
-			if ( ! self.CoGateRegion ) {
+		socketIo.on ('pingCheckSuccess', function () {
+			self.pingCheckLoading ( false )
+			return self.QTGateRegions.sort ( function ( a, b ) {
+				const _a = a.ping()
+				const _b = b.ping()
+				if ( a.available() === b.available()) {
+					if ( !a.available ())
+						return 0
+					if ( _b > 0 && _a > _b )
+						return 1
+					return -1
+				}  
+					
+				if ( b.available() && !a.available() ) {
+					return 1
+				}
+				return -1
+			})
+		})
+
+		socketIo.on ( 'QTGateGatewayConnectRequest', function ( err, cmd: IConnectCommand[],  ) {
+			
+			if ( ! self.CoGateRegion() ) {
 				let uuu: coGateRegion = null
 				const region = cmd[0].region
 				const regionIndex = self.QTGateRegions().findIndex ( function ( n ) {
 					return n.qtRegion === region
 				})
 				const uu = self.QTGateRegions()[ regionIndex ]
-				self.CoGateRegion ( uuu = new coGateRegion ( uu, self.QTTransferData(), function () {
+				uuu = new coGateRegion ( uu, self.QTTransferData(), function () {
 					self.account ()
-				}, function () {
+				}, isUsedPublicImapAccount, function () {
 					self.CoGateRegion ( uuu = null )
 					return self.showCards ( true )
-				}))
+				})
+				self.CoGateRegion ( uuu )
+
 				
 			}
+			self.reloading ( false )
+			self.showCards ( false )
 			return self.CoGateRegion().QTGateGatewayConnectRequestCallBack ( err, cmd )
 		})
 
-		socketIo.on ( 'containerStop', function () {
-
+		socketIo.on ( 'getAvaliableRegion', function ( region: regionV1 [], dataTransfer: iTransferData, config: install_config ) {
+			return self.getAvaliableRegionCallBack ( region, dataTransfer, config )
 		})
 	}
 
@@ -265,7 +390,7 @@ class CoGateClass {
 		let uuu = null
 		this.CoGateRegion ( uuu = new coGateRegion ( uu, this.QTTransferData(), function () {
 			self.account ()
-		}, function () {
+		}, this.isUsedPublicImapAccount,function () {
 			self.CoGateRegion ( uuu = null )
 			return self.showCards ( true )
 		}))
@@ -284,22 +409,23 @@ class CoGateClass {
 		this.doingCommand = true
 		this.pingCheckLoading ( true )
 		this.QTGateRegions().forEach ( function ( n ) {
-			if ( ! n.available())
+			if ( ! n.available ())
 				return
 			return n.ping ( -1 )
 		})
 
 		return socketIo.emit11 ( 'pingCheck', function ( err, CallBack ) {
-			self.pingCheckLoading ( false )
+			
 			if ( CallBack === -1 ) {
 				self.QTGateRegions().forEach ( function ( n ) {
 					n.ping ( -2 )
 				})
 				return self.pingError ( true )
 			}
-			return self.QTGateRegions.sort ( function ( a, b ) {
+			return self.QTGateRegions().sort ( function ( a, b ) {
 				const _a = a.ping()
 				const _b = b.ping()
+				
 				if ( a.available() === b.available()) {
 					if ( !a.available ())
 						return 0
@@ -331,6 +457,9 @@ class CoGateClass {
 
 }
 
+interface PlanArray {
+	name: string
+}
 const planArray = [
     {
 		name:'free',
@@ -357,6 +486,9 @@ const planArray = [
 		},{
 			title: ['多代理','マルチプロクシ','Multi-Gateway','多代理'],
 			detail: ['1','1','1','1'],
+		},{
+			title: ['客户端数','端末数','Devices','客戶端數'],
+			detail: ['无限制','無制限','Unlimited','無限制'],
 		}]
 
     },{
@@ -384,6 +516,9 @@ const planArray = [
 		},{
 			title: ['多代理','マルチプロクシ','Multi-Gateway','多代理'],
 			detail: ['2','2','2','2'],
+		},{
+			title: ['客户端数','端末数','Devices','客戶端數'],
+			detail: ['无限制','無制限','Unlimited','無限制'],
 		}]
     },{
 		name:'p2',
@@ -409,17 +544,26 @@ const planArray = [
 		},{
 			title: ['多代理','マルチプロクシ','Multi-Gateway','多代理'],
 			detail: ['4','4','4','4'],
+		},{
+			title: ['客户端数','端末数','Devices','客戶端數'],
+			detail: ['无限制','無制限','Unlimited','無限制'],
 		}]
     }
 ]
 
 
 class planUpgrade {
+	public currentPromo: KnockoutObservable < CoPromo > = ko.observable (null) 
 	private plan = planArray[ this.planNumber ]
 	public showNote = ko.observable ( false )
 	public detailArea = ko.observable ( true )
-	public annually = this.promo ? Math.round ( this.promoPrice * this.plan.annually * 100 )/100 : this.plan.annually
-	public annuallyMonth = Math.round ( this.annually * 100 / 12 ) / 100
+	public _promo = this.dataTransfer.promo[0]
+	public _promoFor = this._promo.promoFor
+	
+	
+
+	//public annually = this.promo ? Math.round ( this.promoPrice * this.plan.annually * 100 )/100 : this.plan.annually
+	public planExpiration: string
 	public monthlyPay = this.plan.monthlyPay
 	public showCancel = ko.observable ( false )
 	public showCurrentPlanBalance = null
@@ -439,6 +583,15 @@ class planUpgrade {
 	public showSuccessPayment = ko.observable ( false )
 	public cardExpirationYearFolder_Error = ko.observable ( false )
 	public cancel_Amount = ko.observable (0)
+	public totalAmount
+	public currentPromoIndex: number
+	public paymentError = ko.observable ( false )
+	
+	public annually: string
+	public annuallyMonth: string 
+	public planExpirationYear = ko.observable ('')
+	public planExpirationMonth = ko.observable ('')
+	public planExpirationDay = ko.observable ('')
 
 	private clearPaymentError () {
 		this.cardNumberFolder_Error ( false )
@@ -449,12 +602,45 @@ class planUpgrade {
 		return this.paymentCardFailed ( false )
 
 	}
+	/*
+	public get annually () {
+		if ( !this.promo || !this.promo.length ) {
+			return this.plan.annually
+		}
+		const index = this.promo.findIndex ( function ( n ) {
+			return n.promoFor === this.plan.name
+		})
+		if ( index < 0 ) {
+			return this.plan.annually
+		}
+		const promo = this.promo [ index ]
+		return  Math.round (( parseInt ( this.plan.annually ) * promo.pricePromo * 100 ) / 100 )
+	}
 
-	constructor ( public planNumber: number, public isAnnual: boolean,  public promo: string[], public promoPrice, private dataTransfer: iTransferData, exit: ( payment ? ) => void ) {
+	public get annuallyMonth () {
+
+	}
+	*/
+
+
+	constructor ( public planNumber: number, public isAnnual: boolean, private dataTransfer: iTransferData, private exit: ( payment ? ) => void ) {
 		const self = this
+		this.currentPromoIndex = this._promoFor && this._promoFor.length ? this._promoFor.findIndex ( function ( n ) {
+			return n === self.plan.name
+		}) : -1
+		if ( this.currentPromoIndex > -1 ) {
+			this.currentPromo ( this._promo )
+		}
+		
+		this.annually = this.currentPromo() ?  ( Math.round (parseInt ( this.plan.annually * 100 ) * this.currentPromo().pricePromo) / 100 ).toString() : this.plan.annually
+		const month = this.currentPromo() ? 12 * this.currentPromo().datePromo : 12
+		this.annuallyMonth = ( Math.round ( parseInt ( this.annually * 100 ) / month ) / 100 ).toString ()
+		
+
 		if ( planNumber === 2 ) {
 			this.showNote ( true )
 		}
+
 		this.showCurrentPlanBalance = ko.computed (function (){
 			if ( /free/i.test (dataTransfer.productionPackage )) {
 				return null
@@ -462,6 +648,7 @@ class planUpgrade {
 			return getCurrentPlanUpgradelBalance ( dataTransfer.expire, dataTransfer.productionPackage, dataTransfer.isAnnual )
 
 		})
+
 		this.totalAmount = ko.computed ( function () {
 			const amount = ( Math.round (( self.payment() - self.showCurrentPlanBalance()) * 100 ) / 100 ).toString ()
             if ( !/\./.test( amount )) {
@@ -469,23 +656,43 @@ class planUpgrade {
             }
             return amount
 		})
+
+		socketIo.on ( 'cardToken', function ( err, res: QTGateAPIRequestCommand ) {
+			const data = res.Args[0]
+			self.doingPayment ( false )
+			if ( err || typeof res.error === 'number' && res.error > -1 ) {
+				return self.paymentError ( true )
+			}
+			self.showSuccessPayment ( true )
+
+			
+		})
 	}
+
+
 	public showPayment ( payment: number, annually: boolean ) {
 		this.detailArea ( false )
 		this.payment ( payment )
 		this.paymentAnnually ( annually )
+		const currentPro = this.currentPromo().datePromo || 1
+		const month = annually ? 12 * currentPro : 1
+		const expir = getExpireWithMonths ( month )
+		this.planExpirationYear ( expir.getFullYear ().toString())
+		this.planExpirationMonth ( expir.getMonth ().toString())
+		this.planExpirationDay ( expir.getDate ().toString())
+
 	}
 
 	private showWaitPaymentFinished () {
-
+		const self = this
 		this.doingPayment ( true )
 		this.paymentSelect ( false )
 		this.clearPaymentError ()
 		$('.paymentProcess').progress ('reset')
 		let percent = 0
-		const doingProcessBar = () => {
-			clearTimeout ( this.doingProcessBarTime )
-			this.doingProcessBarTime = setTimeout (() => {
+		const doingProcessBar = function () {
+			clearTimeout ( self.doingProcessBarTime )
+			self.doingProcessBarTime = setTimeout ( function () {
 				$('.paymentProcess').progress ({
 					percent: ++ percent
 				})
@@ -496,23 +703,18 @@ class planUpgrade {
 		return doingProcessBar ()
 	}
 
-	private stopShowWaitPaymentFinished () {
-		this.doingPayment ( false  )
-		clearTimeout ( this.doingProcessBarTime )
-		return $('.paymentProcess').progress ('reset')
-	}
 
 	public showBrokenHeart () {
 		return $( '.ui.basic.modal').modal ('setting', 'closable', false ).modal ( 'show' )
 	}
 
 	private paymentCallBackFromQTGate ( err, data: QTGateAPIRequestCommand ) {
-		this.stopShowWaitPaymentFinished ()
+		this.paymentSelect ( false )
 			if ( err ) {
 				return this.showBrokenHeart()
 			}
 			if ( data.error === -1 ) {
-				this.paymentSelect ( false )
+				
 				data.command === 'cancelPlan' ? this.showCancelSuccess ( true ) : this.showSuccessPayment ( true )
 				if ( data.command === 'cancelPlan' && data.Args[1]) {
 					this.cancel_Amount ( data.Args[1])
@@ -556,6 +758,7 @@ class planUpgrade {
 	}
 
 	public openStripeCard () {
+		const self = this
 		this.clearPaymentError ()
 		let handler = null
 		const amount = Math.round (( this.payment() - this.showCurrentPlanBalance()) * 100 )
@@ -566,20 +769,22 @@ class planUpgrade {
 				email: this.dataTransfer.account,
 				zipCode: true,
 				locale: _view.tLang() === 'tw' ? 'zh': _view.tLang(),
-				token: token => {
+				token: function ( token ) {
 					
 					const payment: iQTGatePayment = {
 						tokenID: token.id,
 						Amount: amount,
-						plan: this.plan.name,
-						isAnnual: this.paymentAnnually (),
+						plan: self.plan.name,
+						isAnnual: self.paymentAnnually (),
 						autoRenew: true
 						
 					}
-					this.showWaitPaymentFinished () 
-					return socketIo.emit ( 'cardToken', payment, ( err, data: QTGateAPIRequestCommand ) => {
-						return this.paymentCallBackFromQTGate ( err, data )
+					self.showWaitPaymentFinished ()
+					
+					return socketIo.emit11 ( 'cardToken', payment, function ( err, data: QTGateAPIRequestCommand ) {
+						return self.paymentCallBackFromQTGate ( err, data )
 					})
+					
 				}
 			})
 			handler.open ({
@@ -588,7 +793,7 @@ class planUpgrade {
 				amount: amount
 			})
 
-			return window.addEventListener( 'popstate', () => {
+			return window.addEventListener( 'popstate', function () {
 				handler.close()
 			})
 			
@@ -603,6 +808,11 @@ class planUpgrade {
 		
 
 	}
+
+
+	public closeClick () {
+		this.exit ()
+	}
 	
 }
 
@@ -615,8 +825,7 @@ const findCurrentPlan = function ( planName: string ) {
 class CoGateAccount {
 	public username = this.dataTransfer.account
 	public productionPackage = this.dataTransfer.productionPackage
-	public promo = this.dataTransfer.promo
-	public proPrice = this.dataTransfer.promoPrice
+	public promo = this.dataTransfer.promo[0]
 	public currentPlan = findCurrentPlan ( this.productionPackage )
 	public freeAccount = ko.observable ( /^free$/i.test(this.dataTransfer.productionPackage ))
 	public planArray = ko.observableArray ( planArray )
@@ -707,7 +916,7 @@ class CoGateAccount {
 	public selectPlan1 ( n: number ) {
 		let uu = null
 		const self = this
-		this.planUpgrade ( uu = new planUpgrade ( n, this.dataTransfer.isAnnual, this.dataTransfer.promo, this.dataTransfer.promoPrice, this.dataTransfer, function ( payment ) {
+		this.planUpgrade ( uu = new planUpgrade ( n, this.dataTransfer.isAnnual, this.dataTransfer, function ( payment ) {
 			self.planUpgrade ( uu = null )
 		}))
 
@@ -771,5 +980,6 @@ class CoGateAccount {
 		}
 		return doingProcessBar ()
 	}
+
 	
 }

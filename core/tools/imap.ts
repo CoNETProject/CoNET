@@ -78,7 +78,7 @@ class ImapServerSwitchStream extends Stream.Transform {
     private _login = false
     private first = true
     private idleCallBack = null
-    public waitLogout = false
+    public isWaitLogout = false
     public waitLogoutCallBack = null
     private _newMailChunk = Buffer.alloc (0)
     public idleResponsrTime: NodeJS.Timer = null
@@ -290,11 +290,12 @@ class ImapServerSwitchStream extends Stream.Transform {
                         console.log (`========================= [${ this.imapServer.imapSerialID }] openBox Error do this.end ()`, err )
                         return this.imapServer.destroyAll( err )
                     }
-                    if ( this.waitLogout ) {
+                    /*
+                    if ( this.isWaitLogout ) {
                         console.log (`capability this.waitLogout = true doing logout_process ()`)
                         return this.logout_process ( this.waitLogoutCallBack )
                     }
-                    
+                    */
                     if ( /^inbox$/i.test ( this.imapServer.listenFolder )) {
                         console.log (`capability open inbox !`)
                         this.canDoLogout = this.ready = true
@@ -302,9 +303,9 @@ class ImapServerSwitchStream extends Stream.Transform {
                     }
 
                     if ( newMail && typeof this.imapServer.newMail === 'function') {
-                        this.canDoLogout = this.ready = true
+                        
                         this.imapServer.emit ( 'ready' )
-                        console.log (`[${ this.imapServer.imapSerialID }]capability doing newMail = true`)
+                        //console.log (`[${ this.imapServer.imapSerialID }]capability doing newMail = true`)
                         return this.doNewMail ()
                     }
                     
@@ -346,161 +347,167 @@ class ImapServerSwitchStream extends Stream.Transform {
     public doNewMail () {
         
         this.reNewCount --
-        this.canDoLogout = true
-        this.checkLogout (() => {
-            if ( /LOGOUT/.test ( this.cmd )) {
-                return 
+               
+        this.canDoLogout = false
+        this.runningCommand = 'doNewMail'
+        this.seachUnseen (( err, newMailIds, havemore ) => {
+            if ( err ) {
+                return this.imapServer.destroyAll ( err )
             }
+            if (! newMailIds || ! newMailIds.length ) {
                 
-            this.canDoLogout = false
-            this.runningCommand = 'doNewMail'
-            this.seachUnseen (( err, newMailIds, havemore ) => {
+                this.runningCommand = null
+                return this.idleNoop()
+            }
+            let haveMoreNewMail = false
+            
+            return Async.waterfall ([
+                next => this.fetch ( newMailIds, next ),
+                ( _moreNew, next ) => {
+                    haveMoreNewMail = _moreNew
+                    return this.flagsDeleted ( newMailIds, next )
+                },
+                next => {
+                    return this.expunge ( next )
+                }
+            ], ( err: Error, newMail ) => {
+                
+                this.runningCommand = null
                 if ( err ) {
+                    saveLog ( `ImapServerSwitchStream [${ this.imapServer.imapSerialID }] doNewMail ERROR! [${ err.message }]`)
                     return this.imapServer.destroyAll ( err )
                 }
-                if (! newMailIds || ! newMailIds.length ) {
                     
-                    this.runningCommand = null
-                    return this.idleNoop()
+                if ( haveMoreNewMail || havemore || newMail ) {
+                    
+                    return this.doNewMail ()
                 }
-                let haveMoreNewMail = false
-                
-                return Async.waterfall ([
-                    next => this.fetch ( newMailIds, next ),
-                    ( _moreNew, next ) => {
-                        haveMoreNewMail = _moreNew
-                        return this.flagsDeleted ( newMailIds, next )
-                    },
-                    next => {
-                        return this.expunge ( next )
-                    }
-                ], ( err: Error, newMail ) => {
-                    
-                    this.runningCommand = null
-                    if ( err ) {
-                        saveLog ( `ImapServerSwitchStream [${ this.imapServer.imapSerialID }] doNewMail ERROR! [${ err.message }]`)
-                        return this.imapServer.destroyAll ( err )
-                    }
-                        
-                    if ( haveMoreNewMail || havemore || newMail ) {
-                        
-                        return this.doNewMail ()
-                    }
-                    return this.idleNoop ( )
-                })
-                
+                return this.idleNoop ( )
             })
+            
         })
         
     }
 
     public checkLogout ( CallBack ) {
 
-        if ( this.waitLogout ) {
-            console.trace ('checkLogout this.waitLogout = [true]')
-            if ( ! this.canDoLogout ) {
-                return this.logout_process ( CallBack )
-            }
-                
+        if ( !this.isWaitLogout ) {
+            console.log (`[${ this.imapServer.imapSerialID }] checkLogout have not waiting logout`)
+            return CallBack ()
+        }
+        const _callBack = () => {
             if ( this.exitWithDeleteBox ) {
+            
                 return this.deleteBox (() => {
                     return this.logout_process ( CallBack )
                 })
             }
-            return this.logout_process ( CallBack )
+            return this.logout_process ( CallBack )    
         }
-        CallBack ()
+
+        if ( ! this.canDoLogout ) {
+            this.isWaitLogout = true
+            this.idleCallBack = _callBack
+            return //console.trace (`[${ this.imapServer.imapSerialID }] checkLogout canDoLogout = false, set this.isWaitLogout = true &&  this.idleCallBack = CallBack`)
+            
+        }
+        return _callBack ()
+        
     }
 
     private idleNoop () {
-
+        if ( this.isWaitLogout ) {
+            if ( this.idleCallBack && typeof this.idleCallBack === 'function') {
+                return this.idleCallBack()
+            }
+            return console.log (`idleNoop have this.isWaitLogout but have not this.idleCallBack ${ typeof this.idleCallBack }`)
+        }
         this.canDoLogout = true
-        this.checkLogout (() => {
-            if ( /LOGOUT/.test ( this.cmd )) {
-                return
+        let newSwitchRet = false
+        this.runningCommand = 'idle'
+        if ( ! this.ready ) {
+            this.ready = true
+            this.imapServer.emit ( 'ready' )
+        }
+        this.doCommandCallback = ( err => {
+            if ( err ) {
+                return this.imapServer.destroyAll ( null )
             }
-                 
-            let newSwitchRet = false
-            this.runningCommand = 'idle'
-            if ( ! this.ready ) {
-                this.ready = true
-                this.imapServer.emit ( 'ready' )
+            this.waitingDoingIdleStop = false
+            this.runningCommand = null
+            if ( this.idleCallBack ) {
+                this.idleCallBack ()
+                return this.idleCallBack = null
             }
-            this.doCommandCallback = ( err => {
-                if ( err ) {
-                    return this.imapServer.destroyAll ( null )
-                }
-                this.waitingDoingIdleStop = false
-                this.runningCommand = null
-                if ( this.idleCallBack ) {
-                    this.idleCallBack ()
-                    return this.idleCallBack = null
-                }
-                //console.log(`IDLE DONE newSwitchRet = [${newSwitchRet}] nextRead = [${this.nextRead}]`)
-                if ( newSwitchRet || this.reNewCount > 0 ) {
-                    return this.doNewMail ()
-                }
+            //console.log(`IDLE DONE newSwitchRet = [${newSwitchRet}] nextRead = [${this.nextRead}]`)
+            if ( newSwitchRet || this.reNewCount > 0 ) {
+                return this.doNewMail ()
+            }
+            
+            if ( this.imapServer.idleSupport ) {
+                return this.idleNoop ()
+            }
+
+            setTimeout (() => {
+                return this.idleNoop ()
+            }, noopInterval )
+        })
     
-                if ( this.imapServer.idleSupport ) {
-                    return this.idleNoop ()
-                }
-    
-                setTimeout (() => {
-                    return this.idleNoop ()
-                }, noopInterval )
-            })
-       
-            this.idleNextStop = this.imapServer.idleSupport
-                ? setTimeout (() => {
-                    this.idleStop ()
-                }, idleInterval )
-                : null
-            this.commandProcess = (  text: string, cmdArray: string[], next, callback ) => {
-                switch ( cmdArray[0] ) {
-                    case '+':
-                    case '*': {
-                        clearTimeout ( this.idleResponsrTime )
-                        if ( /^RECENT$|^FETCH$|^EXISTS$/i.test ( cmdArray[2] )) {
-                            if ( parseInt ( cmdArray[1])) {
-                                newSwitchRet = true
-                                
-                                if ( ! this.callback ) {
-                                    this.callback = true 
-                                    next()
-                                }
-                                this.idleStop ()
-                                
-                                /*
-                                if ( this.nextRead ) {
-                                    clearTimeout(idleNoopTime)
-                                    return this.idleStop()
-                                }
-                                    
-                                console.log(`idle got RECENT, but this.nextRead === false [${this.nextRead}]`)
-                                */
+        this.idleNextStop = this.imapServer.idleSupport
+            ? setTimeout (() => {
+                this.idleStop ()
+            }, idleInterval )
+            : null
+        this.commandProcess = (  text: string, cmdArray: string[], next, callback ) => {
+            switch ( cmdArray[0] ) {
+                case '+':
+                case '*': {
+                    clearTimeout ( this.idleResponsrTime )
+                    if ( /^RECENT$|^FETCH$|^EXISTS$/i.test ( cmdArray[2] )) {
+                        if ( parseInt ( cmdArray[1])) {
+                            newSwitchRet = true
+                            
+                            if ( ! this.callback ) {
+                                this.callback = true 
+                                next()
                             }
+                            this.idleStop ()
+                            
+                            /*
+                            if ( this.nextRead ) {
+                                clearTimeout(idleNoopTime)
+                                return this.idleStop()
+                            }
+                                
+                            console.log(`idle got RECENT, but this.nextRead === false [${this.nextRead}]`)
+                            */
                         }
                         return callback ()
                     }
-                    default:
+                    if ( this.isWaitLogout ) {
+                        this.idleStop ()
+                    }
                     return callback ()
                 }
+                default:
+                return callback ()
             }
-            
-            const name = this.imapServer.idleSupport ? 'IDLE' : 'NOOP'
-            this.Tag = `${ name }`
-            this.cmd = `${ name } ${ name }`
-            
-            this.debug ? debugOut ( this.cmd, false, this.imapServer.imapSerialID ) : null
-            if ( this.writable ) {
-                this.idleResponsrTime = setTimeout (() => {
-                    console.log (`【${ new Date().toISOString ()}】====================[ do IDLE time out ]`)
-                    this.imapServer.destroyAll ( null )
-                }, 10000 )
-                return this.push ( this.cmd + '\r\n')
-            }
-            return this.imapServer.destroyAll ( null )
-        })
+        }
+        
+        const name = this.imapServer.idleSupport ? 'IDLE' : 'NOOP'
+        this.Tag = `${ name }`
+        this.cmd = `${ name } ${ name }`
+        
+        this.debug ? debugOut ( this.cmd, false, this.imapServer.imapSerialID ) : null
+        if ( this.writable ) {
+            this.idleResponsrTime = setTimeout (() => {
+                console.log (`【${ new Date().toISOString ()}】====================[ do IDLE time out ]`)
+                this.imapServer.destroyAll ( null )
+            }, 10000 )
+            return this.push ( this.cmd + '\r\n')
+        }
+        return this.imapServer.destroyAll ( null )
+        
     }
 
     private login ( text: string, cmdArray: string[], next, _callback ) {
@@ -616,7 +623,7 @@ class ImapServerSwitchStream extends Stream.Transform {
     }
 
     public _logout ( CallBack ) {
-        console.trace (`doing _logout typeof CallBack = [${ typeof CallBack }]`)
+        //console.trace (`doing _logout typeof CallBack = [${ typeof CallBack }]`)
         if ( !this.isImapUserLoginSuccess ) {
             return CallBack ()
         }
@@ -644,9 +651,7 @@ class ImapServerSwitchStream extends Stream.Transform {
 
     public append ( text: string, CallBack ) {
         //console.log (`[${ this.imapServer.imapSerialID }] ImapServerSwitchStream append => [${ text.length }]`)
-        if ( this.waitLogout ) {
-            return this.logout_process ( this.waitLogoutCallBack )
-        }
+        
         this.canDoLogout = false
         this.doCommandCallback = ( err, info: string ) => {
             this.canDoLogout = true
@@ -691,6 +696,7 @@ class ImapServerSwitchStream extends Stream.Transform {
         this.appendWaitResponsrTimeOut = setTimeout (() => {
             console.log (`IMAP append TIMEOUT stop IMAP this.imapServer.socket.end ()`)
             return this.imapServer.socket.end ()
+            this.imapServer.emit ('end')
         }, time )
         //console.log (`*************************************  append time = [${ time }] `)
         if ( this.imapServer.literalPlus ) {
@@ -702,9 +708,7 @@ class ImapServerSwitchStream extends Stream.Transform {
     }
 
     public appendStream ( readStream: Stream.Readable, length: number, CallBack ) {
-        if ( this.waitLogout ) {
-            return this.logout_process ( this.waitLogoutCallBack )
-        }
+        
         this.canDoLogout = false
         this.doCommandCallback = () => {
             this.canDoLogout = true
@@ -797,6 +801,7 @@ class ImapServerSwitchStream extends Stream.Transform {
     public fetch ( fetchNum, callback ) {
 
         this.doCommandCallback = ( err ) => {
+            //console.log (`ImapServerSwitchStream doing doCommandCallback [${ newSwitchRet }]`)
             return callback ( err, newSwitchRet )
         }
         
@@ -812,7 +817,7 @@ class ImapServerSwitchStream extends Stream.Transform {
                         }
                         return _callback ()
                     }
-                    if ( /^RECENT$/i.test ( cmdArray[2]) && parseInt (cmdArray[1]) > 0 ) {
+                    if ( /^RECENT$/i.test ( cmdArray[2]) && parseInt ( cmdArray[1]) > 0 ) {
                         newSwitchRet = true
                     }
                     return _callback ()
@@ -821,13 +826,15 @@ class ImapServerSwitchStream extends Stream.Transform {
                 return _callback ()
             }
         }
-
+        //console.log (`ImapServerSwitchStream doing UID FETCH `)
         this.cmd = `UID FETCH ${ fetchNum } ${ this.imapServer.fetchAddCom }`
         this.Tag = `A${ this.imapServer.TagCount1() }`
         this.cmd = `${ this.Tag } ${ this.cmd }`
         this.debug ? debugOut ( this.cmd, false, this.imapServer.imapSerialID ) : null
-        if ( this.writable )
+        if ( this.writable ) {
             return this.push ( this.cmd + '\r\n' )
+        }
+            
         return this.imapServer.logout ()
     }
 
@@ -864,11 +871,11 @@ class ImapServerSwitchStream extends Stream.Transform {
     }
 
     public logout ( callback: () => void ) {
-        if ( this.waitLogout ) {
-            return callback
+        if ( this.isWaitLogout ) {
+            return callback ()
         }
             
-        this.waitLogout = true
+        this.isWaitLogout = true
         this.checkLogout ( callback )
     }
 
@@ -884,12 +891,6 @@ class ImapServerSwitchStream extends Stream.Transform {
             
         const doLogout = () => {
             
-            if ( this.imapServer.listenFolder && this.imapServer.deleteBoxWhenEnd ) {
-                return Async.series ([
-                    next => { /^INBOX$/i.test( this.imapServer.listenFolder ) ? next () : this.deleteBox ( next )},
-                    next => this._logout ( next )
-                ], callback )
-            }
             return this._logout ( callback )
         }
         if ( this.imapServer.listenFolder && this.runningCommand ) {
@@ -1080,6 +1081,7 @@ export class qtGateImap extends Event.EventEmitter {
             
         })
         
+        
     }
 
     public destroyAll ( err: Error ) {
@@ -1099,6 +1101,9 @@ export class qtGateImap extends Event.EventEmitter {
     }
 
     public logout () {
+        if ( this.imapEnd ) {
+            return 
+        }
         this.imapEnd = true
         return this.imapStream.logout (() => {
             
@@ -1114,9 +1119,7 @@ export class qtGateImap extends Event.EventEmitter {
 }
 
 const appendFromFile = ( imap: ImapServerSwitchStream, fileName: string, CallBack ) => {
-    if ( imap.waitLogout ) {
-        return imap.logout_process ( imap.waitLogoutCallBack )
-    }
+    
     
     return Fs.stat ( fileName, ( err, stat: Fs.Stats ) => {
         if ( err ) {
@@ -1500,7 +1503,9 @@ export const imapGetMediaFile = ( IMapConnect: imapConnect, fileName: string, Ca
     })
 }
 
-const pingPongTimeOut = 1000 * 30
+const pingPongTimeOut = 1000 * 10
+
+
 interface mailPool {
     CallBack: () => void
     mail: Buffer
@@ -1795,7 +1800,7 @@ export class imapPeer extends Event.EventEmitter {
         })
 
         this.rImap.once ( 'end', err => {
-            
+            console.log (`imapPeer rImap on END!`)
             this.rImap = null
             this.makeRImap = false
             if ( !this.doingDestroy && !err ) {
@@ -1977,7 +1982,7 @@ const debugOutStream = ( text: string, isIn: boolean ) => {
     saveLogForstreamImap ( log )
 }
 
-class streamImap extends Stream.Transform {
+class streamImap1 extends Stream.Transform {
     public pipeWriteFile = false
     
     public writeStream: Stream.Writable = null
@@ -2398,7 +2403,7 @@ class streamImap extends Stream.Transform {
                 }
             }
         }
-
+        console.log (`class streamImap doing UID FETCH`)
         this.cmd = `UID FETCH ${ fetchNum } ${ this.fetchAddCom }`
         this.Tag = `A${ this.TagCount1() }`
         this.cmd = `${ this.Tag } ${ this.cmd }`

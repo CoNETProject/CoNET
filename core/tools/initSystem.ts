@@ -54,7 +54,7 @@ export const QTGateTemp = Path.join ( QTGateFolder, 'tempfile' )
 export const QTGateVideo = Path.join ( QTGateTemp, 'videoTemp')
 export const ErrorLogFile = Path.join ( QTGateFolder, 'systemError.log' )
 export const CoNETConnectLog = Path.join ( QTGateFolder, 'CoNETConnect.log' )
-export const imapDataFileName = Path.join ( QTGateFolder, 'imapData.pem' )
+export const imapDataFileName1 = Path.join ( QTGateFolder, 'imapData.pem' )
 
 export const CoNET_Home = Path.join ( __dirname )
 export const CoNET_PublicKey = Path.join ( CoNET_Home, '3C272D2E.pem')
@@ -64,6 +64,8 @@ export const configPath = Path.join ( QTGateFolder, 'config.json' )
 const packageFilePath = Path.join ( '..', '..','package.json')
 export const packageFile = require ( packageFilePath )
 export const QTGateSignKeyID = /3acbe3cbd3c1caa9/i
+export const twitterDataFileName = Path.join ( QTGateFolder, 'twitterData.pem' )
+
 export const checkFolder = ( folder: string, CallBack: ( err?: Error ) => void ) => {
     Fs.access ( folder, err => {
         if ( err ) {
@@ -162,16 +164,6 @@ export const InitConfig = () => {
 	return ret
 }
 
-const getBitLength = ( key: OpenPgp.key.Key ) => {
-	const algorithm = key.primaryKey.getAlgorithmInfo ()
-    return algorithm.bits
-}
-
-const getKeyId = ( key: OpenPgp.key.Key ) => {
-	const algorithm = key.primaryKey.getAlgorithmInfo ()
-    return algorithm.algorithm
-}
-
 export const getNickName = ( str: string ) => {
 	const uu = str.split ('<')
 	return uu[0]
@@ -212,7 +204,6 @@ export const getKeyPairInfo = ( publicKey: string, privateKey: string, password:
 	
 	ret.publicKey = publicKey
 	ret.privateKey = privateKey
-	ret.keyLength = getBitLength ( privateKey1 )
 	ret.nikeName = getNickName ( user.userId.userid )
 	ret.createDate = privateKey1.primaryKey.created.toDateString ()
 	ret.email = getEmailAddress ( user.userId.userid )
@@ -609,7 +600,7 @@ export const getPbkdf2 = ( config: install_config, passwrod: string, CallBack ) 
 }
 
 export const makeGpgKeyOption = ( config: install_config, passwrod: string, CallBack ) => {
-	const option: OpenPgp.option_KeyOption = {
+	const option = {
 		privateKeys: OpenPgp.key.readArmored ( config.keypair.privateKey ).keys,
 		publicKeys: null
 	}
@@ -632,13 +623,13 @@ export const makeGpgKeyOption = ( config: install_config, passwrod: string, Call
 	})
 }
 
-export const saveImapData = ( imapConnectData: IinputData, config: install_config, password: string, CallBack ) => {
+export const saveEncryptoData = ( fileName: string, data: any, config: install_config, password: string, CallBack ) => {
 		
-	if ( ! imapConnectData ) {
-		return Fs.unlink ( imapDataFileName, CallBack )
+	if ( ! data ) {
+		return Fs.unlink ( fileName, CallBack )
 	}
-	const _data = JSON.stringify ( imapConnectData )
-	const options: OpenPgp.encrypto_option = {
+	const _data = JSON.stringify ( data )
+	const options = {
 		data: _data,
 		publicKeys: OpenPgp.key.readArmored ( config.keypair.publicKey ).keys,
 		privateKeys: OpenPgp.key.readArmored ( config.keypair.privateKey ).keys
@@ -649,7 +640,7 @@ export const saveImapData = ( imapConnectData: IinputData, config: install_confi
 		}
 		return options.privateKeys[0].decrypt ( data.toString( 'hex' )).then ( keyOK => {
 			return OpenPgp.encrypt ( options ).then ( ciphertext => {
-				return Fs.writeFile ( imapDataFileName, ciphertext.data, { encoding: 'utf8' }, CallBack )
+				return Fs.writeFile ( fileName, ciphertext.data, { encoding: 'utf8' }, CallBack )
 			}).catch ( CallBack )
 		}).catch ( CallBack )
 		
@@ -658,17 +649,17 @@ export const saveImapData = ( imapConnectData: IinputData, config: install_confi
 
 }
 
-export const readImapData = ( savedPasswrod, config: install_config, CallBack ) => {
+export const readEncryptoFile = ( filename: string, savedPasswrod, config: install_config, CallBack ) => {
 	if ( ! savedPasswrod || ! savedPasswrod.length || ! config || ! config.keypair || ! config.keypair.createDate ) {
 		return CallBack ( new Error ('readImapData no password or keypair data error!'))
 	}
-	const options: OpenPgp.decrypto_option = {
+	const options = {
 		message: null,
 		publicKeys: OpenPgp.key.readArmored ( config.keypair.publicKey ).keys,
 		privateKeys: OpenPgp.key.readArmored ( config.keypair.privateKey ).keys
 	}
 	return Async.waterfall ([
-		next => Fs.access ( imapDataFileName, next ),
+		next => Fs.access ( filename, next ),
 		( acc, next ) => {
 			/**
 			 * 		support old nodejs 
@@ -694,7 +685,7 @@ export const readImapData = ( savedPasswrod, config: install_config, CallBack ) 
 			})
 		},
 		next => {
-			Fs.readFile ( imapDataFileName, 'utf8', next )
+			Fs.readFile ( filename, 'utf8', next )
 		}], ( err, data ) => {
 			if ( err ) {
 				return CallBack ( err )
@@ -717,8 +708,8 @@ export const readImapData = ( savedPasswrod, config: install_config, CallBack ) 
 	
 }
 
-export const encryptMessage = ( openKeyOption: OpenPgp.option_KeyOption, message: string, CallBack ) => {
-	const option: OpenPgp.encrypto_option = {
+export const encryptMessage = ( openKeyOption, message: string, CallBack ) => {
+	const option = {
 		privateKeys: openKeyOption.privateKeys,
 		publicKeys: openKeyOption.publicKeys,
 		data: message
@@ -729,8 +720,8 @@ export const encryptMessage = ( openKeyOption: OpenPgp.option_KeyOption, message
 	}).catch ( CallBack )
 }
 
-export const decryptoMessage = ( openKeyOption: OpenPgp.option_KeyOption, message: string, CallBack ) => {
-	const option: OpenPgp.decrypto_option = {
+export const decryptoMessage = ( openKeyOption, message: string, CallBack ) => {
+	const option = {
 		privateKeys: openKeyOption.privateKeys,
 		publicKeys: openKeyOption.publicKeys,
 		message: null
@@ -773,7 +764,7 @@ const testSmtpAndSendMail = ( imapData: IinputData, CallBack ) => {
 	})
 }
 
-export const sendCoNETConnectRequestEmail = ( imapData: IinputData, openKeyOption: OpenPgp.option_KeyOption, ver: string, publicKey: string, CallBack ) => {
+export const sendCoNETConnectRequestEmail = ( imapData: IinputData, openKeyOption, ver: string, publicKey: string, CallBack ) => {
 
 	const qtgateCommand: QTGateCommand = {
 		account: imapData.account,
@@ -851,3 +842,4 @@ export const testPing = ( hostIp: string, CallBack ) => {
 	})
 	
 }
+

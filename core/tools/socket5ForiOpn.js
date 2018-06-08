@@ -19,7 +19,6 @@ const Rfc1928 = require("./rfc1928");
 const res = require("./res");
 const Crypto = require("crypto");
 const proxyServer = require("./proxyServer");
-const Dgram = require("dgram");
 const Util = require("util");
 //	socks 5 headers
 const server_res = {
@@ -42,7 +41,7 @@ class socks5 {
         this.targetDomainData = null;
         this.keep = false;
         this.clientIP = this.socket.remoteAddress.split(':')[3] || this.socket.remoteAddress;
-        console.log(`new socks 5`);
+        //console.log (`new socks 5`)
         this.socket.once('data', (chunk) => {
             return this.connectStat2(chunk);
         });
@@ -62,7 +61,7 @@ class socks5 {
     connectStat3(data) {
         const CallBack = (err, _data) => {
             if (err) {
-                if (this.proxyServer.useGatWay && _data && _data.length && this.socket.writable) {
+                if (this.proxyServer.useGatWay && _data && _data.length && this.socket.writable && this.proxyServer.gateway) {
                     const uuuu = {
                         uuid: Crypto.randomBytes(10).toString('hex'),
                         host: this.host || this.targetIpV4,
@@ -72,15 +71,22 @@ class socks5 {
                         port: this.port,
                         ssl: isSslFromBuffer(_data)
                     };
-                    console.log(Util.inspect(uuuu));
+                    //console.log ( Util.inspect ( uuuu ))
+                    //console.log (`doing gateway.requestGetWay ssl [${ uuuu.ssl }][${ uuuu.host }:${ uuuu.port }] cmd [${ uuuu.cmd }]`)
                     const id = `[${this.clientIP}:${this.port}][${Util.inspect(uuuu)}] `;
                     return this.proxyServer.gateway.requestGetWay(id, uuuu, this.agent, this.socket);
                 }
+                console.log(`SOCK5 ! this.proxyServer.gateway STOP socket`);
                 return this.socket.end(res.HTTP_403);
             }
             return;
         };
         this.socket.once('data', (_data) => {
+            //			gateway shutdown
+            if (!this.proxyServer.gateway) {
+                //console.log (`SOCK5 !this.proxyServer.gateway STOP sokcet! res.HTTP_403`)
+                return this.socket.end(res._HTTP_PROXY_302(this.proxyServer.localhost, this.proxyServer.managerServerPort));
+            }
             proxyServer.tryConnectHost(this.host || this.targetIpV4, this.targetDomainData, this.port, _data, this.socket, false, this.proxyServer.checkAgainTimeOut, this.proxyServer.connectHostTimeOut, this.proxyServer.useGatWay, CallBack);
         });
         data.REP = Rfc1928.Replies.GRANTED;
@@ -93,16 +99,20 @@ class socks5 {
         else {
             this.targetDomainData = { dns: [{ family: 4, address: this.targetIpV4, expire: null, connect: [] }], expire: null };
         }
+        //			gateway shutdown
+        if (!this.proxyServer.gateway) {
+            return this.connectStat3(retBuffer);
+        }
         return proxyServer.checkDomainInBlackList(this.proxyServer.domainBlackList, this.host || this.targetIpV4, (err, result) => {
             if (result) {
-                console.log(`[${this.host}] Blocked!`);
+                console.log(`host [${this.host}] Blocked!`);
                 retBuffer.REP = Rfc1928.Replies.CONNECTION_NOT_ALLOWED_BY_RULESET;
                 return this.closeSocks5(retBuffer.buffer);
             }
             if (this.host && !this.proxyServer.useGatWay) {
                 return proxyServer.isAllBlackedByFireWall(this.host, false, this.proxyServer.gateway, this.agent, this.proxyServer.domainListPool, (err, _hostIp) => {
                     if (err) {
-                        console.log(`[${this.host}] Blocked!`);
+                        console.log(`host [${this.host}] Blocked!`);
                         retBuffer.REP = Rfc1928.Replies.CONNECTION_NOT_ALLOWED_BY_RULESET;
                         return this.closeSocks5(retBuffer.buffer);
                     }
@@ -136,7 +146,7 @@ class socks5 {
         //		IPv6 not support!
         switch (this.cmd) {
             case Rfc1928.CMD.CONNECT: {
-                console.log(`sock5 [${this.host}]`);
+                //console.log (`sock5 [${ this.host }]`)
                 this.keep = true;
                 break;
             }
@@ -160,8 +170,9 @@ class socks5 {
             req.REP = Rfc1928.Replies.COMMAND_NOT_SUPPORTED_or_PROTOCOL_ERROR;
             return this.closeSocks5(req.buffer);
         }
-        if (this.cmd === Rfc1928.CMD.UDP_ASSOCIATE)
-            return console.log('');
+        if (this.cmd === Rfc1928.CMD.UDP_ASSOCIATE) {
+            return console.log('this.cmd === Rfc1928.CMD.UDP_ASSOCIATE skip!');
+        }
         return this.connectStat2_after(req);
     }
 }
@@ -209,7 +220,7 @@ class sockt4 {
     connectStat2() {
         const CallBack = (err, _data) => {
             if (err) {
-                if (this.proxyServer.useGatWay && _data && _data.length && this.socket.writable) {
+                if (this.proxyServer.useGatWay && _data && _data.length && this.socket.writable && this.proxyServer.gateway) {
                     const uuuu = {
                         uuid: Crypto.randomBytes(10).toString('hex'),
                         host: this.host || this.targetIpV4,
@@ -222,12 +233,17 @@ class sockt4 {
                     const id = `[${this.clientIP}:${this.port}][${uuuu.uuid}] `;
                     return this.proxyServer.gateway.requestGetWay(id, uuuu, this.agent, this.socket);
                 }
+                console.log(`SOCK4 connectStat2 this.proxyServer.gateway === null`);
                 return this.socket.end(res.HTTP_403);
             }
             return;
         };
         this.socket.once('data', (_data) => {
             console.log(`connectStat2 [${this.host || this.targetIpV4}]get data `);
+            if (!this.proxyServer.gateway) {
+                console.log(`SOCK4 !this.proxyServer.gateway STOP sokcet! res.HTTP_403`);
+                this.socket.end(res._HTTP_PROXY_302(this.proxyServer.localhost, this.proxyServer.managerServerPort));
+            }
             proxyServer.tryConnectHost(this.host, this.targetDomainData, this.port, _data, this.socket, false, this.proxyServer.checkAgainTimeOut, this.proxyServer.connectHostTimeOut, this.proxyServer.useGatWay, CallBack);
         });
         const buffer = this.req.request_4_granted(!this.host ? null : this.targetDomainData.dns[0].address, this.port);
@@ -237,6 +253,10 @@ class sockt4 {
     connectStat1() {
         if (this.host) {
             this.targetDomainData = this.proxyServer.domainListPool.get(this.host);
+        }
+        //		gateway server shutdoan
+        if (!this.proxyServer.gateway) {
+            return this.connectStat2();
         }
         return proxyServer.checkDomainInBlackList(this.proxyServer.domainBlackList, this.host || this.targetIpV4, (err, result) => {
             if (result) {
@@ -265,32 +285,38 @@ class sockt4 {
     }
 }
 exports.sockt4 = sockt4;
-class UdpDgram {
-    constructor() {
-        this.server = null;
-        this.port = 0;
-        this.createDgram();
-    }
-    createDgram() {
-        this.server = Dgram.createSocket('udp4');
-        this.server.once('error', err => {
-            console.log('server.once error close server!', err);
-            this.server.close();
-        });
-        this.server.on('message', (msg, rinfo) => {
-            console.log(`UdpDgram server msg: ${msg.toString('hex')} from ${rinfo.address}:${rinfo.port}`);
-        });
-        this.server.once('listening', () => {
-            const address = this.server.address();
-            this.port = address.port;
-            console.log(`server listening ${address.address}:${address.port}`);
-        });
-        this.server.bind({ port: 0 }, (err, kkk) => {
-            if (err) {
-                return console.log(`server.bind ERROR`, err);
+/*
+export class UdpDgram {
+    private server: Dgram.Socket = null
+    public port = 0
+
+    private createDgram () {
+        this.server = Dgram.createSocket ( 'udp4' )
+        
+        this.server.once ( 'error', err => {
+            console.log ( 'server.once error close server!', err  )
+            this.server.close ()
+        })
+
+        this.server.on ( 'message', ( msg: Buffer, rinfo ) => {
+            console.log(`UdpDgram server msg: ${ msg.toString('hex') } from ${ rinfo.address }:${ rinfo.port }`)
+        })
+
+        this.server.once ( 'listening', () => {
+            const address = this.server.address()
+            this.port = address.port
+            console.log ( `server listening ${ address.address }:${ address.port }` )
+        })
+
+        this.server.bind ({ port: 0 } , ( err, kkk ) => {
+            if ( err ) {
+                return console.log ( `server.bind ERROR`, err )
             }
-            console.log(kkk);
-        });
+            console.log ( kkk )
+        })
+    }
+    constructor () {
+        this.createDgram ()
     }
 }
-exports.UdpDgram = UdpDgram;
+*/

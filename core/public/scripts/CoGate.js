@@ -1,15 +1,16 @@
-const Stripe_publicKey = 'pk_live_VwEPmqkSAjDyjdia7xn4rAK9';
+const Stripe_publicKey = 'pk_test_eVOSOJHeYmAznyxbZ4durBXh';
 class coGateRegion {
-    constructor(region, dataTransfer, account, exit) {
+    constructor(region, dataTransfer, account, isPublicImapAccount, exit) {
         this.region = region;
         this.dataTransfer = dataTransfer;
         this.account = account;
+        this.isPublicImapAccount = isPublicImapAccount;
         this.exit = exit;
         this.QTConnectData = ko.observable(null);
         this.QTGateConnect1 = ko.observable('1');
         this.showQTGateConnectOption = ko.observable(false);
         this.QTGateMultipleGateway = ko.observable(1);
-        this.QTGateMultipleGatewayPool = ko.observableArray([1, 2, 4]);
+        this.QTGateMultipleGatewayPool = ko.observableArray([]);
         this.isFreeUser = ko.observable(/free/i.test(this.dataTransfer.productionPackage));
         this.QTGateGatewayPortError = ko.observable(false);
         this.requestPortNumber = ko.observable('80');
@@ -21,8 +22,14 @@ class coGateRegion {
         this.error = ko.observable(-1);
         this.CoGateConnerting = ko.observable(false);
         this.disconnecting = ko.observable(false);
+        this.localHostIP = ko.observable('');
+        this.proxyInfoMacOS = ko.observable(false);
+        this.proxyInfoIE = ko.observable(false);
+        this.iOS = ko.observable(false);
+        this.fireFox = ko.observable(false);
+        this.android = ko.observable(false);
         const self = this;
-        socketIo.emit11('checkPort', '3001', (err, nextPort) => {
+        socketIo.emit11('checkPort', '3001', function (err, nextPort) {
             if (err) {
                 self.QTGateLocalProxyPort(nextPort);
             }
@@ -58,10 +65,35 @@ class coGateRegion {
                     inline: true
                 });
             }
-            return socketIo.emit11('checkPort', newValue, err => {
+            return socketIo.emit11('checkPort', newValue, function (err) {
                 return self.localProxyPortError(err);
             });
         });
+        setTimeout(function () {
+            $('.ui.radio.checkbox.canVoH').checkbox('check').checkbox({
+                onChecked: function () {
+                    self.QTGateConnect1('1');
+                }
+            });
+            $('.ui.radio.checkbox.canVoe').checkbox().checkbox({
+                onChecked: function () {
+                    if (self.isPublicImapAccount) {
+                        self.error(5);
+                        return $('.ui.radio.checkbox.canVoH').checkbox('check');
+                    }
+                    self.QTGateConnect1('2');
+                }
+            });
+        }, 50);
+        if (/p1/i.test(dataTransfer.productionPackage)) {
+            this.QTGateMultipleGatewayPool([1, 2]);
+        }
+        else if (/p2/i.test(dataTransfer.productionPackage)) {
+            this.QTGateMultipleGatewayPool([1, 2, 4]);
+        }
+        else {
+            this.QTGateMultipleGatewayPool([1]);
+        }
     }
     upgradeAccount() {
     }
@@ -85,6 +117,8 @@ class coGateRegion {
         }
         const data1 = connectCommand[0];
         if (data1) {
+            this.localHostIP(data1.localServerIp[0]);
+            this.QTGateLocalProxyPort(data1.localServerPort);
             //this.QTTransferData ( data1.transferData )
             return this.QTConnectData(data1);
         }
@@ -105,22 +139,76 @@ class coGateRegion {
             multipleGateway: [],
             requestPortNumber: this.requestPortNumber(),
             requestMultipleGateway: this.QTGateMultipleGateway(),
-            webWrt: this.WebRTCleak()
+            webWrt: this.WebRTCleak(),
+            globalIpAddress: null
         };
         this.CoGateConnerting(true);
         socketIo.emit11('QTGateGatewayConnectRequest', connect);
         return false;
     }
-    showUserInfoMacOS() {
+    showUserInfoMacOS(infoOS) {
+        this.closeInfo();
+        switch (infoOS) {
+            default:
+            case 'macOS': {
+                return this.proxyInfoMacOS(true);
+            }
+            case 'WInIE': {
+                return this.proxyInfoIE(true);
+            }
+            case 'iOS': {
+                return this.iOS(true);
+            }
+            case 'fireFox': {
+                return this.fireFox(true);
+            }
+            case 'android': {
+                return this.android(true);
+            }
+        }
     }
     disconnectClick() {
-        socketIo.emit11('disconnectClick');
-        this.QTConnectData(null);
+        const self = this;
+        this.disconnecting(true);
+        socketIo.emit11('disconnectClick', function () {
+            self.disconnecting(false);
+            self.QTConnectData(null);
+            self.exit();
+        });
+    }
+    closeErrMessage() {
+        this.error(-1);
+    }
+    selectConnectTech(n) {
+        this.QTGateConnect1(n.toString());
+        if (n === 2) {
+            if (this.isPublicImapAccount) {
+                this.error(5);
+                this.QTGateConnect1('1');
+            }
+        }
+        if (this.QTGateConnect1() === '1') {
+            $('.radio.checkbox.canVoH').checkbox('set checked');
+        }
+        else {
+            $('.radio.checkbox.canVoe').checkbox('set checked');
+        }
+        return false;
+    }
+    exit1() {
         this.exit();
+    }
+    closeInfo() {
+        this.proxyInfoMacOS(false);
+        this.proxyInfoIE(false);
+        this.iOS(false);
+        this.fireFox(false);
+        this.android(false);
     }
 }
 class CoGateClass {
-    constructor() {
+    constructor(isUsedPublicImapAccount) {
+        this.isUsedPublicImapAccount = isUsedPublicImapAccount;
         this.QTGateRegions = ko.observableArray(_QTGateRegions);
         this.reloading = ko.observable(true);
         this.CoGateRegion = ko.observable(null);
@@ -129,6 +217,7 @@ class CoGateClass {
         this.pingCheckLoading = ko.observable(false);
         this.pingError = ko.observable(false);
         this.doingCommand = false;
+        this.error = ko.observable(-1);
         this.freeAccount = ko.observable(true);
         this.CoGateAccount = ko.observable(null);
         const self = this;
@@ -136,37 +225,63 @@ class CoGateClass {
         socketIo.on('pingCheck', function (region, ping) {
             return self.pingCheckReturn(region, ping);
         });
+        socketIo.on('pingCheckSuccess', function () {
+            self.pingCheckLoading(false);
+            return self.QTGateRegions.sort(function (a, b) {
+                const _a = a.ping();
+                const _b = b.ping();
+                if (a.available() === b.available()) {
+                    if (!a.available())
+                        return 0;
+                    if (_b > 0 && _a > _b)
+                        return 1;
+                    return -1;
+                }
+                if (b.available() && !a.available()) {
+                    return 1;
+                }
+                return -1;
+            });
+        });
         socketIo.on('QTGateGatewayConnectRequest', function (err, cmd) {
-            if (!self.CoGateRegion) {
+            if (!self.CoGateRegion()) {
                 let uuu = null;
                 const region = cmd[0].region;
                 const regionIndex = self.QTGateRegions().findIndex(function (n) {
                     return n.qtRegion === region;
                 });
                 const uu = self.QTGateRegions()[regionIndex];
-                self.CoGateRegion(uuu = new coGateRegion(uu, self.QTTransferData(), function () {
+                uuu = new coGateRegion(uu, self.QTTransferData(), function () {
                     self.account();
-                }, function () {
+                }, isUsedPublicImapAccount, function () {
                     self.CoGateRegion(uuu = null);
                     return self.showCards(true);
-                }));
+                });
+                self.CoGateRegion(uuu);
             }
+            self.reloading(false);
+            self.showCards(false);
             return self.CoGateRegion().QTGateGatewayConnectRequestCallBack(err, cmd);
         });
-        socketIo.on('containerStop', function () {
+        socketIo.on('getAvaliableRegion', function (region, dataTransfer, config) {
+            return self.getAvaliableRegionCallBack(region, dataTransfer, config);
         });
     }
     getAvaliableRegionCallBack(region, dataTransfer, config) {
         this.showCards(true);
         this.QTGateRegions().forEach(function (n) {
-            const index = region.findIndex(function (nn) { return nn === n.qtRegion; });
-            if (index < 0)
+            const index = region.findIndex(function (nn) { return nn.regionName === n.qtRegion; });
+            if (index < 0) {
                 return n.available(false);
+            }
+            n.freeUser(region[index].freeUser);
+            n.canVoe(region[index].VoE);
             return n.available(true);
         });
         this.QTGateRegions.sort(function (a, b) {
-            if (a.available() === b.available())
+            if (a.available() === b.available()) {
                 return 0;
+            }
             if (b.available() && !a.available()) {
                 return 1;
             }
@@ -174,8 +289,6 @@ class CoGateClass {
         });
         this.reloading(false);
         this.doingCommand = false;
-        dataTransfer.promo = dataTransfer.promo || ['对折促销月：选择年付费送一年服务', '今月中プロモーション：50%オフ、一年払いと次年度フリー', 'Promotion 50% off:  Annual user will get next free year.', '對折促銷月：選擇年付費送一年服務'];
-        dataTransfer.promoPrice = 0.5;
         this.QTTransferData(dataTransfer);
         this.freeAccount(/^free$/i.test(dataTransfer.productionPackage));
         /*
@@ -202,19 +315,17 @@ class CoGateClass {
         const self = this;
         this.reloading(true);
         this.doingCommand = true;
-        socketIo.emit11('getAvaliableRegion', function (region, dataTransfer, config) {
-            if (region && region.length) {
-                return self.getAvaliableRegionCallBack(region, dataTransfer, config);
-            }
-        });
+        socketIo.emit11('getAvaliableRegion');
     }
     pingCheckReturn(region, ping) {
         const index = this.QTGateRegions().findIndex(function (n) { return n.qtRegion === region; });
-        if (index < 0)
+        if (index < 0) {
             return;
+        }
         const _reg = this.QTGateRegions()[index];
-        if (!_reg.available)
+        if (!_reg.available) {
             return;
+        }
         _reg.ping(ping);
         const fromIInputData = $(`#card-${_reg.qtRegion.replace('.', '-')}`);
         const uu = ping;
@@ -229,7 +340,7 @@ class CoGateClass {
         let uuu = null;
         this.CoGateRegion(uuu = new coGateRegion(uu, this.QTTransferData(), function () {
             self.account();
-        }, function () {
+        }, this.isUsedPublicImapAccount, function () {
             self.CoGateRegion(uuu = null);
             return self.showCards(true);
         }));
@@ -251,14 +362,13 @@ class CoGateClass {
             return n.ping(-1);
         });
         return socketIo.emit11('pingCheck', function (err, CallBack) {
-            self.pingCheckLoading(false);
             if (CallBack === -1) {
                 self.QTGateRegions().forEach(function (n) {
                     n.ping(-2);
                 });
                 return self.pingError(true);
             }
-            return self.QTGateRegions.sort(function (a, b) {
+            return self.QTGateRegions().sort(function (a, b) {
                 const _a = a.ping();
                 const _b = b.ping();
                 if (a.available() === b.available()) {
@@ -311,6 +421,9 @@ const planArray = [
             }, {
                 title: ['多代理', 'マルチプロクシ', 'Multi-Gateway', '多代理'],
                 detail: ['1', '1', '1', '1'],
+            }, {
+                title: ['客户端数', '端末数', 'Devices', '客戶端數'],
+                detail: ['无限制', '無制限', 'Unlimited', '無限制'],
             }]
     }, {
         name: 'p1',
@@ -337,6 +450,9 @@ const planArray = [
             }, {
                 title: ['多代理', 'マルチプロクシ', 'Multi-Gateway', '多代理'],
                 detail: ['2', '2', '2', '2'],
+            }, {
+                title: ['客户端数', '端末数', 'Devices', '客戶端數'],
+                detail: ['无限制', '無制限', 'Unlimited', '無限制'],
             }]
     }, {
         name: 'p2',
@@ -362,21 +478,43 @@ const planArray = [
             }, {
                 title: ['多代理', 'マルチプロクシ', 'Multi-Gateway', '多代理'],
                 detail: ['4', '4', '4', '4'],
+            }, {
+                title: ['客户端数', '端末数', 'Devices', '客戶端數'],
+                detail: ['无限制', '無制限', 'Unlimited', '無限制'],
             }]
     }
 ];
 class planUpgrade {
-    constructor(planNumber, isAnnual, promo, promoPrice, dataTransfer, exit) {
+    /*
+    public get annually () {
+        if ( !this.promo || !this.promo.length ) {
+            return this.plan.annually
+        }
+        const index = this.promo.findIndex ( function ( n ) {
+            return n.promoFor === this.plan.name
+        })
+        if ( index < 0 ) {
+            return this.plan.annually
+        }
+        const promo = this.promo [ index ]
+        return  Math.round (( parseInt ( this.plan.annually ) * promo.pricePromo * 100 ) / 100 )
+    }
+
+    public get annuallyMonth () {
+
+    }
+    */
+    constructor(planNumber, isAnnual, dataTransfer, exit) {
         this.planNumber = planNumber;
         this.isAnnual = isAnnual;
-        this.promo = promo;
-        this.promoPrice = promoPrice;
         this.dataTransfer = dataTransfer;
+        this.exit = exit;
+        this.currentPromo = ko.observable(null);
         this.plan = planArray[this.planNumber];
         this.showNote = ko.observable(false);
         this.detailArea = ko.observable(true);
-        this.annually = this.promo ? Math.round(this.promoPrice * this.plan.annually * 100) / 100 : this.plan.annually;
-        this.annuallyMonth = Math.round(this.annually * 100 / 12) / 100;
+        this._promo = this.dataTransfer.promo[0];
+        this._promoFor = this._promo.promoFor;
         this.monthlyPay = this.plan.monthlyPay;
         this.showCancel = ko.observable(false);
         this.showCurrentPlanBalance = null;
@@ -396,7 +534,20 @@ class planUpgrade {
         this.showSuccessPayment = ko.observable(false);
         this.cardExpirationYearFolder_Error = ko.observable(false);
         this.cancel_Amount = ko.observable(0);
+        this.paymentError = ko.observable(false);
+        this.planExpirationYear = ko.observable('');
+        this.planExpirationMonth = ko.observable('');
+        this.planExpirationDay = ko.observable('');
         const self = this;
+        this.currentPromoIndex = this._promoFor && this._promoFor.length ? this._promoFor.findIndex(function (n) {
+            return n === self.plan.name;
+        }) : -1;
+        if (this.currentPromoIndex > -1) {
+            this.currentPromo(this._promo);
+        }
+        this.annually = this.currentPromo() ? (Math.round(parseInt(this.plan.annually * 100) * this.currentPromo().pricePromo) / 100).toString() : this.plan.annually;
+        const month = this.currentPromo() ? 12 * this.currentPromo().datePromo : 12;
+        this.annuallyMonth = (Math.round(parseInt(this.annually * 100) / month) / 100).toString();
         if (planNumber === 2) {
             this.showNote(true);
         }
@@ -413,6 +564,14 @@ class planUpgrade {
             }
             return amount;
         });
+        socketIo.on('cardToken', function (err, res) {
+            const data = res.Args[0];
+            self.doingPayment(false);
+            if (err || typeof res.error === 'number' && res.error > -1) {
+                return self.paymentError(true);
+            }
+            self.showSuccessPayment(true);
+        });
     }
     clearPaymentError() {
         this.cardNumberFolder_Error(false);
@@ -426,16 +585,23 @@ class planUpgrade {
         this.detailArea(false);
         this.payment(payment);
         this.paymentAnnually(annually);
+        const currentPro = this.currentPromo().datePromo || 1;
+        const month = annually ? 12 * currentPro : 1;
+        const expir = getExpireWithMonths(month);
+        this.planExpirationYear(expir.getFullYear().toString());
+        this.planExpirationMonth(expir.getMonth().toString());
+        this.planExpirationDay(expir.getDate().toString());
     }
     showWaitPaymentFinished() {
+        const self = this;
         this.doingPayment(true);
         this.paymentSelect(false);
         this.clearPaymentError();
         $('.paymentProcess').progress('reset');
         let percent = 0;
-        const doingProcessBar = () => {
-            clearTimeout(this.doingProcessBarTime);
-            this.doingProcessBarTime = setTimeout(() => {
+        const doingProcessBar = function () {
+            clearTimeout(self.doingProcessBarTime);
+            self.doingProcessBarTime = setTimeout(function () {
                 $('.paymentProcess').progress({
                     percent: ++percent
                 });
@@ -445,21 +611,15 @@ class planUpgrade {
         };
         return doingProcessBar();
     }
-    stopShowWaitPaymentFinished() {
-        this.doingPayment(false);
-        clearTimeout(this.doingProcessBarTime);
-        return $('.paymentProcess').progress('reset');
-    }
     showBrokenHeart() {
         return $('.ui.basic.modal').modal('setting', 'closable', false).modal('show');
     }
     paymentCallBackFromQTGate(err, data) {
-        this.stopShowWaitPaymentFinished();
+        this.paymentSelect(false);
         if (err) {
             return this.showBrokenHeart();
         }
         if (data.error === -1) {
-            this.paymentSelect(false);
             data.command === 'cancelPlan' ? this.showCancelSuccess(true) : this.showSuccessPayment(true);
             if (data.command === 'cancelPlan' && data.Args[1]) {
                 this.cancel_Amount(data.Args[1]);
@@ -491,6 +651,7 @@ class planUpgrade {
         return this.paymentCardFailed(true);
     }
     openStripeCard() {
+        const self = this;
         this.clearPaymentError();
         let handler = null;
         const amount = Math.round((this.payment() - this.showCurrentPlanBalance()) * 100);
@@ -501,17 +662,17 @@ class planUpgrade {
                 email: this.dataTransfer.account,
                 zipCode: true,
                 locale: _view.tLang() === 'tw' ? 'zh' : _view.tLang(),
-                token: token => {
+                token: function (token) {
                     const payment = {
                         tokenID: token.id,
                         Amount: amount,
-                        plan: this.plan.name,
-                        isAnnual: this.paymentAnnually(),
+                        plan: self.plan.name,
+                        isAnnual: self.paymentAnnually(),
                         autoRenew: true
                     };
-                    this.showWaitPaymentFinished();
-                    return socketIo.emit('cardToken', payment, (err, data) => {
-                        return this.paymentCallBackFromQTGate(err, data);
+                    self.showWaitPaymentFinished();
+                    return socketIo.emit11('cardToken', payment, function (err, data) {
+                        return self.paymentCallBackFromQTGate(err, data);
                     });
                 }
             });
@@ -520,7 +681,7 @@ class planUpgrade {
                 description: `${this.plan.name} `,
                 amount: amount
             });
-            return window.addEventListener('popstate', () => {
+            return window.addEventListener('popstate', function () {
                 handler.close();
             });
         }
@@ -531,6 +692,9 @@ class planUpgrade {
             });
             return $('.showStripeErrorIcon').transition('flash');
         }
+    }
+    closeClick() {
+        this.exit();
     }
 }
 const findCurrentPlan = function (planName) {
@@ -544,8 +708,7 @@ class CoGateAccount {
         this.exit = exit;
         this.username = this.dataTransfer.account;
         this.productionPackage = this.dataTransfer.productionPackage;
-        this.promo = this.dataTransfer.promo;
-        this.proPrice = this.dataTransfer.promoPrice;
+        this.promo = this.dataTransfer.promo[0];
         this.currentPlan = findCurrentPlan(this.productionPackage);
         this.freeAccount = ko.observable(/^free$/i.test(this.dataTransfer.productionPackage));
         this.planArray = ko.observableArray(planArray);
@@ -618,7 +781,7 @@ class CoGateAccount {
     selectPlan1(n) {
         let uu = null;
         const self = this;
-        this.planUpgrade(uu = new planUpgrade(n, this.dataTransfer.isAnnual, this.dataTransfer.promo, this.dataTransfer.promoPrice, this.dataTransfer, function (payment) {
+        this.planUpgrade(uu = new planUpgrade(n, this.dataTransfer.isAnnual, this.dataTransfer, function (payment) {
             self.planUpgrade(uu = null);
         }));
     }

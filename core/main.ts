@@ -16,7 +16,7 @@
 
 import LocalServer from './localWebServer'
 const test = /^true$/.test ( process.argv[2] ) ? true : false
-const _start = process.argv[3] || false
+const _start = process.argv [3] || false
 export const start = ( cmd: () => void, _test ) => {
 	const localServer = new LocalServer ( cmd, _test )
 }

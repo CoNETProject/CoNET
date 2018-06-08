@@ -17,6 +17,7 @@ const uuID = function () {
     return uuid_generate().replace( /-/g,'')
 }
 
+
 const isElectronRender = typeof process === 'object'
 
 const cookieName = 'langEH'
@@ -221,6 +222,11 @@ const getExpire = function ( startDate: string, isAnnual: boolean ) {
 	return start
 }
 
+function getExpireWithMonths ( month: number ) {
+    let date = new Date()
+    return new Date ( date.setMonth ( date.getMonth() + month ))
+}
+
 const getCurrentPlanUpgradelBalance = function ( expiration: string, planName: string, isAnnual: boolean ) {
 	if ( !isAnnual ) {
         return getPlanPrice ( planName, false )
@@ -274,7 +280,14 @@ const infoDefine = [
                 return `中止订阅成功。您可以一直使用您的原订阅到${ new Date( PlanExpire) .toLocaleDateString() }为止。以后您将会自动成为CoNET免费用户，可以继续使用CoNET的各项免费功能。${ isAnnual ? `退款金额us$${ returnAmount }会在5个工作日内退还到您的支付卡。`: '下月起CoNET系统不再自动扣款。'} 祝您网络冲浪愉快。`
             },
             currentPlan:'当前订阅: ',
-            cardPaymentErrorMessage:['输入的信用卡号有误，或支付系统不支持您的信用卡！','输入的信用卡期限有误！','输入的信用卡安全码有误！','输入的信用卡持有人邮编有误！','支付失败，支付无法完成请稍后再试','支付数据存在错误','您的付款被发卡行所拒绝'],
+            cardPaymentErrorMessage:[
+                '输入的信用卡号有误，或支付系统不支持您的信用卡！',
+                '输入的信用卡期限有误！',
+                '输入的信用卡安全码有误！',
+                '输入的信用卡持有人邮编有误！',
+                '支付失败，支付无法完成请稍后再试',
+                '支付数据存在错误','您的付款被发卡行所拒绝'
+            ],
             planPrice: '订阅原价：',
             cancelPlanButton:'中止当前订阅',
             needPay: '应付金额：',
@@ -287,6 +300,8 @@ const infoDefine = [
             MonthBandwidthTitle:'月度代理服務器限额：',
             dayBandwidthTitle:'毎日限额：',
             upgradeTitle:'升级',
+            planExpirDate: function ( year: string, month: string, day: string ) { return `${ year } 年${ month }月${ day }日`},
+            
             accountOptionButton: '账户选项',
             paymentProcessing:'正在通讯中...',
             cantUpgradeMonthly: '年度计划不可降级为月度计划。请先终止您当前订阅的年度计划，再重新申请此月度订阅',
@@ -366,7 +381,8 @@ const infoDefine = [
         cover: {
             firstTitle1: 'CoNET平台',
             firstTitle2: '安全隐私自由的互联网',
-            start: '开门'
+            start: '开门',
+            proxyStoped: 'CoGate定制代理服务器已经停止，如需使用请重新定制代理服务器。'
         },
         
         firstNote: {
@@ -621,6 +637,7 @@ const infoDefine = [
             title: '高品质定制代理服务器区域',
             speedTest: '代理服务器速度测试：',
             error: [],
+            CoGateRegionStoped:'所订制的代理服务器已经被停止，如需使用请再次订制.',
             pingError:'代理服务区域速度检测发生错误，请退出CoNET，以管理员身份再次打开CoNET后，再执行速度检测！',
             connectQTGate:'正在获得代理服务器区域信息...',
             available: '服务中',
@@ -628,6 +645,7 @@ const infoDefine = [
             requestPortNumber: '指定代理服务器通讯端口',
             proxyDomain: '域名解释全程使用CoNET代理服务器端',
             setupCardTitle: '使用连接技术:',
+            paidUse:'本区域只对收费用户开放',
             MultipleGateway: '同时并发使用代理数',
             dataTransfer: '数据通讯：',
             dataTransfer_datail: ['全程使用代理服务器','当不能到达目标时使用代理'],
@@ -667,7 +685,7 @@ const infoDefine = [
         },
 
         useInfoMacOS: {
-            title:'<p>本地代理服务器已在后台运行，MacOS和Windows用户可以关闭本窗口。</p>您的其他电子设备，可通过设置本地Proxy伺服器，来使用CoNET连接到互联网',
+            title:'<p>本地代理服务器已在后台运行。</p>您的其他电子设备，可通过设置本地Proxy伺服器，来使用CoNET连接到互联网',
             title1:'MacOS 本地代理服务器设定',
             customProxy: '定制服务器生成完成：',
             webRTCinfo:'阻止WebRTC漏洞，请使用SOCKS代理设置，检查是否漏洞还在，请点击<a target="_blank" href="/Wrt">这里</a>',
@@ -700,16 +718,18 @@ const infoDefine = [
             comesoon:'即将推出',
             information: 'CoNET平台',
             app: ['Co定制代理','CoChat','Co云存储','Co邮件','Co新闻频道','CoNET定制业务','Co谷歌','Co推特', 'Co油管','Co加密货币钱包'],
-            qtgateGateway: 'CoNET提供的高質量上網技術iOPN和@OPN，在CoNET全球16個區域，當場定制您專屬的代理服務器，變換您的IP地址隱身無障礙的訪問互聯網',
+            qtgateGateway: 'CoNET提供的高质量上网技术iOPN和@OPN，在CoNET全球16个区域，当场定制您专属的代理服务器，变换您的IP地址隐身无障碍的访问互联网',
             dimmer: [
-                '高質量定制代理服務器，讓您隱身安全不受注意的網上沖浪。 ',
-                '推特風格隱身匿名去中心化不被封鎖的社交媒體',
-                '安全隱私文件存儲系統',
-                '隱身匿名郵件客戶端，免VPN訪問Gmail',
-                '提供免翻牆接受每日世界新聞',
-                'QTG承接定制各類公眾服務類及跨國企業私有APP業務',
-                '免代理匿名谷歌檢索客戶端',
-                '免代理匿名推特客戶端'
+                '高质量量身定制代理服务器业务，让您隐身安全不受注意的网上冲浪。 ',
+                '隐身匿名去中心化不被封锁的社交媒体',
+                '安全隐私文件云存储系统',
+                '隐身匿名邮件客户端，可免翻墙访问Gmail',
+                '免翻墙隐身匿名访问世界头条新闻',
+                'QTG承接定制各类公众服务类及跨国企业私有APP业务',
+                '免翻墙匿名隐身谷歌检索客户端',
+                '免翻墙匿名隐身推特客户端',
+                '免翻墙匿名隐身Youtube客户端，可下载视频',
+                '免翻墙匿名隐身加密货币钱包和交易所'
             ]
         }, 
 
@@ -812,14 +832,18 @@ const infoDefine = [
         QTGateGateway: {
             title: 'CoNET服务使用详细',
             processing: '正在尝试连接CoNET网络...',
-            error: [ '错误：您的账号下已经有一个正在使用CoNET代理服务器的连接，请先把它断开后再尝试连接。',
-                    '错误：您的账号已经无可使用流量，如果您需要继续使用CoNET代理服务器，请升级您的账户类型。如果是免费用户已经使用当天100M流量，请等待到明天继续使用，如您是免费用户已经用完当月1G流量，请等待到下月继续使用。',
-                    '错误：数据错误，请退出并重新启动CoNET！',
-                    '非常抱歉，您请求的代理区域无资源，请选择其他区域或稍后再试',
-                    '对不起，您所请求连接的区域不支持这样的连接技术，请换其他连接方法或选择其他区域连接'],
+            error: [ 
+            /* 0 */ '错误：您的账号下已经有一个正在使用CoNET代理服务器的连接，请先把它断开后再尝试连接。',
+            /* 1 */ '错误：您的账号已经无可使用流量，如果您需要继续使用CoNET代理服务器，请升级您的账户类型。如果是免费用户已经使用当天100M流量，请等待到明天继续使用，如您是免费用户已经用完当月1G流量，请等待到下月继续使用。',
+            /* 2 */ '错误：数据错误，请退出并重新启动CoNET！',
+            /* 3 */ '非常抱歉，您请求的代理区域无资源，请选择其他区域或稍后再试',
+            /* 4 */ '对不起，您所请求连接的区域不支持这样的连接技术，请换其他连接方法或选择其他区域连接',
+            /* 5 */ '@OPN链接技术不支持公用iCloud邮箱，请撤换通讯用IMAP邮箱，换您自有的iCloud邮箱。'
+                ],
             connected:'已连接。',
             promo: '促销活动',
             upgrade:'升级账号',
+            accountManager:'账户管理',
             userType:['免费用户','付费用户'],
             datatransferToday:'日流量限额：',
             datatransferMonth:'月流量限额：',
@@ -827,8 +851,8 @@ const infoDefine = [
             monthDatatransfer: '本月可使用流量',
             gatewayInfo: ['代理服务器IP地址：','代理服务器连接端口：'],
             userInfoButton: '使用指南',
-            stopGatewayButton:'切断连接',
-            disconnecting: '正在切断中'
+            stopGatewayButton:'停止所定制的服务器',
+            disconnecting: '正在销毁中...'
         },
 
         topWindow: {
@@ -896,6 +920,8 @@ const infoDefine = [
                 'CoNETに公衆及び私有ビジネスカスタム業務',
                 '匿名Googleサーチ端末',
                 '匿名Tweet端末',
+                '匿名Youtube端末、ビデオダウンロードをサポート',
+                '匿名ブロックチェーンウォレットとエクスチェンジ'
             ]
         }, 
 
@@ -936,6 +962,7 @@ const infoDefine = [
 
             dayBandwidthTitle:'日制限：',
             upgradeTitle:'アプグランド',
+            planExpirDate: function ( year: string, month: string, day: string ) { return `${ year } 年${ month }月${ day }日`},
             accountOptionButton: 'アカウトオプション',
             DowngradeTitle:'ダウングレードオプション',
             cancelPlan:'キャンセルプラン',
@@ -1036,7 +1063,7 @@ const infoDefine = [
         },
 
         useInfoMacOS: {
-            title:'ローカルプロキシサーバはバックグランドで実行しています。MacoSとWindowsユーザーはこのウィンドウを閉じても構わないです。他のデバイスはローカルプロキシに設定による、CoNET利用してインターネットへアクセスができます。',
+            title:'ローカルプロキシサーバはバックグランドで実行しています。他のデバイスはローカルプロキシに設定による、CoNET利用してインターネットへアクセスができます。',
             title1:'MacOS プロキシ設定',
             customProxy: 'サーバ作成しました',
             webRTCinfo:'WebRTC漏れ対応はSOCKSプロキシ設定をしてください。WebRTC漏れをテストするしたい場合は<a href="/Wrt" target="_blank">ここ</a>をクリックしてください',
@@ -1133,7 +1160,8 @@ const infoDefine = [
         cover: {
             firstTitle1: 'CoNETプラットフォーム',
             firstTitle2: '隠れて安全自由なネットワークへ',
-            start: 'オプンドア'
+            start: 'オプンドア',
+            proxyStoped: 'カスタマーゲートウェイサーバーが停止しました、再作成をしてください。'
         },
 
         firstNote:  {
@@ -1245,7 +1273,7 @@ const infoDefine = [
             smtpServer: 'SMTP設定',
             smtpServerInput: 'SMTPサーバー名又はIP',
             emailServerPassword: 'Emailパスワード(アプリパスワードお勧め)',
-            imapAccountConform: function ( iamp, account ) { return `<p class="ui small header brown">以下の事項をよく確認してから、送信ボタンを押してください：</p><p>このEmailアカンウト「<B class="red">${ iamp }</B>」はあなたがCoNETシステムを使用するのために、一時的新たに作ったEmailアカンウトです。あなたはCoNETにこのEmailアカンウトのアクセス権にすることが了承しました。</p><p>以下の内容をCoNETへ送信することを了承すること：メールアカウント「<B class="red">${ iamp }</B>」とAPPパスワード、ユーザー登録メール「<B class="red">${ account }</B>」、使う言語、タイムゾーン、パブリックキー。</p><p>あなたはCoNETに「<B class="red">${ account }</B>」へCoNETに関わるシステム情報、支払い、アカンウト、販促などを送信することを了承と認可をします。</p>` },
+            imapAccountConform: function ( iamp, account ) { return `<p class="ui small header brown">以下の事項をよく確認してから、送信ボタンを押してください：</p><p>このEmailアカンウト「<B class="red">${ iamp }</B>」はあなたがCoNETシステムを使用するのために、一時的新たに作ったEmailアカンウトです。あなたはCoNETにこのEmailアカンウトのアクセス権にすることが了承しました。</p><p>以下の内容をCoNETへ送信することを了承すること：メールアカウント「<B class="red">${ iamp }</B>」とAPPパスワード、メールアドレス「<B class="red">${ account }</B>」、使う言語、タイムゾーン、パブリックキー。</p><p>あなたはCoNETに「<B class="red">${ account }</B>」へCoNETに関わるシステム情報、支払い、アカンウト、販促などを送信することを了承と認可をします。</p>` },
             agree:'私はそのリスクが了承して続きする',
             imapOtherCheckError: 'Emailサーバーに接続ができませんでした。Emailサーバー名又はIPアドレス又は通信ポート番号に間違いがあります、詳細設定で再チェックをしてください。',
             CertificateError: 'Emailサーバーに提示したセキュリティ証明書は信頼できないものです。続くをしたい場合は、詳細設定の中の「セキュリティ証明書信頼でき無くとも接続をする」を選択してください。その場合はあなたのEmailインフォメーションを漏れる可能性があります。',
@@ -1403,9 +1431,11 @@ const infoDefine = [
             speedTest: 'スピードテスト：',
             available: 'サービス中',
             unavailable: '準備しています',
+            CoGateRegionStoped:'ゲートウェイサーバーシャットダウンされました。',
             requestPortNumber: 'ゲートウェイサーバーとの通信ポート:',
             proxyDomain:'ドメイン検索はCoNETゲットウェイ側に依頼します。',
             setupCardTitle: '接続技術:',
+            paidUse:'このエリアは契約ユーザーだけ使えます。',
             MultipleGateway: '並列使うゲットウェイ数',
             dataTransfer: '通信データは：',
             dataTransfer_datail: ['全てのデータをOPN経由','ターゲットサーバへ到達不能時だけ'],
@@ -1424,7 +1454,7 @@ const infoDefine = [
             ''],
             sendConnectRequestMail: [
                 'CoNETクライアントはCoNETシステムとの接続が切れた。再接続要請メールをCoNETシステムへ送信しました、接続を完了するまで時間がかかるのためしばらくお待ちおください。',
-                                    'CoNETに長い間ご利用していなっかた時、接続は切れた場合もあります。'],
+                'CoNETに長い間ご利用していなっかた時、接続は切れた場合もあります。'],
             GlobalIp: 'グロバールIP:',
             GlobalIpInfo:'要注意：【CoNET接続】をおすとあなたのグロバールIPアドレスをCoNETシステムに送信しますので、それを遠慮すれば【@OPN】接続を選んでください。@OPN技術がサンフランシスコリージョンに、iCloudメールしか対応しておりません。',
             cacheDatePlaceDate: [{ name:'1時間', id: 1 }, { name:'12時間', id: 12 },{ name:'一日', id: 24 }, { name:'15日', id: 360 }, { name:'1月', id: 720 }, { name:'6月', id: 4320 }, { name:'永遠', id: -1 }],
@@ -1450,13 +1480,18 @@ const infoDefine = [
         QTGateGateway: {
             title: 'CoNETサービス使用詳細',
             processing: 'CoNETネットワークへ接続中...',
-            error: ['エラー：あなたのアカンウトに既にCoNETゲットウェイに接続しているクライアントがありますが、その接続を退出してからもう一度接続してください。',
-                    'エラー：あなたのアカンウトにCoNETゲットウェイデータ通信制限になっております。もし引き続きご利用を頂きたいなら、アカンウトをアップグレードにしてください。フリーアカウントの場合は毎日100M、毎月1GBの通信制限があります。',
-                    'エラー：データフォーマットエラー、CoNETをリスタートしてください。','ごめんなさい、ご請求したゲットウェイエリアは準備中です。そのたのエリアを選ぶか、後ほど接続をしてください。',
-                    'エラー：請求した接続方法はこのエリアに対応しておりません、他のエリアに変更するか他の接続方法へください。'],
+            error: [
+        /* 0 */     'エラー：あなたのアカンウトに既にCoNETゲットウェイに接続しているクライアントがありますが、その接続を退出してからもう一度接続してください。',
+        /* 1 */     'エラー：あなたのアカンウトにCoNETゲットウェイデータ通信制限になっております。もし引き続きご利用を頂きたいなら、アカンウトをアップグレードにしてください。フリーアカウントの場合は毎日100M、毎月1GBの通信制限があります。',
+        /* 2 */     'エラー：データフォーマットエラー、CoNETをリスタートしてください。','ごめんなさい、ご請求したゲットウェイエリアは準備中です。そのたのエリアを選ぶか、後ほど接続をしてください。',
+        /* 3 */     'エラー：請求した接続方法はこのエリアに対応しておりません、他のエリアに変更するか他の接続方法へください。',
+        /* 4 */     '@OPN接続をしたいなら、公衆iCloudアカウントに対応できません、ご自分のiCloudアカウントをCoNET通信アカウントにしてください。'
+                ],
+                    
             connected:'接続しました。',
             promo: 'プロモーション',
             upgrade:'アップグレードアカンウト',
+            accountManager:'アカンウト',
             userType: ['無料ユーザー','月契約'],
             datatransferToday:'日通信量制限：',
             datatransferMonth:'月通信量制限：',
@@ -1464,12 +1499,12 @@ const infoDefine = [
             monthDatatransfer: '今月使える通信量',
             gatewayInfo: ['ゲットウェイIPアドレス：','ゲットウェイ接続ポート番号：'],
             userInfoButton: '使用ガイド',
-            stopGatewayButton:'ゲットウェイ接続を切る',
-            disconnecting: '接続を切っています'
+            stopGatewayButton:'ゲットウェイサーバを停止します',
+            disconnecting: 'ゲットウェイサーバを破壊しています'
         },
         
         qtGateView: {
-            title: 'CoNETへカスタムサーバーを要請',
+            title: 'CoNETへカスタムサーバーの作成を要請',
             QTGateConnectResultWaiting: 'CoNETへ接続請求メールを送信しました。初めてのCoNETへ接続請求ですから、接続完成したまで数分かかる場合もあるかもしれませんが、暫くお待ちをください。',
             mainImapAccount: 'CoNETへ情報交換用Emailアカンウト',
             QTGateDisconnectInfo: 'CoNETと接続はしておりません、通信専用Emailを選択してCoNETへ接続メールを送信します。',
@@ -1521,13 +1556,15 @@ const infoDefine = [
             
             dimmer: [
                 'Advanced private custom gateway service',
-                'Private and secure, decentralized Tweet style social media',
-                'The secure and Private cloud storage and file sharing',
+                'Private and secure, decentralized social media',
+                'Private cloud storage and file sharing',
                 'Privacy email client',
                 'Discover your world every day',
                 'Custom business solution for public or private APPs in CoNET',
                 'Privacy Google search client',
-                'Privacy Tweet client'
+                'Privacy Tweet client',
+                'Privacy Youtube client. May download Youtube video via 3rd-party webside.',
+                'Privacy blockchain wallet'
             ]
         }, 
         account:{
@@ -1559,6 +1596,7 @@ const infoDefine = [
             dayBandwidthTitle:'Day limited：',
             bandwidthBalance:'Bandwidth remaining: ',
             upgradeTitle: 'Upgrade',
+            planExpirDate: function ( year: string, month: string, day: string ) { return `${ month }/${ day } ${ year }`},
             accountOptionButton: 'Account option',
             planPrice: 'Plan price：',
             monthResetDay:'Monthly reset day: ',
@@ -1656,7 +1694,8 @@ const infoDefine = [
         cover: {
             firstTitle1: 'CoNET Platform',
             firstTitle2: 'Security Privacy And Freedom on the Internet',
-            start: 'ENTER NOW'
+            start: 'ENTER NOW',
+            proxyStoped: 'Gateway server shutdown. Please rebuild try again.'
         },
 
         useInfoiOS: {
@@ -1739,12 +1778,12 @@ const infoDefine = [
             proxyServerPort: 'HTTP & HTTPS proxy setup:',
             webRTCinfo:'Stop WebRTC leak: Please use SOCKS proxy setup. Click <a href="/Wrt" target="_blank">here</a> to check WebRTC leak.',
             wrtTest: 'Test result: ',
-            customProxy: 'Custom server ready',
+            customProxy: 'Custom gateway server ready',
             wrtTestAreaTitle: 'WebRTC leak area',
             proxyServerPassword: 'SOCKS proxy setup:',
             localIpAddress:'This is intronet IP address, No leak.',
             globalIpAddress:'This is your real IP address, If show this it is WebRTC leak.',
-            title:'Local proxy server is running at background. MacOS and windows user may close this window. All other devices can access internet via local proxy setup to use the CoNET OPN.',
+            title:'Local proxy server is running at background. All other devices can access internet via local proxy setup to use the CoNET OPN.',
             title1:'MacOS proxy setup',
             info:[{
                 title:'Open the control panel, click on network.',
@@ -1903,7 +1942,7 @@ const infoDefine = [
         imapInformation: {
             title: 'Email account to use by OPN.',
             tempImapAccount: `Have problem with your IMAP enabled email account? <a href="#" onclick="return linkClick ('https://github.com/QTGate/QTGate-Desktop-Client/wiki/iCloud-temporary-account')"> Get temporary account.</a>`,
-            infomation: `Please provide an IMAP enabled email account to be used with CoNET’s OPN services. The account name and password will be required. For your personal privacy, please consider registering a new email account to use. CoNET currently supports <a href="#" onclick="return linkClick('https://www.icloud.com/')">Apple iCloud</a>, <a href="#" onclick="return linkClick('https://outlook.live.com/owa/')">Outlook Mail</a>, <a href="#" onclick="return linkClick('https://login.yahoo.com/')">Yahoo Mail</a>, <a href="#" onclick="return linkClick('https://mail.google.com')">GMAIL</a>, <a href="#" onclick="return linkClick('https://www.gmx.com/')">GMX</a>, <a href="#" onclick="return linkClick('https://www.zoho.com/mail/')">ZOHO</a>. (@OPN currently supports iCloud mail only.) For passwords, it is recommended use a <a href="#" onclick="return linkClick('https://help.yahoo.com/kb/SLN15241.html')">generated app-specific password.</a> If using <a href="#" onclick="return linkClick('https://help.yahoo.com/kb/two-step-verification-sln5013.html')">2-step verification</a>, we recommend using a free anonymous SMS receiving site to receive SMS codes, ( such as <a href="#" onclick="return linkClick('http://receive-sms-online.com/')">receive-sms-online.com</a>, <a href="#" onclick="return linkClick('https://sms-online.co/receive-free-sms')" >sms-online.co</a>, <a href="#" onclick="return linkClick('https://receive-a-sms.com/')" >receive-a-sms.com</a>, or <a href="#" onclick="return linkClick('https://www.google.com/search?q=free+anonymous+SMS+receiving+site&oq=free+anonymous+SMS+receiving+site&aqs=chrome..69i57.268j0j4&sourceid=chrome&ie=UTF-8')" >others</a> ).`,
+            infomation: `Please provide an IMAP enabled email account to be used to communication with CoNET network. The account name and password will be required. For your personal privacy, please consider registering a new email account to use. CoNET currently supports <a href="#" onclick="return linkClick('https://www.icloud.com/')">Apple iCloud</a>, <a href="#" onclick="return linkClick('https://outlook.live.com/owa/')">Outlook Mail</a>, <a href="#" onclick="return linkClick('https://login.yahoo.com/')">Yahoo Mail</a>, <a href="#" onclick="return linkClick('https://mail.google.com')">GMAIL</a>, <a href="#" onclick="return linkClick('https://www.gmx.com/')">GMX</a>, <a href="#" onclick="return linkClick('https://www.zoho.com/mail/')">ZOHO</a>. (@OPN currently supports iCloud mail only.) For passwords, it is recommended use a <a href="#" onclick="return linkClick('https://help.yahoo.com/kb/SLN15241.html')">generated app-specific password.</a> If using <a href="#" onclick="return linkClick('https://help.yahoo.com/kb/two-step-verification-sln5013.html')">2-step verification</a>, we recommend using a free anonymous SMS receiving site to receive SMS codes, ( such as <a href="#" onclick="return linkClick('http://receive-sms-online.com/')">receive-sms-online.com</a>, <a href="#" onclick="return linkClick('https://sms-online.co/receive-free-sms')" >sms-online.co</a>, <a href="#" onclick="return linkClick('https://receive-a-sms.com/')" >receive-a-sms.com</a>, or <a href="#" onclick="return linkClick('https://www.google.com/search?q=free+anonymous+SMS+receiving+site&oq=free+anonymous+SMS+receiving+site&aqs=chrome..69i57.268j0j4&sourceid=chrome&ie=UTF-8')" >others</a> ).`,
             serverDetail: 'settings:',
             imapServer: 'IMAP server setup',
             imapServerInput: 'IMAP server name or IP address',
@@ -2071,10 +2110,12 @@ const infoDefine = [
         QTGateRegion: {
             title: 'Advanced private custom gateway service area.',
             available: 'Available',
+            CoGateRegionStoped:'Custom gateway server was stopped.',
             speedTest: 'Speed test：',
             unavailable: 'Unavailable',
             proxyDomain:'Domain lookup via CoNET gateway side.',
             setupCardTitle: 'connecting with:',
+            paidUse:'This area offer for subscription user.',
             MultipleGateway: 'Multi-Gateway:',
             dataViaGateway:'All internet data transfered via CoNET gateway.',
             dataTransfer: 'Data:',
@@ -2121,13 +2162,17 @@ const infoDefine = [
         QTGateGateway: {
             title: 'CoNET service user detail',
             processing: 'Trying to connect to CoNET network...',
-            error: ['Error: Your account has a connection that is using the CoNET proxy server. Please disconnect it before attempting to connect again.',
-                    'Error: Bandwidth maximum. If you would like to continue using OPN, please upgrade your account. Free accounts have a bandwidth maximum of 100MB per a day, 1 GB every month.',
-                    'Error: Data format error. Please restart CoNET.','Error: This area does not have the resources. Please select another area or try connecting again later.',
-                    'Error: This region does not support OPN technology. Please select another area, or change other connect type.'],
+            error: [
+            /* 0 */ 'Error: Your account has a connection that is using the CoNET proxy server. Please disconnect it before attempting to connect again.',
+            /* 1 */ 'Error: Bandwidth maximum. If you would like to continue using OPN, please upgrade your account. Free accounts have a bandwidth maximum of 100MB per a day, 1 GB every month.',
+            /* 2 */ 'Error: Data format error. Please restart CoNET.','Error: This area does not have the resources. Please select another area or try connecting again later.',
+            /* 3 */ 'Error: This region does not support OPN technology. Please select another area, or change other connect type.',
+            /* 4 */ '@OPN support your own iCloud account only. Please change the email account that used to communication with CoNET.'
+                ],
             connected:'connected.',
             promo: 'Promotions',
             upgrade:'Upgrade account',
+            accountManager:'Account',
             userType:['Free user', 'Subscription'],
             datatransferToday:'The daily bandith limit.：',
             datatransferMonth:'The monthly bandwidth limit.：',
@@ -2135,8 +2180,8 @@ const infoDefine = [
             monthDatatransfer: 'Available bandwidth this month.',
             gatewayInfo: ['Gateway Ip address：','Gateway connection port：'],
             userInfoButton: 'How to use?',
-            stopGatewayButton:'Disconnect',
-            disconnecting: 'Disconnecting'
+            stopGatewayButton:'Stop gateway server',
+            disconnecting: 'Destroying...'
         },
         
         qtGateView: {
@@ -2194,14 +2239,16 @@ const infoDefine = [
             qtgateGateway: 'CoNET提供的高質量上網技術iOPN和@OPN，在CoNET全球16個區域，當場定制您專屬的代理服務器，變換您的IP地址隱身無障礙的訪問互聯網',
             
             dimmer: [
-                '高質量定制代理服務器，讓您隱身安全不受注意的網上沖浪。',
-                '推特風格隱身匿名去中心化不被封鎖的社交媒體',
-                '安全隱私文件存儲系統',
-                '隱身匿名邮件客户端，免VPN访问Gmail',
-                '提供免翻墙接受每日世界新闻',
+                '高質量量身定制代理伺服器業務，讓您隱身安全不受注意的網上沖浪。',
+                '隱身匿名去中心化不被封鎖的社交媒體',
+                '安全隱私文件雲存儲系統',
+                '隱身匿名邮件客户端，可免翻牆访问Gmail',
+                '免翻墙隱身匿名訪問世界頭條新闻',
                 'QTG承接定制各類公眾服務類及跨國企業私有APP業務',
-                '免代理匿名谷歌檢索客戶端',
-                '免代理匿名推特客戶端'
+                '免翻牆匿名隱身谷歌檢索客戶端',
+                '免翻牆匿名隱身推特客戶端',
+                '免翻牆匿名隱身Youtube客戶端',
+                '免翻牆匿名隱身加密貨幣錢包和交易所'
                 
             ]
         }, 
@@ -2235,6 +2282,7 @@ const infoDefine = [
             MonthBandwidthTitle:'月度代理伺服器限額：',
             dayBandwidthTitle:'每日限額：',
             upgradeTitle:'升級',
+            planExpirDate: function ( year: string, month: string, day: string ) { return `${ year } 年${ month }月${ day }日`},
             accountOptionButton: '賬戶選項',
             paymentSuccess:'您的訂閱已經完成，數據流量限制已經被更新。祝您網絡衝浪愉快。',
             qtgateTeam: 'CoNET開發團隊敬上',
@@ -2373,7 +2421,7 @@ const infoDefine = [
         },
 
         useInfoMacOS: {
-            title:'本地代理伺服器已在後台運行，MacOS和Windows用戶可以關閉本窗口。您的其他電子設備，可通過設置本地Proxy伺服器，來使用CoNET連接到互聯網',
+            title:'本地代理伺服器已在後台運行。您的其他電子設備，可通過設置本地Proxy伺服器，來使用CoNET連接到互聯網',
             wrtTestAreaTitle: 'WebRTC漏洞数据泄漏区域',
             customProxy: '訂製伺服器完成',
             title1:'MacOS 本地代理伺服器設定',
@@ -2438,7 +2486,8 @@ const infoDefine = [
         cover: {
             firstTitle1: 'CoNET平台',
             firstTitle2: '安全隱私自由的互聯網',
-            start: '開門'
+            start: '開門',
+            proxyStoped: 'CoGate定制代理伺服器已經停止，如需使用請重新定制代理伺服器。'
         },
 
         topWindow: {
@@ -2690,9 +2739,11 @@ const infoDefine = [
             title: '高品質訂製代理伺服器區域',
             available: '服務中',
             speedTest: '代理伺服器速度測試',
+            CoGateRegionStoped:'所訂製的代理伺服器已經被停止，如需使用請再次訂製.',
             unavailable: '準備中',
             proxyDomain: '域名解釋全程使用CoNET代理伺服器端',
             setupCardTitle: '使用連接技術:',
+            paidUse:'本區域只對收費用戶開放',
             MultipleGateway: '同時併發使用代理數:',
             connectQTGate:'正在獲得代理伺服器區域信息...',
             dataTransfer: '數據通訊:',
@@ -2737,10 +2788,16 @@ const infoDefine = [
             title: 'CoNET服務使用詳細',
             promo: '促銷活動',
             processing: '正在嘗試连接CoNET網絡...',
-            error: ['錯誤：您的賬號下已經有一個正在使用CoNET代理伺服器的連接，請先把它斷開後再嘗試連接。', '錯誤：您的賬號已經無可使用流量，如果您需要繼續使用CoNET代理伺服器，請升級您的賬戶類型。如果是免費用戶已經使用當天100M流量，請等待到明天繼續使用，如您是免費用戶已經用完當月1G流量，請等待到下月繼續使用。',
-                    '錯誤：數據錯誤，請退出並重新啟動CoNET！','非常抱歉，您請求的代理區域無資源，請選擇其他區域或稍後再試','對不起，您所請求連接的區域不支持這樣的連接技術，請換其他連接方法或選擇其他區域連接'],
+            error: [
+                '錯誤：您的賬號下已經有一個正在使用CoNET代理伺服器的連接，請先把它斷開後再嘗試連接。', 
+                '錯誤：您的賬號已經無可使用流量，如果您需要繼續使用CoNET代理伺服器，請升級您的賬戶類型。如果是免費用戶已經使用當天100M流量，請等待到明天繼續使用，如您是免費用戶已經用完當月1G流量，請等待到下月繼續使用。',
+                '錯誤：數據錯誤，請退出並重新啟動CoNET！','非常抱歉，您請求的代理區域無資源，請選擇其他區域或稍後再試',
+                '對不起，您所請求連接的區域不支持這樣的連接技術，請換其他連接方法或選擇其他區域連接',
+                '@OPN链接技术不支持公用iCloud邮箱，请撤換通訊用IMAP郵箱，換您自有的iCloud邮箱。'
+            ],
             connected:'已連接。',
             upgrade:'升級賬號',
+            accountManager:'賬號管理',
             userType:['免費用戶','付費用戶'],
             datatransferToday:'日流量限額：',
             datatransferMonth:'月流量限額：',
@@ -2748,8 +2805,8 @@ const infoDefine = [
             monthDatatransfer: '本月可使用流量',
             gatewayInfo: ['代理伺服器IP地址：','代理伺服器連接端口：'],
             userInfoButton: '使用指南',
-            stopGatewayButton:'切斷連接',
-            disconnecting: '正在切斷中'
+            stopGatewayButton:'停止所定制伺服器',
+            disconnecting: '正在銷毀中...'
         },
         
         qtGateView: {
@@ -2777,6 +2834,8 @@ const infoDefine = [
 const linkClick = function ( url: string ) {
     return window.open ( url, '_blank')
 }
+
+const socketIo = io ({ reconnectionAttempts: 5, timeout: 500, autoConnect: true })
 const QTGateRegionsSetup: IQTGateRegionsSetup[] = [
     {
         title: '@OPN'
@@ -2802,7 +2861,8 @@ const _QTGateRegions: QTGateRegions[] = [
         showRegionConnectProcessBar: ko.observable ( false ),
         showConnectedArea: ko.observable ( false ),
         ping: ko.observable ( -2 ),
-        downloadSpeed: ko.observable (-2)
+        downloadSpeed: ko.observable (-2),
+        freeUser: ko.observable(false)
 
     },{
         icon: 'singapore',
@@ -2820,7 +2880,8 @@ const _QTGateRegions: QTGateRegions[] = [
         showRegionConnectProcessBar: ko.observable ( false ),
         showConnectedArea: ko.observable ( false ),
         ping: ko.observable ( -2 ),
-        downloadSpeed: ko.observable (-2)
+        downloadSpeed: ko.observable (-2),
+        freeUser: ko.observable(false)
     },{
         icon: 'japan',
         content: ['东京','東京','Tokyo','東京'],
@@ -2837,7 +2898,8 @@ const _QTGateRegions: QTGateRegions[] = [
         showRegionConnectProcessBar: ko.observable ( false ),
         showConnectedArea: ko.observable ( false ),
         ping: ko.observable ( -2 ),
-        downloadSpeed: ko.observable (-2)
+        downloadSpeed: ko.observable (-2),
+        freeUser: ko.observable(false)
     },{
         icon: 'france',
         content: ['巴黎','パリ','Paris','巴黎'],
@@ -2854,7 +2916,8 @@ const _QTGateRegions: QTGateRegions[] = [
         showRegionConnectProcessBar: ko.observable ( false ),
         showConnectedArea: ko.observable ( false ),
         ping: ko.observable ( -2 ),
-        downloadSpeed: ko.observable (-2)
+        downloadSpeed: ko.observable (-2),
+        freeUser: ko.observable(true)
     }
     /*
     ,{
@@ -2892,7 +2955,8 @@ const _QTGateRegions: QTGateRegions[] = [
         showRegionConnectProcessBar: ko.observable ( false ),
         showConnectedArea: ko.observable ( false ),
         ping: ko.observable ( -2 ),
-        downloadSpeed: ko.observable (-2)
+        downloadSpeed: ko.observable (-2),
+        freeUser: ko.observable(false)
     },{
         icon: 'germany',
         content: ['法兰克福','フランクフルト','Frankfurt','法蘭克福'],
@@ -2909,7 +2973,8 @@ const _QTGateRegions: QTGateRegions[] = [
         showRegionConnectProcessBar: ko.observable ( false ),
         showConnectedArea: ko.observable ( false ),
         ping: ko.observable ( -2 ),
-        downloadSpeed: ko.observable (-2)
+        downloadSpeed: ko.observable (-2),
+        freeUser: ko.observable(false)
 
     },{
         icon: 'united kingdom',
@@ -2927,7 +2992,8 @@ const _QTGateRegions: QTGateRegions[] = [
         showRegionConnectProcessBar: ko.observable ( false ),
         showConnectedArea: ko.observable ( false ),
         ping: ko.observable ( -2 ),
-        downloadSpeed: ko.observable (-2)
+        downloadSpeed: ko.observable (-2),
+        freeUser: ko.observable(false)
     },{
         icon: 'united kingdom',
         content: ['伦敦','ロンドン','London','倫敦'],
@@ -2944,7 +3010,8 @@ const _QTGateRegions: QTGateRegions[] = [
         showRegionConnectProcessBar: ko.observable ( false ),
         showConnectedArea: ko.observable ( false ),
         ping: ko.observable ( -2 ),
-        downloadSpeed: ko.observable (-2)
+        downloadSpeed: ko.observable (-2),
+        freeUser: ko.observable(false)
     },{
         icon: 'australia',
         content: ['悉尼','シドニー','Sydney','悉尼'],
@@ -2961,7 +3028,8 @@ const _QTGateRegions: QTGateRegions[] = [
         showRegionConnectProcessBar: ko.observable ( false ),
         showConnectedArea: ko.observable ( false ),
         ping: ko.observable ( -2 ),
-        downloadSpeed: ko.observable (-2)
+        downloadSpeed: ko.observable (-2),
+        freeUser: ko.observable(false)
     },{
         icon: 'united states',
         content: ['纽约','ニューヨーク','New York City','紐約'],
@@ -2978,7 +3046,8 @@ const _QTGateRegions: QTGateRegions[] = [
         showRegionConnectProcessBar: ko.observable ( false ),
         showConnectedArea: ko.observable ( false ),
         ping: ko.observable ( -2 ),
-        downloadSpeed: ko.observable (-2)
+        downloadSpeed: ko.observable (-2),
+        freeUser: ko.observable(false)
 
     },{
         icon: 'canada',
@@ -2996,7 +3065,8 @@ const _QTGateRegions: QTGateRegions[] = [
         showRegionConnectProcessBar: ko.observable ( false ),
         showConnectedArea: ko.observable ( false ),
         ping: ko.observable ( -2 ),
-        downloadSpeed: ko.observable (-2)
+        downloadSpeed: ko.observable (-2),
+        freeUser: ko.observable(false)
     },{
         icon: 'united states',
         content: ['旧金山','サンフランシスコ','San Francisco','舊金山'],
@@ -3013,7 +3083,8 @@ const _QTGateRegions: QTGateRegions[] = [
         showRegionConnectProcessBar: ko.observable ( false ),
         showConnectedArea: ko.observable ( false ),
         ping: ko.observable ( -2 ),
-        downloadSpeed: ko.observable (-2)
+        downloadSpeed: ko.observable (-2),
+        freeUser: ko.observable(false)
     },{
         icon: 'hong kong',
         content: ['香港','香港','Hong Kong','香港'],
@@ -3030,7 +3101,8 @@ const _QTGateRegions: QTGateRegions[] = [
         showRegionConnectProcessBar: ko.observable ( false ),
         showConnectedArea: ko.observable ( false ),
         ping: ko.observable ( -2 ),
-        downloadSpeed: ko.observable (-2)
+        downloadSpeed: ko.observable (-2),
+        freeUser: ko.observable(false)
     },{
         icon: 'china',
         content: ['上海市','上海市','Shanghai','上海市'],
@@ -3047,7 +3119,8 @@ const _QTGateRegions: QTGateRegions[] = [
         showRegionConnectProcessBar: ko.observable ( false ),
         showConnectedArea: ko.observable ( false ),
         ping: ko.observable ( -2 ),
-        downloadSpeed: ko.observable (-2)
+        downloadSpeed: ko.observable (-2),
+        freeUser: ko.observable(false)
     },{
         icon: 'china',
         content: ['北京市','北京市','Beijing','北京市'],
@@ -3064,7 +3137,8 @@ const _QTGateRegions: QTGateRegions[] = [
         showRegionConnectProcessBar: ko.observable ( false ),
         showConnectedArea: ko.observable ( false ),
         ping: ko.observable ( -2 ),
-        downloadSpeed: ko.observable (-2)
+        downloadSpeed: ko.observable (-2),
+        freeUser: ko.observable(false)
     },{
         icon: 'china',
         content: ['无锡市','無錫市','Wuxi','無錫市'],
@@ -3081,6 +3155,7 @@ const _QTGateRegions: QTGateRegions[] = [
         showRegionConnectProcessBar: ko.observable ( false ),
         showConnectedArea: ko.observable ( false ),
         ping: ko.observable ( -2 ),
-        downloadSpeed: ko.observable (-2)
+        downloadSpeed: ko.observable (-2),
+        freeUser: ko.observable(false)
     }
 ]

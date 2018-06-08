@@ -63,6 +63,7 @@ class gateWay {
         this.multipleGateway = multipleGateway;
         this.userAgent = null;
         this.currentGatewayPoint = 0;
+        this.RemoteServerDistroyed = false;
     }
     request(str, gateway) {
         return Buffer.from(otherRequestForNet(str, gateway.gateWayIpAddress, gateway.gateWayPort, this.userAgent), 'utf8');
@@ -91,18 +92,31 @@ class gateWay {
         _socket.once('end', () => {
             //console.log ( `_socket.once end!` )
         });
+        _socket.once('error', err => {
+            return CallBack(err);
+        });
         httpBlock.once('error', err => {
             console.log(`httpBlock.on error`, err);
             _socket.end(res._HTTP_502);
             return CallBack(err);
         });
         decrypt.once('err', err => {
+            CallBack(err);
         });
         encrypt.pipe(_socket).pipe(httpBlock).pipe(decrypt).pipe(finish);
     }
     requestGetWay(id, uuuu, userAgent, socket) {
+        //			remote server was stoped
+        if (this.RemoteServerDistroyed) {
+            console.log(`requestGetWay this.RemoteServerDistroyed === true !`);
+            return socket.end(res._HTTP_404);
+        }
         this.userAgent = userAgent;
         const gateway = this.getCurrentGateway();
+        //		remote gateway error
+        if (!gateway) {
+            return socket.end(res._HTTP_404);
+        }
         const decrypt = new Compress.decryptStream(gateway.randomPassword);
         const encrypt = new Compress.encryptStream(gateway.randomPassword, 3000, (str) => {
             return this.request(str, gateway);
@@ -112,7 +126,7 @@ class gateWay {
             socket.end(res._HTTP_404);
         });
         encrypt.once('end', () => {
-            console.log(`encrypt.once end`);
+            //console.log (`encrypt.once end` )
             socket.end(res._HTTP_404);
         });
         encrypt.once('error', err => {
@@ -133,7 +147,7 @@ class gateWay {
             socket.end(res._HTTP_404);
         });
         encrypt.pipe(_socket).pipe(httpBlock).pipe(decrypt).pipe(socket).pipe(encrypt);
-        console.log(`new requestGetWay use gateway[${gateway.gateWayIpAddress}: ${gateway.gateWayPort || 80}]`);
+        //console.log ( `new requestGetWay use gateway[${ gateway.gateWayIpAddress }: ${ gateway.gateWayPort || 80 }]`)
     }
 }
 exports.default = gateWay;

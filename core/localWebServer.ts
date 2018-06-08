@@ -30,14 +30,21 @@ import * as Imap from './tools/imap'
 import CoNETConnectCalss from './tools/coNETConnect'
 import * as Crypto from 'crypto'
 import * as ProxyServer from './tools/proxyServer'
+import * as Jimp from 'jimp'
+import * as UploadFile from './tools/uploadFile'
+import * as Twitter_text from 'twitter-text'
 
 interface localConnect {
 	socket: SocketIO.Socket
 	login: boolean
 	listenAfterPasswd: boolean
 }
+
 let logFileFlag = 'w'
 const conetImapAccount = /^qtgate_test\d\d?@icloud.com$/i
+const tweetImageMaxWidth = 1024
+const tweetImageMaxHeight = 512
+
 const saveLog = ( err: {} | string ) => {
 	if ( !err ) {
 		return 
@@ -115,14 +122,18 @@ export default class localServer {
 	public imapConnectData: IinputData = null
 	public localConnected: Map < string, localConnect > = new Map ()
 	private CoNETConnectCalss: CoNETConnectCalss = null
-	private openPgpKeyOption: openpgp.option_KeyOption = null
+	private openPgpKeyOption = null
 	private pingChecking = false
 	private regionV1: regionV1[] = null
 	private connectCommand: IConnectCommand[] = null
+	private dataTransfer: iTransferData = null
 	private proxyServer: ProxyServer.proxyServer = null
 	private whiteIpList = []
 	private domainBlackList = []
 	private domainPool: Map < string, domainData > = new Map ()
+	private twitterDataInit = false
+	private twitterData: TwitterAccount[] = []
+	private doingCreateTweetData = false 
 
 	public CoNET_systemError () {
 		return this.socketServer.emit ( 'CoNET_systemError' )
@@ -132,7 +143,7 @@ export default class localServer {
 
 		//		have CoGate connect
 		if ( this.connectCommand && this.connectCommand.length ) {
-			socket.emit ( 'tryConnectCoNETStage', 4, true )
+			socket.emit ( 'tryConnectCoNETStage', -1, 4, true )
 			setTimeout (() => {
 				socket.emit ( 'QTGateGatewayConnectRequest', null, this.connectCommand )
 			}, 200 )
@@ -175,7 +186,7 @@ export default class localServer {
 			
 			if ( !this.imapConnectData.sendToQTGate || sendMail ) {
 				this.imapConnectData.sendToQTGate = true
-				Tool.saveImapData( this.imapConnectData, this.config, this.savedPasswrod, () => {})
+				Tool.saveEncryptoData ( Tool.imapDataFileName1, this.imapConnectData, this.config, this.savedPasswrod, () => {})
 				this.socketServer.emit ( 'tryConnectCoNETStage', null, 3 )
 				return Tool.sendCoNETConnectRequestEmail ( this.imapConnectData, this.openPgpKeyOption, this.config.version, this.keyPair.publicKey, ( err: Error ) => {
 					if ( err ) {
@@ -202,7 +213,7 @@ export default class localServer {
 		
 	}
 
-	private sendrequest ( socket: SocketIO.Socket, cmd: QTGateAPIRequestCommand, CallBack ) {
+	private sendRequest ( socket: SocketIO.Socket, cmd: QTGateAPIRequestCommand, CallBack ) {
 		if ( !this.openPgpKeyOption) {
 			console.log ( `sendrequest keypair error! !this.config [${ !this.config }] !this.keyPair[${ !this.keyPair }] !this.keyPair.passwordOK [${ !this.keyPair.passwordOK }]`)
 			return CallBack (1)
@@ -212,8 +223,11 @@ export default class localServer {
 			this.tryConnectCoNET ( socket )
 			return CallBack ( 0 )
 		}
-		saveLog (`sendrequest send [${ cmd.command }]`)
-		return this.CoNETConnectCalss.request ( cmd, ( err: number, res: QTGateAPIRequestCommand ) => {
+		saveLog (`sendRequest send [${ cmd.command }]`)
+
+		cmd.requestSerial = Crypto.randomBytes(8).toString('hex')
+
+		return this.CoNETConnectCalss.requestCoNET ( cmd, ( err: number, res: QTGateAPIRequestCommand ) => {
 			saveLog (`request response [${ cmd.command }]`)
 			if ( err ) {
 				this.socketServer.emit ('CoNET_offline')
@@ -225,11 +239,18 @@ export default class localServer {
 	}
 
 	private checkPort ( portNum, socket: SocketIO.Socket ) {
+
+		
 		const num = parseInt ( portNum.toString())
 		if (! /^[0-9]*$/.test( portNum.toString()) || !num || num < 3000 || num > 65535 ) {
 			return socket.emit ( 'checkPort', true )
 		}
-			
+		if ( this.proxyServer && this.proxyServer.port ) {
+			console.log ( `this.proxyServer = true, typeof this.proxyServer.port = [${ typeof this.proxyServer.port }] typeof portNum = [${ typeof portNum }]`)
+			if ( portNum.toString () === this.proxyServer.port )
+			return socket.emit ( 'checkPort', true, this.proxyServer.port )
+		}
+		console.log ( `this.proxyServer && this.proxyServer.port = [${ this.proxyServer && this.proxyServer.port }] typeof this.proxyServer [${ typeof this.proxyServer }] `)
 		return findPort ( portNum, ( err, kk ) => {
 			saveLog( `check port [${ typeof portNum }] got back kk [${ typeof kk }]`)
 			if ( kk !== portNum ) {
@@ -242,32 +263,12 @@ export default class localServer {
 	public makeOpnConnect ( arg: IConnectCommand[] ) {
 		const uu = arg[0]
 		saveLog (`makeOpnConnect arg = ${ JSON.stringify (arg)}`)
-		
-		ProxyServer.proxyServer
-
-		return this.proxyServer = new ProxyServer.proxyServer ( this.whiteIpList, this.domainPool, uu.localServerPort, 'pac', 5000, arg, 50000, true, this.domainBlackList  )
-	}
-
-	private stopGetwayConnect ( sendToCoNET: boolean ) {
-		
-		if ( this.connectCommand && this.connectCommand.length ) {
-			this.connectCommand = null
+		if ( this.proxyServer && typeof this.proxyServer.reNew === 'function' ) {
+			console.log (`find this.proxyServer && typeof this.proxyServer.reNew === 'function'`)
+			return this.proxyServer.reNew ( arg )
 		}
-		
-		if ( this.proxyServer && typeof this.proxyServer.exit === 'function') {
-			console.log (`this.proxyServer = null`)
-			this.proxyServer.exit ()
-			this.proxyServer = null
-		}
-		if ( sendToCoNET ) {
-			const com: QTGateAPIRequestCommand = {
-				command: 'stopGetwayConnect',
-				Args: null,
-				error: null,
-				requestSerial: null
-			}
-			return this.CoNETConnectCalss.request ( com, null )
-		}
+		this.proxyServer = new ProxyServer.proxyServer ( this.whiteIpList, this.domainPool, uu.localServerPort, 'pac', 5000, arg, 50000, true, this.domainBlackList, uu.localServerIp[0], Tool.LocalServerPortNumber )
+		console.log (`this.proxyServer = new ProxyServer.proxyServer! this.proxyServer && this.proxyServer.port = [${ this.proxyServer && this.proxyServer.port }]`)
 		
 	}
 
@@ -276,10 +277,7 @@ export default class localServer {
 		//this.connectCommand = arg
 		//socket.emit ( 'QTGateGatewayConnectRequest', null, this.connectCommand )
 		
-		if ( !this.CoNETConnectCalss || typeof this.CoNETConnectCalss.request !== 'function') {
-			console.log ( `on QTGateGatewayConnectRequest !this.CoNETConnectCalss `)
-			return saveLog (`socket.on ( 'getAvaliableRegion') but !this.QTClass `)
-		}
+		
 		if ( this.connectCommand ) {
 			return socket.emit ( 'QTGateGatewayConnectRequest', null, this.connectCommand )
 		}
@@ -295,8 +293,8 @@ export default class localServer {
 				error: null,
 				requestSerial: Crypto.randomBytes(8).toString( 'hex' )
 			}
-
-			return this.CoNETConnectCalss.request ( com, ( err: number, res: QTGateAPIRequestCommand ) => {
+			
+			return this.sendRequest ( socket, com, ( err: number, res: QTGateAPIRequestCommand ) => {
 				//		no error
 				if ( err ) {
 					return console.log ( `on QTGateGatewayConnectRequest CoNETConnectCalss.request return error`, err )
@@ -306,11 +304,13 @@ export default class localServer {
 					const arg: IConnectCommand[] = this.connectCommand = res.Args
 					console.log ( JSON.stringify ( res.Args ))
 					this.makeOpnConnect ( arg )
+					
 					return socket.emit ( 'QTGateGatewayConnectRequest', null, this.connectCommand )
 				}
 				
 				saveLog ( `connectRequest res.error [${ res.error }]`)
 			})
+			
 		}
 
 		//		iOPN connect 
@@ -323,8 +323,8 @@ export default class localServer {
 					return saveLog (`on QTGateGatewayConnectRequest Tool.myIpServer return no data!`)
 				}
 				saveLog (`on QTGateGatewayConnectRequest Tool.myIpServer return localHostIP [${ data }]`)
-				cmd.localServerIp = data
-				
+				cmd.globalIpAddress = data
+				cmd.localServerIp = Tool.getLocalInterface()
 				return request ()
 			})
 			
@@ -366,7 +366,7 @@ export default class localServer {
 					serverFolder: Uuid.v4(),
 					randomPassword: Uuid.v4(),
 					uuid: Uuid.v4(),
-					confirmRisk: conetImapAccount.test (emailAddress),
+					confirmRisk: false,
 					clientIpAddress: null,
 					ciphers: null,
 					sendToQTGate: false
@@ -385,7 +385,7 @@ export default class localServer {
 			}
 			if ( !this.imapConnectData.confirmRisk ) {
 				this.imapConnectData.confirmRisk = true
-				return Tool.saveImapData ( this.imapConnectData, this.config, this.savedPasswrod, err => {
+				return Tool.saveEncryptoData (  Tool.imapDataFileName1,this.imapConnectData, this.config, this.savedPasswrod, err => {
 					return this.tryConnectCoNET ( socket )
 				})
 			}
@@ -399,12 +399,11 @@ export default class localServer {
 			const com: QTGateAPIRequestCommand = {
 				command: 'requestActivEmail',
 				Args: [],
-				error: null,
-				requestSerial: Crypto.randomBytes(8).toString('hex')
+				error: null
 				
 			}
 
-			return this.sendrequest ( socket, com, ( err: number, res: QTGateAPIRequestCommand ) => {
+			return this.sendRequest ( socket, com, ( err: number, res: QTGateAPIRequestCommand ) => {
 				console.log (`requestActivEmail sendrequest callback! `)
 				return socket.emit ( 'requestActivEmail', err, res )
 			})
@@ -448,7 +447,7 @@ export default class localServer {
 				}
 				console.log ( Util.inspect ( com ))
 				
-				return this.sendrequest ( socket, com, ( err, data: QTGateAPIRequestCommand ) => {
+				return this.sendRequest ( socket, com, ( err, data: QTGateAPIRequestCommand ) => {
 					if ( err ) {
 						return socket.emit  ('checkActiveEmailSubmit', err )
 					}
@@ -475,10 +474,16 @@ export default class localServer {
 		socket.on ( 'getAvaliableRegion', CallBack1 => {
 
 			CallBack1 ()
-			if ( !this.CoNETConnectCalss || typeof this.CoNETConnectCalss.request !== 'function') {
-				console.log (`this.CoNETConnectCalss `)
-				socket.emit ('getAvaliableRegion', null, 0 )
-				return saveLog (`socket.on ( 'getAvaliableRegion') but !this.QTClass `)
+
+			if ( this.connectCommand && this.connectCommand.length ) {
+				console.log (`getAvaliableRegion have this.connectCommand `)
+				//socket.emit ('getAvaliableRegion', this.regionV1, this.dataTransfer, this.config )
+				socket.emit ( 'getAvaliableRegion', this.regionV1, this.dataTransfer, this.config )
+				return setTimeout (() => {
+					return socket.emit ( 'QTGateGatewayConnectRequest', -1, this.connectCommand )
+				}, 500 )
+				
+
 			}
 			const com: QTGateAPIRequestCommand = {
 				command: 'getAvaliableRegion',
@@ -487,17 +492,19 @@ export default class localServer {
 				requestSerial: Crypto.randomBytes(8).toString('hex')
 			}
 
-			console.log (`socket.on ( 'getAvaliableRegion')`)
+			console.log (`socket.on ( 'getAvaliableRegion') no this.connectCommand`)
 
-			return this.CoNETConnectCalss.request ( com, ( err: number, res: QTGateAPIRequestCommand ) => {
+			return this.sendRequest ( socket, com, ( err: number, res: QTGateAPIRequestCommand ) => {
 				if ( err ) {
 					return saveLog ( `getAvaliableRegion QTClass.request callback error! STOP [${ err }]`)
 				}
 				if ( res && res.dataTransfer && res.dataTransfer.productionPackage ) {
 					this.config.freeUser = /free/i.test ( res.dataTransfer.productionPackage )
 				}
-				saveLog (`getAvaliableRegion got return Args [0] [${ JSON.stringify ( res.Args[0] )}]`)
-				socket.emit ('getAvaliableRegion', res.Args[0], res.dataTransfer, this.config )
+				this.dataTransfer = res.dataTransfer
+				
+				saveLog ( `getAvaliableRegion got return Args [2] [${ JSON.stringify ( res.Args[2] )}]`)
+				socket.emit ( 'getAvaliableRegion', res.Args[2], res.dataTransfer, this.config )
 				
 				//		Have gateway connect!
 				//this.saveConfig ()
@@ -551,7 +558,7 @@ export default class localServer {
 			}, () => {
 				saveLog (`pingCheck success!`)
 				this.pingChecking = false
-				return socket.emit ( 'pingCheck' )
+				return socket.emit ( 'pingCheckSuccess' )
 			})
 			
 		})
@@ -561,11 +568,10 @@ export default class localServer {
 			const com: QTGateAPIRequestCommand = {
 				command: 'promoCode',
 				error: null,
-				Args: [ promoCode ],
-				requestSerial: Crypto.randomBytes(8).toString ('hex')
+				Args: [ promoCode ]
 			}
 			saveLog (`on promoCode`)
-			return this.CoNETConnectCalss.request ( com, ( err: number, res: QTGateAPIRequestCommand ) => {
+			return this.sendRequest ( socket, com, ( err: number, res: QTGateAPIRequestCommand ) => {
 				saveLog ( `promoCode got callBack: [${ JSON.stringify ( res )}]`)
 				if ( err ) {
 					socket.emit ( 'promoCode', err )
@@ -594,7 +600,35 @@ export default class localServer {
 
 		socket.on ( 'disconnectClick', CallBack1 => {
 			CallBack1 ()
-			this.stopGetwayConnect ( true )
+			return this.stopGetwayConnect ( socket, true, null )
+		})
+
+		socket.on ( 'cardToken', ( payment: iQTGatePayment, CallBack1 ) => {
+			const com: QTGateAPIRequestCommand = {
+				command: 'cardToken',
+				error: null,
+				Args: [ payment ],
+				requestSerial: Crypto.randomBytes(8).toString ('hex')
+			}
+			CallBack1 ()
+			console.log ( `socket.on cardToken send to QTGate!`, Util.inspect ( com, false, 2, true ))
+			
+			return this.sendRequest ( socket, com, ( err: number, res: QTGateAPIRequestCommand ) => {
+				saveLog ( `cardToken got callBack: [${ JSON.stringify ( res )}]`)
+				if ( err ) {
+					return saveLog ( `cardToken got QTClass.request  error!`)
+				}
+				if ( res.error === -1 ) {
+					saveLog ( 'cancelPlan success!' )
+					this.config.freeUser = false
+					Tool.saveConfig ( this.config, err => {
+
+					})
+				}
+				socket.emit ( 'cardToken', err, res )
+				
+			})
+			
 		})
 	}
 
@@ -617,7 +651,7 @@ export default class localServer {
 				return socket.emit ( 'smtpTest', imapErrorCallBack ( err.message ))
 			}
 			this.imapConnectData.imapTestResult = true
-			return Tool.saveImapData ( this.imapConnectData, this.config, this.savedPasswrod, err => {
+			return Tool.saveEncryptoData ( Tool.imapDataFileName1, this.imapConnectData, this.config, this.savedPasswrod, err => {
 				console.log (`socket.emit ( 'imapTestFinish' )`)
 				socket.emit ( 'imapTestFinish' , this.imapConnectData )
 			})
@@ -625,6 +659,471 @@ export default class localServer {
 		})
 			
 		
+	}
+
+	private getTimelines ( socket: SocketIO.Socket, account: TwitterAccount, CallBack ) {
+		
+		const com: QTGateAPIRequestCommand = {
+			command: 'twitter_home_timeline',
+			Args: [ account ],
+			error: null,
+			requestSerial: Crypto.randomBytes(8).toString ('hex' )
+		}
+		let _return = 0
+		return this.sendRequest ( socket, com, ( err, res: QTGateAPIRequestCommand ) => {
+			_return ++
+			if ( err ) {
+				return CallBack ()
+			}
+			
+			if ( res.Args && res.Args.length > 0 ) {
+				let uu: twitter_post = null
+				try {
+					uu = JSON.parse ( Buffer.from ( res.Args [0], 'base64' ).toString ())
+				} catch ( ex ) {
+					return saveLog ( `getTimelines QTClass.request return JSON.parse Error! _return [ ]` )
+				}
+				
+				return CallBack ( null, uu )
+			}
+			if ( res.error ) {
+				saveLog ( `this.localServer.QTClass.request ERROR typeof res.error = ${ typeof res.error }`)
+				
+				return CallBack ( res.error )
+			}
+			
+		})
+	}
+
+	private getMedia ( mediaString: string, CallBack ) {
+		saveLog (` getMedia mediaString = [${ mediaString }]`)
+		if ( /^http[s]*\:\/\//.test ( mediaString )) {
+			return CallBack ( null, mediaString )
+		}
+		const files = mediaString.split (',')
+		if ( !files || !files.length ) {
+			return CallBack ( null, '')
+		}
+		//console.log ( files )
+		return Imap.imapGetMediaFile ( this.imapConnectData, files[0], CallBack )
+	}
+
+	private getVideo ( m: twitter_media_video_info, CallBack ) {
+		if ( !m || !m.QTDownload ) {
+			return CallBack ()
+		}
+		return this.getMedia ( m.QTDownload, ( err, data ) => {
+			if ( data ) {
+				const file = Uuid.v4() + '.mp4'
+				const viode = Buffer.from ( data, 'base64' )
+				return Fs.writeFile ( Path.join ( Tool.QTGateVideo, file ), viode, err => {
+					m.QTDownload = `/videoTemp/${ file }`
+					console.log (`save video file: [${ file }]`)
+					return CallBack ()
+				})
+			}
+			return CallBack ()
+			
+		})
+	}
+
+	private getQuote_status ( tweet: twitter_post, CallBack ) {
+		saveLog ( `doing getQuote_status [${ tweet.id_str }]`)
+		if ( tweet.quoted_status ) {
+			
+			const entities = tweet.quoted_status.extended_entities = tweet.quoted_status.extended_entities || null
+			if ( entities && entities.media && entities.media.length ) {
+				console.log (`getTweetMediaData [${ entities.media.map ( n => { return n.media_url_https })}]`)
+				return this.getTweetMediaData ( tweet.quoted_status.extended_entities.media, CallBack )
+			}
+		}
+		if ( tweet.retweeted_status ) {
+			const entities = tweet.retweeted_status.extended_entities = tweet.retweeted_status.extended_entities || null
+			if ( entities && entities.media && entities.media.length ) {
+				console.log (`getTweetMediaData [${ entities.media.map ( n => { return n.media_url_https })}]`)
+				return this.getTweetMediaData ( tweet.retweeted_status.extended_entities.media, CallBack )
+			}
+		}
+		return CallBack ()
+	}
+
+	private getTweetMediaData ( media: twitter_media[], CallBack  ) {
+		const uu = media && media.length && media[0].video_info ? media[0].video_info : null
+		if ( uu && uu.QTDownload ) {
+			return this.getVideo ( uu, CallBack )
+		}
+		return Async.eachSeries ( media, ( n: twitter_media, next ) => {
+			n.video_info = null
+			return this.getMedia ( n.media_url_https, ( err, data ) => {
+				if ( err ) {
+					return next ()
+				}
+				n.media_url_https = data ? `data:image/png;base64,${ data }` : n.media_url_https
+				return next ()
+			})
+		}, CallBack )
+
+	}
+
+	private createTweetData_next ( tweet: twitter_post, err: Error, data: string[][], CallBack ) {
+		saveLog ( `createTweetData_next CallBack: data = [${ data.map ( n => { return n.length })}]`)
+		tweet.user.profile_image_url_https = `data:image/png;base64,${ data [0]}`
+		if ( tweet.retweeted && tweet.retweeted.user ) {
+			tweet.retweeted.user.profile_image_url_https = `data:image/png;base64,${ data [1]}`
+		}
+		if ( tweet.retweeted_status && tweet.retweeted_status.user ) {
+			tweet.retweeted_status.user.profile_image_url_https  = `data:image/png;base64,${ data [1]}`
+		}
+		
+		if ( !tweet.retweeted_status && tweet.extended_entities && tweet.extended_entities.media && tweet.extended_entities.media.length ) {
+			return this.getTweetMediaData ( tweet.extended_entities.media, err => {
+				return this.getQuote_status ( tweet, CallBack )
+			})
+		}
+		return this.getQuote_status ( tweet, CallBack )
+	}
+
+	private getTimelinesNext ( socket, account: TwitterAccount, max_id: number, CallBack ) {
+		delete account['twitter_verify_credentials']
+		const com: QTGateAPIRequestCommand = {
+			command: 'twitter_home_timelineNext',
+			Args: [ account, max_id ],
+			error: null,
+			requestSerial: Crypto.randomBytes(8).toString ('hex' )
+		}
+
+		return this.sendRequest ( socket, com, ( err, res: QTGateAPIRequestCommand ) => {
+
+			if ( err ) {
+				return CallBack ()
+			}
+			
+			if ( res.Args && res.Args.length > 0 ) {
+
+				let uu: twitter_post[] = null
+
+				try {
+					uu= JSON.parse ( Buffer.from ( res.Args [0], 'base64' ).toString ())
+				} catch ( ex ) {
+					return saveLog (`getTimelines QTClass.request return JSON.parse Error!`)
+				}
+				
+				return CallBack ( null, uu )
+			}
+			if ( res.error ) {
+				saveLog ( `this.localServer.QTClass.request ERROR typeof res.error = ${ typeof res.error  }` )
+				return CallBack ( res.error )
+			}
+			
+		})
+	}
+
+	private createTweetData ( tweet: twitter_post, CallBack ) {
+		/*
+		if ( this.doingCreateTweetData ) {
+			return this.tweetTimeLineDataPool.push ({
+				post: tweet,
+				CallBack: CallBack
+			})
+		}
+		this.doingCreateTweetData = true
+		*/
+		if ( !tweet ) {
+			saveLog ( `createTweetData got Null tweet data `)
+			return CallBack ( new Error ('have no tweet data!'))
+		}
+		
+		const action = [
+			next => this.getMedia ( tweet.user.profile_image_url_https, next )
+		]
+		if ( tweet.retweeted && tweet.retweeted.user ) {
+			action.push (
+				next => this.getMedia ( tweet.retweeted.user.profile_image_url_https, next )
+			)
+		}
+		if ( tweet.retweeted_status && tweet.retweeted_status.user ) {
+			action.push (
+				next => this.getMedia ( tweet.retweeted_status.user.profile_image_url_https, next )
+			)
+		}
+		return Async.series ( action, ( err, data ) => {
+			
+			return this.createTweetData_next ( tweet, err, data, err1 => {
+				this.doingCreateTweetData = false
+				CallBack ( null, tweet )
+				/*
+				if ( this.tweetTimeLineDataPool.length ) {
+					const uu = this.tweetTimeLineDataPool.shift ()
+					return this.createTweetData ( uu.post, uu.CallBack )
+				}
+				*/
+			})
+		})
+        
+	}
+
+	private getPictureBase64ToTwitter_mediaData ( mediaData: string, CallBack ) {
+		
+		const media = mediaData.split(',')
+		const type = media[0].split(';')[0].split (':')[1]
+		const _media = Buffer.from ( media[1], 'base64')
+		const ret: twitter_mediaData = {
+			total_bytes: media[1].length,
+			media_type: type,
+			rawData: media[1],
+			media_id_string: null
+		}
+		const uploadDataPool = []
+		
+		//if ( mediaData.length > maxImageLength) {
+			const exportImage = ( _type, img ) => {
+				return img.getBuffer ( _type, ( err, _buf: Buffer ) => {
+					if ( err ) {
+						return CallBack ( err )
+					}
+					ret.rawData = _buf.toString( 'base64' )
+					ret.total_bytes = _buf.length
+
+					return CallBack ( null, ret )
+				})
+			}
+			return Jimp.read ( _media, ( err, image ) => {
+				if ( err ) {
+					return CallBack ( err )
+				}
+				const uu = image.bitmap
+				if ( uu.height > uu.width ) {
+					image.resize ( Jimp.AUTO, tweetImageMaxHeight )
+				} else {
+					image.resize ( tweetImageMaxWidth, Jimp.AUTO )
+				}
+				if ( /\/PNG/i.test ( type )) {
+					return image.deflateStrategy ( 1, () => {
+						return exportImage ( type, image )
+					})
+				}
+				if ( /\/(JPEG|JPG)/i.test ( type )) {
+					return image.quality ( 100, () => {
+						return exportImage ( type, image )
+					})
+				}
+				//		BMP and all other to PNG
+				ret.media_type = 'image/png'
+				return image.deflateStrategy ( 4, () => {
+					return exportImage ( ret.media_type, image )
+				})
+			})
+		//}
+		
+		//return CallBack ( null, ret )
+		
+	}
+
+	private QT_PictureMediaUpload ( data: twitter_postData, CallBack ) {
+		let imageIndex = 0
+		return Async.eachSeries ( data.images, ( n: string, next ) => {
+			return Async.waterfall ([
+				_next => this.getPictureBase64ToTwitter_mediaData ( n, _next ),
+				( media: twitter_mediaData, _next ) => {
+					media.media_id_string = Path.join ( Tool.QTGateVideo,  Uuid.v4 ())
+					data.media_data.push ( media )
+					return Fs.writeFile ( media.media_id_string, Buffer.from ( media.rawData, 'base64' ), 'binary', _next )
+				},
+				_next => {
+
+					return UploadFile.sendFile3 ( data.media_data[ data.media_data.length - 1 ].media_id_string, this.CoNETConnectCalss, ( err, files: string[] ) => {
+						if ( err ) {
+							saveLog (`QT_PictureMediaUpload UploadFile.sendFile error: [${ err.message }]`)
+							return _next ( err )
+						}
+						const media = data.media_data[ imageIndex ++ ]
+						media.media_id_string = files.join (',')
+						delete media.rawData
+						return _next ()
+					})
+				}
+			], next )
+		}, CallBack )
+		
+	}
+
+	private QT_VideoMediaUpload ( data: twitter_postData, CallBack ) {
+		return UploadFile.sendFile3 ( Path.join ( Tool.QTGateVideo, data.videoFileName), this.CoNETConnectCalss, ( err, files: string[] ) => {
+			if ( err ) {
+				return CallBack ( err )
+			}
+			saveLog (`QT_VideoMediaUpload got files ${ files }`)
+			data.videoFileName = files.join (',')
+			return CallBack ()
+		})
+	}
+
+	private postTweetViaQTGate ( socket, account: TwitterAccount, postData: twitter_postData, Callback ) {
+		const post = err => {
+			if ( err ) {
+				saveLog (`postTweetViaQTGate post got error: [${ err.message }] `)
+				return Callback ( err )
+			}
+
+			delete account['twitter_verify_credentials']
+			delete postData.images
+			const com: QTGateAPIRequestCommand = {
+				command: 'twitter_post',
+				Args: [ account, postData ],
+				error: null,
+				requestSerial: Crypto.randomBytes( 10 ).toString ( 'hex' )
+			}
+			/*
+			Imap.imapGetMediaFilesFromString ( this.localServer.QTClass.imapData, postData.videoFileName, QTGateVideo, ( err1, data ) => {
+				if ( err1 ) {
+					saveLog ( `Imap.imapGetMediaFilesFromString got error [${ err }]`)
+				}
+				saveLog ( `Imap.imapGetMediaFilesFromString success! [${ data }]`)
+			})
+			*/
+			return this.sendRequest ( socket, com, Callback )
+			
+		}
+		if ( postData.images && postData.images.length ) {
+			return this.QT_PictureMediaUpload ( postData, post )
+		}
+		if ( postData.videoFileName ) {
+			return this.QT_VideoMediaUpload ( postData, post )
+		}
+		return post ( null )
+	}
+
+	private listenAfterTwitterLogin ( socket: SocketIO.Socket ) {
+
+
+		socket.on ( 'addTwitterAccount', ( addTwitterAccount: TwitterAccount, CallBack1 ) => {
+			CallBack1()
+			delete addTwitterAccount ['twitter_verify_credentials']
+			const com: QTGateAPIRequestCommand = {
+				command: 'twitter_account',
+				Args: [ addTwitterAccount ],
+				error: null
+			}
+			return this.sendRequest ( socket, com, ( err, res: QTGateAPIRequestCommand ) => {
+				if ( err ) {
+					return socket.emit ('addTwitterAccount' )
+					
+				}
+				
+				if ( res.Args && res.Args.length > 0 ) {
+					let uu = null
+					try {
+						uu = JSON.parse ( Buffer.from ( res.Args [0], 'base64').toString ())
+					} catch ( ex ) {
+						socket.emit ('addTwitterAccount')
+						return saveLog (`getTwitterAccountInfo QTClass.request return JSON.parse Error!`)
+					}
+					if ( uu && uu.twitter_verify_credentials ) {
+						console.log (`addTwitterAccount ${ Util.inspect ( uu, false, 2, true )}`)
+						socket.emit ('addTwitterAccount', null, uu )
+						this.twitterData.push ( uu )
+						return Tool.saveEncryptoData ( Tool.twitterDataFileName, this.twitterData, this.config, this.savedPasswrod, err => {
+							if ( err ) {
+								return saveLog (`saveANEWTwitterData got error: ${ err.messgae }`)
+							}
+							
+						})
+
+					}
+					
+					
+				}
+				
+				return socket.emit ('addTwitterAccount')
+			})
+		})
+
+		socket.on ( 'getTimelines', ( item: TwitterAccount, CallBack1 ) => {
+			CallBack1()
+			delete item ['twitter_verify_credentials']
+			let getTimelinesCount = 0
+			return this.getTimelines ( socket, item, ( err, tweets: twitter_post ) => {
+				getTimelinesCount ++
+				if ( err ) {
+					return saveLog (`socket.on ( 'getTimelines' return [${ getTimelinesCount }] error, [${ err.message }]`)
+					
+				}
+				saveLog ( `doinging createTweetData for count [${ getTimelinesCount }]`)
+				return this.createTweetData ( tweets, ( err, tweet: twitter_post ) => {
+					saveLog (`createTweetData CallBack! [${ getTimelinesCount }]`)
+					
+						if ( err ) {
+							return console.log (`getTweetCount error`, err )
+						}
+						
+						return socket.emit ( 'getTimelines', tweet )
+					
+					
+				})
+				
+			})
+		})
+
+		socket.on ( 'mediaFileUpdata', ( uploadId, data: Buffer, part: number, CallBack1 ) => {
+			CallBack1 ()
+			const fileName = Path.join ( Tool.QTGateVideo, uploadId )
+			//		the end!
+			const CallBack = err => {
+				return socket.emit ( 'mediaFileUpdata', err )
+			}
+			if ( !part ) {
+				Fs.writeFile ( fileName, data, 'binary', CallBack )
+			} else {
+				Fs.appendFile ( fileName, data, 'binary',CallBack )
+			}
+		})
+
+		socket.on ( 'getTimelinesNext', ( item: TwitterAccount, maxID: number, CallBack1 ) => {
+			CallBack1 ()
+			return this.getTimelinesNext ( socket, item, maxID, ( err, tweets: twitter_post ) => {
+				if ( err ) {
+					return socket.emit ('getTimelinesNext', err )
+					
+				}
+
+				if ( tweets ) {
+					return this.createTweetData ( tweets, ( err, tweet ) => {
+						return socket.emit ( 'getTimelines', tweet )
+					})
+				}
+				
+			})
+		})
+
+		socket.on ( 'twitter_postNewTweet', ( account: TwitterAccount, postData: twitter_postData[], CallBack1 ) => {
+			CallBack1 ()
+			if ( !account || !postData.length ) {
+				return console.log ('on twitter_postNewTweet but format error!')
+			}
+			
+			
+			return this.postTweetViaQTGate ( socket, account, postData[0], ( err, data ) => {
+				
+				return socket.emit ( 'twitter_postNewTweet', err )
+			})
+		})
+
+		socket.on ( 'getTwitterTextLength', ( twitterText: string, CallBack1 ) => {
+			return CallBack1 ()
+
+			return socket.emit ( 'getTwitterTextLength', Twitter_text.parseTweet ( twitterText ))
+		})
+
+		return socket.on ( 'saveAccounts', ( twitterAccounts: TwitterAccount[], CallBack1 ) => {
+			CallBack1 ()
+			this.twitterData = twitterAccounts
+			return Tool.saveEncryptoData ( Tool.twitterDataFileName, this.twitterData, this.config, this.savedPasswrod, err => {
+				if ( err ) {
+					return saveLog (`saveTwitterData error [${ err.message ? err.message : ''}]`)
+				}
+			})
+		})
+
 	}
 
 	private socketServerConnected ( socket: SocketIO.Socket ) {
@@ -639,7 +1138,7 @@ export default class localServer {
 		socket.on ( 'init', Callback1 => {
 			Callback1()
 			const ret = Tool.emitConfig ( this.config, false )
-			return socket.emit ('init', null, ret )
+			return socket.emit ( 'init', null, ret )
 		})
 
 		socket.once ( 'agreeClick', CallBack1 => {
@@ -686,7 +1185,7 @@ export default class localServer {
 				( option_KeyOption, next ) => {
 					
 					this.openPgpKeyOption = option_KeyOption
-					return Tool.readImapData ( password, this.config, next )
+					return Tool.readEncryptoFile ( Tool.imapDataFileName1, password, this.config, next )
 			}], ( err: Error, data: string ) => {
 				if ( err ) {
 					socket.emit ( 'checkPemPassword' )
@@ -786,6 +1285,75 @@ export default class localServer {
 			})
 			
 		})
+
+		socket.on ( 'password', ( password: string, Callback1 ) => {
+			Callback1()
+            if ( !this.config.keypair || !this.config.keypair.publicKey ) {
+				console.log ( `password !this.config.keypair`)
+				return socket.emit ( 'password', true )
+			}
+
+			if ( !password || password.length < 5 ) {
+				console.log (`! password `)
+				return socket.emit ( 'password', true )
+			}
+
+			if ( this.savedPasswrod && this.savedPasswrod.length ) {
+				if ( this.savedPasswrod !== password ) {
+					console.log (`savedPasswrod !== password `)
+					return socket.emit ( 'password', true )
+				}
+
+			}
+
+            
+			this.listenAfterTwitterLogin ( socket )
+			if ( this.twitterDataInit ) {
+				return socket.emit ( 'password', null, this.twitterData )
+			}
+			this.twitterDataInit = true
+			return Tool.readEncryptoFile ( Tool.twitterDataFileName, password, this.config, ( err, data ) => {
+				if ( data && data.length ) {
+					
+					try {
+						this.twitterData = JSON.parse ( data )
+					} catch ( ex ) {
+						return socket.emit ( 'password', true )
+					}
+					
+					return socket.emit ( 'password', null, this.twitterData )
+				}
+				return socket.emit ( 'password', true )
+			})
+            
+			
+		})
+	}
+
+	private stopGetwayConnect ( socket, sendToCoNET: boolean, region: string ) {
+		
+	
+		if ( this.connectCommand && this.connectCommand.length ) {
+			region = this.connectCommand[0].region
+			this.connectCommand = this.dataTransfer = null
+		}
+		
+		if ( this.proxyServer && typeof this.proxyServer.exit === 'function') {
+			console.log (`this.proxyServer = null`)
+			this.proxyServer.exit ()
+		}
+
+		if ( sendToCoNET ) {
+			const com: QTGateAPIRequestCommand = {
+				command: 'stopGetwayConnect',
+				Args: null,
+				error: null
+			}
+			return this.sendRequest ( socket, com, ( err, retCmd: QTGateAPIRequestCommand ) => {
+				return socket.emit ('disconnectClick', region )
+			})
+		}
+		
 	}
 
 	constructor( private cmdResponse: ( cmd: QTGateAPIRequestCommand ) => void, test: boolean ) {
@@ -795,15 +1363,38 @@ export default class localServer {
 		this.expressServer.use ( cookieParser ())
 		this.expressServer.use ( Express.static ( Tool.QTGateFolder ))
 		this.expressServer.use ( Express.static ( Path.join ( __dirname, 'public' )))
+
 		this.expressServer.get ( '/', ( req, res ) => {
 
-            res.render( 'home', { title: 'home' })
+            res.render( 'home', { title: 'home', proxyErr: false  })
+		})
+
+		this.expressServer.get ( '/twitter', ( req, res ) => {
+			console.log (`get twitter`)
+            res.render( 'twitter', { title: 'CoNET for Twitter' })
+		})
+
+		this.expressServer.get ( '/proxyErr', ( req, res ) => {
+			console.log ( `get /proxyErr`)
+            res.render( 'home', { title: 'CoNET for Twitter', proxyErr: true })
+		})
+
+		this.expressServer.get ( '/doingUpdate', ( req, res ) => {
+			res.json()
+			
+			const { ver } = req.query
+			saveLog ( `/doingUpdate res.query = [${ ver }]`)
+			this.config.newVersion = ver
+			this.config.newVerReady = true
+			return Tool.saveConfig ( this.config, err => {
+				
+			})
 		})
 
 		this.expressServer.get ( '/Wrt', ( req, res ) => {
 			let globalIp = ''
 			if ( this.connectCommand && this.connectCommand.length ) {
-				globalIp = this.connectCommand[0].localServerIp
+				globalIp = this.connectCommand[0].localServerIp[0]
 			} else {
 				console.log (`Wrt doing Tool.myIpServer`)
 				return Tool.myIpServer (( err, data ) => {
@@ -829,6 +1420,7 @@ export default class localServer {
 			saveServerStartupError ( err )
 			return process.exit (1)
 		})
+
 		Async.series ([
 			next => Tool.checkSystemFolder ( next ),
 			next => Tool.checkConfig ( next )	
@@ -851,8 +1443,8 @@ export default class localServer {
 		switch ( cmd.command ) {
 			//		
 			case 'containerStop': {
-				this.socketServer.emit ('containerStop')
-				return this.stopGetwayConnect ( false )
+				
+				return this.stopGetwayConnect ( this.socketServer, false, cmd.region )
 			}
 
 			default: {
@@ -867,3 +1459,4 @@ export default class localServer {
 	}
 
 }
+

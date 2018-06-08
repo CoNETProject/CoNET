@@ -207,8 +207,9 @@ class keyPairSign {
 			if (!req ) {
 				const config =  _view.localServerConfig()
 				config.keypair.verified = true
-				_view.localServerConfig(config)
-				_view.keyPair (config.keypair)
+				_view.localServerConfig ( config )
+				_view.keyPair ( config.keypair )
+				_view.sectionLogin ( false )
 				self.exit ()
 			}
 			
@@ -220,15 +221,15 @@ class keyPairSign {
 	public requestActivEmail () {
 		const self = this
 		this.requestActivEmailrunning ( true )
-		this.showSentActivEmail (-1)
-		return socketIo.emit11 ( 'requestActivEmail', function ( err, res ) {
+		
+		return socketIo.emit11 ( 'requestActivEmail', function ( err ) {
 			self.requestActivEmailrunning ( false )
 			if ( err !== null && err > -1 ) {
 				return self.requestError ( err )
 			}
-			return self.showSentActivEmail (1)
-			
-			
+			self.conformButtom ( false )
+			self.showSentActivEmail (1)
+			const u = self.showSentActivEmail()
 		})
 	}
 }
@@ -261,26 +262,32 @@ class CoNETConnect {
 			this.connectStage ( -1 )
 			return this.connetcError ( err )
 		}
+		
 		if ( stage === 4 ) {
 			this.showConnectCoNETProcess ( false )
 			this.connectedCoNET ( true )
 			processBarCount = 67
 			if ( !this.isKeypairBeSign ) {
-				let u = null
-				return this.keyPairSign ( u = new keyPairSign (( function () {
-					
-					self.keyPairSign ( u = null )
-					self.ready ( null, showCoGate )
-				})))
+				if ( !this.keyPairSign()) {
+					let u = null
+					return this.keyPairSign ( u = new keyPairSign (( function () {
+						
+						self.keyPairSign ( u = null )
+						self.ready ( null, showCoGate )
+					})))
+				}
+				return
 			}
 
 			return this.ready ( null, showCoGate )
 		}
-
+		
 		$('.keyPairProcessBar').progress ({
 			percent: processBarCount += 33
 		})
-		
+		if ( this.connectStage() === 3 ) {
+			return
+		}
 		return this.connectStage ( stage )
 		
 	}

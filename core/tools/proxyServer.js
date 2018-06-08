@@ -27,6 +27,7 @@ const Path = require("path");
 const Socks = require("./socket5ForiOpn");
 const gateway_1 = require("./gateway");
 const Os = require("os");
+const Util = require("util");
 const whiteIpFile = 'whiteIpList.json';
 Http.globalAgent.maxSockets = 1024;
 const ipConnectResetTime = 1000 * 60 * 5;
@@ -203,7 +204,7 @@ const isSslFromBuffer = (buffer) => {
     const ret = /^\x16\x03|^\x80/.test(buffer);
     return ret;
 };
-const httpProxy = (clientSocket, buffer, useGatWay, ip6, connectTimeOut, domainListPool, gatway, checkAgainTime, blackDomainList) => {
+const httpProxy = (clientSocket, buffer, useGatWay, ip6, connectTimeOut, domainListPool, _gatway, checkAgainTime, blackDomainList, lostManagerServerIP, lostManagerServerPort) => {
     const httpHead = new httpProxy_1.default(buffer);
     const hostName = httpHead.Url.hostname;
     const userAgent = httpHead.headers['user-agent'];
@@ -220,13 +221,18 @@ const httpProxy = (clientSocket, buffer, useGatWay, ip6, connectTimeOut, domainL
                     ssl: isSslFromBuffer(_data)
                 };
                 const id = `[${clientSocket.remoteAddress.split(':')[3]}:${clientSocket.remotePort}][${uuuu.uuid}] `;
-                return gatway.requestGetWay(id, uuuu, userAgent, clientSocket);
+                if (_gatway && typeof _gatway.requestGetWay === 'function') {
+                    return _gatway.requestGetWay(id, uuuu, userAgent, clientSocket);
+                }
             }
-            return clientSocket.end(res.HTTP_403);
         }
-        return;
+        return clientSocket.end(res.HTTP_403);
     };
-    console.log(`new http`);
+    if (!_gatway || typeof _gatway.requestGetWay !== 'function') {
+        console.log(`httpProxy !gateWay stop SOCKET res._HTTP_PROXY_302 `);
+        return clientSocket.end(res._HTTP_PROXY_302(lostManagerServerIP, lostManagerServerPort));
+    }
+    console.log(`new http proxy request`);
     return exports.checkDomainInBlackList(blackDomainList, hostName, (err, result) => {
         if (result) {
             console.log(`checkDomainInBlackList CallBack result === true`);
@@ -235,8 +241,8 @@ const httpProxy = (clientSocket, buffer, useGatWay, ip6, connectTimeOut, domainL
         const port = parseInt(httpHead.Url.port || httpHead.isHttps ? '443' : '80');
         const isIp = Net.isIP(hostName);
         const hostIp = !isIp ? domainListPool.get(hostName) : { dns: [{ family: isIp, address: hostName, expire: null, connect: [] }], expire: null };
-        if (!hostIp && !this.useGatWay) {
-            return exports.isAllBlackedByFireWall(hostName, ip6, gatway, userAgent, domainListPool, (err, _hostIp) => {
+        if (!hostIp && !useGatWay) {
+            return exports.isAllBlackedByFireWall(hostName, ip6, _gatway, userAgent, domainListPool, (err, _hostIp) => {
                 if (err) {
                     console.log(`[${hostName}] Blocked!`);
                     return closeClientSocket(clientSocket, 504, null);
@@ -284,7 +290,7 @@ const getPac = (hostIp, port, http, sock5) => {
     return res.Http_Pac(FindProxyForURL);
 };
 class proxyServer {
-    constructor(whiteIpList, domainListPool, port, securityPath, checkAgainTimeOut, multipleGateway, connectHostTimeOut, useGatWay, domainBlackList) {
+    constructor(whiteIpList, domainListPool, port, securityPath, checkAgainTimeOut, multipleGateway, connectHostTimeOut, useGatWay, domainBlackList, localhost, managerServerPort) {
         this.whiteIpList = whiteIpList;
         this.domainListPool = domainListPool;
         this.port = port;
@@ -294,6 +300,8 @@ class proxyServer {
         this.connectHostTimeOut = connectHostTimeOut;
         this.useGatWay = useGatWay;
         this.domainBlackList = domainBlackList;
+        this.localhost = localhost;
+        this.managerServerPort = managerServerPort;
         this.hostLocalIpv4 = [];
         this.hostLocalIpv6 = null;
         this.hostGlobalIpV4 = null;
@@ -303,15 +311,17 @@ class proxyServer {
         this.server = null;
         this.gateway = new gateway_1.default(this.multipleGateway);
         this.getGlobalIp = (gateWay) => {
-            if (this.getGlobalIpRunning)
-                return;
+            if (this.getGlobalIpRunning) {
+                return console.log(`getGlobalIp getGlobalIpRunning === true!, skip!`);
+            }
             this.getGlobalIpRunning = true;
             saveLog(`doing getGlobalIp!`);
             gateWay.hostLookup(testGatewayDomainName, null, (err, data) => {
-                if (err)
+                this.getGlobalIpRunning = false;
+                if (err) {
                     return console.log('getGlobalIp ERROR:', err.message);
-                console.log(data);
-                this.network = true;
+                }
+                console.log(Util.inspect(data));
                 this.hostLocalIpv6 ? console.log(`LocalIpv6[ ${this.hostLocalIpv6} ]`) : null;
                 this.hostLocalIpv4.forEach(n => {
                     return console.log(`LocalIpv4[ ${n.address}]`);
@@ -319,9 +329,11 @@ class proxyServer {
                 this.hostGlobalIpV6 ? console.log(`GlobalIpv6[ ${this.hostGlobalIpV6} ]`) : null;
                 this.hostGlobalIpV4 ? console.log(`GlobalIpv4[ ${this.hostGlobalIpV4} ]`) : null;
                 const domain = data;
-                if (!domain)
+                if (!domain) {
                     return console.log(`[] Gateway connect Error!`);
-                console.log('****************************************');
+                }
+                this.network = true;
+                console.log('*************** Gateway connect ready *************************');
             });
         };
         this.getGlobalIp(this.gateway);
@@ -331,6 +343,7 @@ class proxyServer {
             const isWhiteIp = this.whiteIpList.find(n => { return n === ip; }) ? true : false;
             let agent = 'Mozilla/5.0';
             //	windows 7 GET PAC User-Agent: Mozilla/5.0 (compatible; IE 11.0; Win32; Trident/7.0)
+            //		proxy auto setup support
             socket.once('data', (data) => {
                 const dataStr = data.toString();
                 if (/^GET \/pac/.test(dataStr)) {
@@ -349,12 +362,12 @@ class proxyServer {
                     case 0x5:
                         return socks = new Socks.socks5(socket, agent, this);
                     default:
-                        return httpProxy(socket, data, useGatWay, this.hostGlobalIpV6 ? true : false, connectHostTimeOut, domainListPool, this.gateway, checkAgainTimeOut, domainBlackList);
+                        return httpProxy(socket, data, useGatWay, this.hostGlobalIpV6 ? true : false, connectHostTimeOut, domainListPool, this.gateway, checkAgainTimeOut, domainBlackList, this.localhost, this.managerServerPort);
                 }
             });
             socket.on('error', err => {
                 socks = null;
-                console.log(`[${ip}] socket.on error`, err.message);
+                //console.log ( `[${ip}] socket.on error`, err.message )
             });
             socket.once('end', () => {
                 socks = null;
@@ -376,17 +389,11 @@ class proxyServer {
             });
     }
     exit() {
-        console.log(`proxyServer exit ()`);
-        if (this.server) {
-            if (typeof this.server.close === 'function') {
-                console.log(`proxyServer this.server.close ()`);
-                this.server.close();
-            }
-            if (typeof this.server.removeAllListeners === 'function') {
-                console.log(`proxyServer this.server.removeAllListeners ()`);
-                this.server.removeAllListeners();
-            }
-        }
+        console.log(`************ proxyServer on exit ()`);
+        this.gateway = null;
+    }
+    reNew(multipleGateway) {
+        this.gateway = new gateway_1.default(this.multipleGateway = multipleGateway);
     }
     changeDocker(data) {
         const index = this.multipleGateway.findIndex(n => { return n.containerUUID === data.containerUUID; });
