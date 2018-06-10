@@ -8,7 +8,7 @@ class coGateRegion {
 	public showQTGateConnectOption = ko.observable (false)
 	public QTGateMultipleGateway = ko.observable ( 1 )
 	public QTGateMultipleGatewayPool = ko.observableArray ([])
-	public isFreeUser = ko.observable ( /free/i.test( this.dataTransfer.productionPackage ))
+	public isFreeUser = ko.observable ( /free/i.test( this.dataTransfer.productionPackage.toUpperCase() ))
 	public QTGateGatewayPortError = ko.observable ( false )
 	public requestPortNumber = ko.observable ('80')
 	public QTGateLocalProxyPort = ko.observable ('3001')
