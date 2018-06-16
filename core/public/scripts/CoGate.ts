@@ -120,7 +120,7 @@ class coGateRegion {
 		}
 	}
 
-	public QTGateGatewayConnectRequestCallBack ( error, connectCommand: QTGateAPIRequestCommand ) {
+	public QTGateGatewayConnectRequestCallBack ( error, connectCommand: IConnectCommand ) {
 		clearTimeout ( this.doingProcessBarTime )
 		this.CoGateConnerting ( false )
 		
@@ -135,7 +135,7 @@ class coGateRegion {
 		if ( connectCommand.error > -1  ) {
 			return this.error ( connectCommand.error )
 		}
-		const data1 = connectCommand.Args[0]
+		const data1 = connectCommand[0]
 		this.localHostIP ( data1.localServerIp[0] )
 		this.QTGateLocalProxyPort ( data1.localServerPort )
 		//this.QTTransferData ( data1.transferData )

@@ -300,6 +300,7 @@ export default class localServer {
 			return this.sendRequest ( socket, com, ( err: number, res: QTGateAPIRequestCommand ) => {
 				//		no error
 				if ( err ) {
+					socket.emit ( 'QTGateGatewayConnectRequest', err )
 					return console.log ( `on QTGateGatewayConnectRequest CoNETConnectCalss.request return error`, err )
 				}
 				if ( res.error < 0 ) {
@@ -307,10 +308,11 @@ export default class localServer {
 					const arg: IConnectCommand[] = this.connectCommand = res.Args
 					
 					this.makeOpnConnect ( arg )
-					
+					return socket.emit ( 'QTGateGatewayConnectRequest', null, this.connectCommand )
 					
 				}
-				return socket.emit ( 'QTGateGatewayConnectRequest', null, this.connectCommand )
+
+				return socket.emit ( 'QTGateGatewayConnectRequest', res.error )
 				
 			})
 			
