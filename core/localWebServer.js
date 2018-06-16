@@ -316,11 +316,9 @@ class localServer {
                 }
                 if (res.error < 0) {
                     const arg = this.connectCommand = res.Args;
-                    console.log(JSON.stringify(res.Args));
                     this.makeOpnConnect(arg);
-                    return socket.emit('QTGateGatewayConnectRequest', null, this.connectCommand);
                 }
-                saveLog(`connectRequest res.error [${res.error}]`);
+                return socket.emit('QTGateGatewayConnectRequest', null, this.connectCommand);
             });
         };
         //		iOPN connect 

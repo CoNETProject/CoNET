@@ -115,13 +115,14 @@ class coGateRegion {
             this.error(error);
             return;
         }
-        const data1 = connectCommand[0];
-        if (data1) {
-            this.localHostIP(data1.localServerIp[0]);
-            this.QTGateLocalProxyPort(data1.localServerPort);
-            //this.QTTransferData ( data1.transferData )
-            return this.QTConnectData(data1);
+        if (connectCommand.error > -1) {
+            return this.error(connectCommand.error);
         }
+        const data1 = connectCommand.Args[0];
+        this.localHostIP(data1.localServerIp[0]);
+        this.QTGateLocalProxyPort(data1.localServerPort);
+        //this.QTTransferData ( data1.transferData )
+        return this.QTConnectData(data1);
     }
     QTGateGatewayConnectRequest() {
         const self = this;
