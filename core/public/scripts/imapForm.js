@@ -144,7 +144,6 @@ const getImapSmtpHost = function (_email) {
     }
     return ret;
 };
-const conetImapAccount = /^qtgate_test\d\d?@icloud.com$/i;
 class keyPairSign {
     constructor(exit) {
         this.exit = exit;

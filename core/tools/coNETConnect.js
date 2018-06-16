@@ -39,11 +39,9 @@ class default_1 extends Imap.imapPeer {
         this.connectStage = -1;
         this.alreadyExit = false;
         this.ignorePingTimeout = false;
-        this.timeOutWhenSendConnectRequestMail = null;
         saveLog(`=====================================  new CoNET connect() doNetSendConnectMail = [${doNetSendConnectMail}]\n`, true);
         this.newMail = (ret) => {
             //		have not requestSerial that may from system infomation
-            clearTimeout(this.timeOutWhenSendConnectRequestMail);
             if (!ret.requestSerial) {
                 return this.cmdResponse(ret);
             }
@@ -60,7 +58,7 @@ class default_1 extends Imap.imapPeer {
             return this.sockerServer.emit('tryConnectCoNETStage', null, 1);
         });
         this.on('ready', () => {
-            clearTimeout(this.timeOutWhenSendConnectRequestMail);
+            this.ignorePingTimeout = false;
             this.CoNETConnectReady = true;
             saveLog('Connected CoNET!', true);
             this.connectStage = 4;
@@ -73,23 +71,11 @@ class default_1 extends Imap.imapPeer {
             }
             return this.destroy();
         });
+        this.ignorePingTimeout = doNetSendConnectMail;
         this.sockerServer.emit('tryConnectCoNETStage', null, this.connectStage = 0);
     }
     sendFeedback() {
         return;
-    }
-    makeTimeOutEvent() {
-        const self = this;
-        clearTimeout(this.timeOutWhenSendConnectRequestMail);
-        this.ignorePingTimeout = true;
-        return this.timeOutWhenSendConnectRequestMail = setTimeout(() => {
-            this.ignorePingTimeout = false;
-            if (this.peerReady) {
-                return saveLog(`timeOutWhenSendConnectRequestMail peerReady already true!`, true);
-            }
-            saveLog(`makeTimeOutEvent destroy connect!`, true);
-            return self.destroy(0);
-        }, timeOutWhenSendConnectRequestMail);
     }
     checkConnect(CallBack) {
         if (this.wImap && this.wImap.imapStream && this.wImap.imapStream.writable &&

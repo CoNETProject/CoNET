@@ -272,6 +272,9 @@ var view_layout;
                 if (stage === 4) {
                     this.connectToCoNET(false);
                     this.connectedCoNET(true);
+                    if (this.showCoGate()) {
+                        this.homeClick();
+                    }
                 }
             }
         }
@@ -441,9 +444,11 @@ var view_layout;
                         return self.imapSetupClassExit(imapData);
                     }));
                 }
-                self.showCoGate(showCoGate);
+                this.connectedCoNET(true);
+                //self.showCoGate ( showCoGate )
                 if (showCoGate) {
-                    return self.CoGateClick();
+                    self.showCoGate(true);
+                    return self.homeClick();
                 }
                 self.AppList(true);
                 $('.dimmable').dimmer({ on: 'hover' });
@@ -456,14 +461,7 @@ var view_layout;
             }));
         }
         reFreshLocalServer() {
-            const self = this;
-            socketIo.once('connect', function () {
-                return location.reload();
-            });
-            socketIo.once('connect_error', function () {
-                return self.refresh();
-            });
-            socketIo.connect();
+            location.reload();
         }
         homeClick() {
             this.AppList(true);

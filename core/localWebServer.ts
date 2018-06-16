@@ -442,8 +442,7 @@ export default class localServer {
 				const com: QTGateAPIRequestCommand = {
 					command: 'activePassword',
 					Args: [ pass ],
-					error: null,
-					requestSerial: Crypto.randomBytes(8).toString('hex')
+					error: null
 				}
 				console.log ( Util.inspect ( com ))
 				
@@ -474,7 +473,7 @@ export default class localServer {
 		socket.on ( 'getAvaliableRegion', CallBack1 => {
 
 			CallBack1 ()
-
+			console.log (`on getAvaliableRegion`)
 			if ( this.connectCommand && this.connectCommand.length ) {
 				console.log (`getAvaliableRegion have this.connectCommand `)
 				//socket.emit ('getAvaliableRegion', this.regionV1, this.dataTransfer, this.config )
@@ -488,8 +487,7 @@ export default class localServer {
 			const com: QTGateAPIRequestCommand = {
 				command: 'getAvaliableRegion',
 				Args: [],
-				error: null,
-				requestSerial: Crypto.randomBytes(8).toString('hex')
+				error: null
 			}
 
 			console.log (`socket.on ( 'getAvaliableRegion') no this.connectCommand`)
@@ -503,25 +501,12 @@ export default class localServer {
 				}
 				this.dataTransfer = res.dataTransfer
 				
-				saveLog ( `getAvaliableRegion got return Args [2] [${ JSON.stringify ( res.Args[2] )}]`)
+				console.log (`dataTransfer `, Util.inspect ( this.dataTransfer, false, 2, true ))
 				socket.emit ( 'getAvaliableRegion', res.Args[2], res.dataTransfer, this.config )
 				
 				//		Have gateway connect!
 				//this.saveConfig ()
 				
-				if ( res.Args[ 1 ]) {
-					saveLog (`getAvaliableRegion got return Args [1] [${ JSON.stringify ( res.Args[1] )}]`)
-					/*
-					if ( ! this.proxyServer || ! this.connectCommand ) {
-						const arg: IConnectCommand[] = this.connectCommand = res.Args[1]
-						arg.forEach ( n => {
-							n.localServerIp = Encrypto.getLocalInterface ()[0]
-						})
-						this.makeOpnConnect ( arg )
-					}
-					*/
-					return socket.emit ( 'QTGateGatewayConnectRequest', -1, res.Args[ 1 ] )
-				}
 				
 				this.regionV1 = res.Args[2]
 			})
@@ -607,8 +592,7 @@ export default class localServer {
 			const com: QTGateAPIRequestCommand = {
 				command: 'cardToken',
 				error: null,
-				Args: [ payment ],
-				requestSerial: Crypto.randomBytes(8).toString ('hex')
+				Args: [ payment ]
 			}
 			CallBack1 ()
 			console.log ( `socket.on cardToken send to QTGate!`, Util.inspect ( com, false, 2, true ))
@@ -630,6 +614,19 @@ export default class localServer {
 			})
 			
 		})
+
+		socket.on ( 'cancelPlan', ( CallBack1 ) => {
+			CallBack1 ()
+			const com: QTGateAPIRequestCommand = {
+				command: 'cancelPlan',
+				error: null,
+				Args: []
+			}
+			return this.sendRequest ( socket, com, ( err: number, res: QTGateAPIRequestCommand ) => {
+				socket.emit ( 'cancelPlan', err, res )
+			})
+		})
+
 	}
 
 	private doingCheckImap ( socket: SocketIO.Socket ) {
@@ -717,7 +714,7 @@ export default class localServer {
 				const file = Uuid.v4() + '.mp4'
 				const viode = Buffer.from ( data, 'base64' )
 				return Fs.writeFile ( Path.join ( Tool.QTGateVideo, file ), viode, err => {
-					m.QTDownload = `/videoTemp/${ file }`
+					m.QTDownload = `/tempfile/videoTemp/${ file }`
 					console.log (`save video file: [${ file }]`)
 					return CallBack ()
 				})
@@ -1131,7 +1128,7 @@ export default class localServer {
 		this.localConnected.set ( client, { socket: socket, login: false, listenAfterPasswd: false } )
 
 		socket.once ( 'disconnect', reason => {
-			saveLog ( `socketServerConnected ${ client } on disconnect`)
+			//saveLog ( `socketServerConnected ${ client } on disconnect`)
 			return this.localConnected.delete ( client )
 		})
 
@@ -1387,7 +1384,7 @@ export default class localServer {
 			this.config.newVersion = ver
 			this.config.newVerReady = true
 			return Tool.saveConfig ( this.config, err => {
-				
+
 			})
 		})
 
