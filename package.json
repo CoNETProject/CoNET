@@ -1,6 +1,6 @@
 {
   "name": "conet",
-  "version": "2.0.8",
+  "version": "2.0.13",
   "license": "MIT",
   "description": "CoNET",
   "repository": {
@@ -29,7 +29,8 @@
     "pug": "^2.0.3",
     "raw-socket": "^1.6.0",
     "socket.io": "^2.1.1",
-    "twitter-text": "^2.0.4"
+    "twitter-text": "^2.0.4",
+    "merge-descriptors":"^1.0.1"
   },
   "scripts": {
     "test": "node core/main test"

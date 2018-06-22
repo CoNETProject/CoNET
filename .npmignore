@@ -15,12 +15,11 @@ dist
 node_modules
 .gitignore
 yarn.lock
-*.js
 package-lock.json
 .npmignore
 resources
 coverage
 node_modules
-.gitignore
 bower_components
 .vscode
+*.ts

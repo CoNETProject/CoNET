@@ -124,6 +124,9 @@ class localServer {
         });
         this.expressServer.get('/twitter', (req, res) => {
             console.log(`get twitter`);
+            if (!this.config.keypair || !this.config.keypair.publicKey || !this.CoNETConnectCalss) {
+                return res.render('home', { title: 'home', proxyErr: false });
+            }
             res.render('twitter', { title: 'CoNET for Twitter' });
         });
         this.expressServer.get('/proxyErr', (req, res) => {
@@ -245,7 +248,7 @@ class localServer {
     }
     sendRequest(socket, cmd, CallBack) {
         if (!this.openPgpKeyOption) {
-            console.log(`sendrequest keypair error! !this.config [${!this.config}] !this.keyPair[${!this.keyPair}] !this.keyPair.passwordOK [${!this.keyPair.passwordOK}]`);
+            console.log(`sendrequest keypair error! !this.config [${!this.config}] !this.keyPair[${!this.keyPair}]`);
             return CallBack(1);
         }
         if (!this.CoNETConnectCalss) {
@@ -412,16 +415,10 @@ class localServer {
                 socket.emit('checkActiveEmailSubmit', 0);
                 return saveLog(`checkActiveEmailSubmit, no text.length ! [${text}]`);
             }
-            if (text.indexOf('-----BEGIN PGP MESSAGE----- Version: GnuPG v1 ') > -1) {
-                text = text.replace(/-----BEGIN PGP MESSAGE----- Version: GnuPG v1 /, '-----BEGIN__PGP__MESSAGE-----\r\nVersion:__GnuPG__v1\r\n\r\n');
-                text = text.replace(/-----END PGP MESSAGE-----/, '-----END__PGP__MESSAGE-----');
-                text = text.replace(/ /g, '\r\n');
-                text = text.replace(/__/g, ' ');
-            }
             return Tool.decryptoMessage(this.openPgpKeyOption, text, (err, data) => {
                 if (err) {
                     socket.emit('checkActiveEmailSubmit', 1);
-                    return saveLog(`checkActiveEmailSubmit, decryptoMessage error [${err.message ? err.message : null}]`);
+                    return saveLog(`checkActiveEmailSubmit, decryptoMessage error [${err.message ? err.message : null}]\n${text}`);
                 }
                 let pass = null;
                 try {
