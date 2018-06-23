@@ -115,9 +115,6 @@ class coGateRegion {
             this.error(error);
             return;
         }
-        if (connectCommand.error > -1) {
-            return this.error(connectCommand.error);
-        }
         const data1 = connectCommand[0];
         this.localHostIP(data1.localServerIp[0]);
         this.QTGateLocalProxyPort(data1.localServerPort);
@@ -252,6 +249,7 @@ class CoGateClass {
                     return n.qtRegion === region;
                 });
                 const uu = self.QTGateRegions()[regionIndex];
+                self.QTTransferData(cmd[0].transferData);
                 uuu = new coGateRegion(uu, self.QTTransferData(), function () {
                     self.account();
                 }, isUsedPublicImapAccount, function () {
