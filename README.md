@@ -24,7 +24,7 @@ DDos Attack, Connecting Reset, Restrictive and Filtering, Surveillance, SSL man-
 - Ghost network
 
 CoNET is a virtual network that doing routing via email address. Node connect to CoNET use email protocol via third party email server. CoNET have no public IP address or domain name.
-CoNET may keep connecting if those network still allow email communication. The CoNET's structure is totally different than traditional network. 
+CoNET may keep connecting if those network still allow email communication. CoNET's structure is totally different than traditional network. 
 
 CoNET’s users employ this network by connecting through the third-party public email server to establish a virtual tunnel rather than making a direct connection. CoNET is an effective censorship circumvention tool, allowing its users to reach otherwise blocked destinations or content. Along the same line, CoNET’s user leave their IP address in public email server, CoNET thus allowing both organizations and individuals to share information over public networks without compromising their privacy.
 
