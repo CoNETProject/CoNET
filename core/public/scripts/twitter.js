@@ -422,8 +422,7 @@ var twitter_layout;
         }
         twitterPostReturn(data) {
             const self = this;
-            if (!data) {
-                return alert('no data ');
+            if (typeof data === 'number') {
             }
             if (++this.requestNewTimelinesCount === 20) {
                 this.bottomEventLoader(false);

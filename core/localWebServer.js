@@ -622,19 +622,19 @@ class localServer {
             if (err) {
                 return CallBack();
             }
+            if (res.error) {
+                saveLog(`this.localServer.QTClass.request ERROR typeof res.error = ${typeof res.error}`);
+                return CallBack(res.error);
+            }
             if (res.Args && res.Args.length > 0) {
                 let uu = null;
                 try {
                     uu = JSON.parse(Buffer.from(res.Args[0], 'base64').toString());
                 }
                 catch (ex) {
-                    return saveLog(`getTimelines QTClass.request return JSON.parse Error! _return [ ]`);
+                    return saveLog(`getTimelines QTClass.request return JSON.parse Error! _return [${ex} ]`);
                 }
                 return CallBack(null, uu);
-            }
-            if (res.error) {
-                saveLog(`this.localServer.QTClass.request ERROR typeof res.error = ${typeof res.error}`);
-                return CallBack(res.error);
             }
         });
     }
@@ -943,6 +943,7 @@ class localServer {
             return this.getTimelines(socket, item, (err, tweets) => {
                 getTimelinesCount++;
                 if (err) {
+                    socket.emit('getTimelines', err);
                     return saveLog(`socket.on ( 'getTimelines' return [${getTimelinesCount}] error, [${err.message}]`);
                 }
                 saveLog(`doinging createTweetData for count [${getTimelinesCount}]`);
