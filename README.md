@@ -6,7 +6,7 @@
 [![Known Vulnerabilities](https://snyk.io/test/github/qtgate/conet/badge.svg?targetFile=package.json)](https://snyk.io/test/github/qtgate/conet?targetFile=package.json)
 
 ### Internet problems, インターネットの問題, 互聯網問題
-[![CoNET video](/resources/CoNETVideo.png?raw=true)](http://www.youtube.com/watch?v=RPKsYLI-4jU)
+[![CoNET video](/resources/CoNETVideo.png?raw=true)](http://www.CoNETTech.ca/images/CONET.m4v)
 DDos Attack, Connecting Reset, Restrictive and Filtering, Surveillance, SSL man-in-the-middle attack, censorship, IP address Blacklists, all problems in Internet is because the IP address.
 
 インターネット上DDoS攻撃、コネクション・リセット、制限又は遮断された自由なしのインターネット、ネット監視と窃視、中間者攻撃、IPブラックリストなどあらゆる問題の根源はIPアドレスであります。
