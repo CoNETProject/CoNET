@@ -58,6 +58,6 @@ CoNET自身には公開されたIPアドレスがないです、インターネ�
 ### CoNET Platform, CoNETプラットフォーム, CoNET平台
 - [CoNET Platform for laptop, CoNETプラットフォーム for PC, CoNET計算機OS平台](https://github.com/QTGate/QTGate-Desktop-Client)
 - CoNET Platform for iOS (come soon), CoNETプラットフォーム for iOS (開発中), iOS的CoNET平台開發中
-- CoNET Platform for Android (come soon), CoNETプラットフォーム for Android (開発中), 安卓系統的CoNET平台開發中
+- [CoNET Platform for Android, CoNETプラットフォーム for Android, 安卓系統的CoNET平台](https://github.com/QTGate/CoNETPlatform-Android)
 
 ![http protocol](/resources/CoPlatform3.png?raw=true)
