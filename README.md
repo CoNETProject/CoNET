@@ -15,42 +15,36 @@ DDos Attack, Connecting Reset, Restrictive and Filtering, Surveillance, SSL man-
 
 ![http protocol](/resources/conet.png?raw=true)
 
-### The CoNET is a anonymous refraction network that allows people to improve their security, privacy and freedom on the Internet.
+### CoNET design to build global network of interconnected computer within the internet that use the email protocol suite (SMTP & IMAP) via third party mail server to link devices worldwide. CoNET’s goal is:
 ![http protocol](/resources/CoNET_refraction1.png?raw=true)
 - Circumventing online censorship and surveillance
 - Security from danger or threat online
 - Stay anonymous online
 - Bypass restriction and filtering
-- Ghost network
+- Protect server from DDoS attack
 
-CoNET is a virtual network that doing routing via email address. Node connect to CoNET use email protocol via third party email server. CoNET have no public IP address or domain name.
-CoNET may keep connecting if those network still allow email communication. CoNET's structure is totally different than traditional network. 
+Node connected to CoNET network through public email servers. CoNET do not provide email server let node to connecting. This provides a higher level of reliability and redundancy to the network itself. Node doing encrypted communication in CoNET based on standard IMAP protocol. Network monitor is hard to find out different about normal mail and CoNET communication email.
 
-CoNET’s users employ this network by connecting through the third-party public email server to establish a virtual tunnel rather than making a direct connection. CoNET is an effective censorship circumvention tool, allowing its users to reach otherwise blocked destinations or content. Along the same line, CoNET’s user leave their IP address in public email server, CoNET thus allowing both organizations and individuals to share information over public networks without compromising their privacy.
-
-CoNET looks like a ghost network because CoNET have not public IP address for connection. Network attack tools are losing their powers. CoNET allows node to host an anonymous website or server routing use email address.
-### CoNETとは匿名屈折仮想ネットワークです
+### CoNETはインターネットの中公衆メールサーバーよりメールプロトコル(SMTP & IMAP)を通じての仮想ネットワークです。CoNETの目標は以下です：
 - インターネットの検閲、監視から脱出
 - 安全とプライバシーなオンライン環境
 - 匿名
 - 知能化した現代的なファイアウォールをうまくすり抜けること
-- 幽霊ネットワーク
+- DDoS攻撃から守ること
 
-CoNETは公衆メールサーバーを通じて構築した、IPなしの匿名仮想ネットワークです。ノートはCoNETへのコネクトはCoNETのドメインやIPアドレスに接続しなくて、Emailアドレスで繋がりします。各ノートの間はIMAPプロトコルを利用してメールアドレスをルーティングします。CoNETはメール通信を許せるネットワークであれば、その通信能力を持ちます。CoNETも屈折ネットワークと呼ばれます。ネットでの検閲とそれを回避する方法、ネズミと猫のゲームに、VPNやTorなどのネットでの検閲を回避するツールは、弱勢になったことを逆転するチャンスの次時代的な技術です。CoNETはインターネットへのルーティングも提供しています。
+CoNETは公衆メールサーバーを通じて構築した、IPなしの匿名仮想ネットワークです。各ノートの間はメールアドレスを使ってルーティングをします。CoNETはメール通信を許せるネットワークであれば、その通信能力を持ちます。ネットでの検閲とそれを回避する方法、ネズミと猫のゲームに、VPNやTorなどのネットでの検閲を回避するツールは、弱勢になったことを逆転するチャンスの次時代的な技術です。CoNETはインターネットへのルーティングも提供しています。
 
 CoNET自身には公開されたIPアドレスがないです、インターネットから見えない幽霊のような存在であります、伝統的なネットワーク攻撃ツールはCoNETに無効となります。CoNETはCoNETに接続したサーバに、IPアドレスの代わりにメールアドレスを使った、匿名サーバとして、CoNETクライアントからの訪問は可能です。インターネットサーバーはDDoS攻撃を受ける間に、CoNETによって引き続きサービスすることができます。CoNETコアーは各ノートと同等立場ですから、お互いIPアドレスを覗くすることはできないです。
 
-### CoNET是一個使用折射技術的匿名虛擬網絡
-- 對抗網絡監控和審查
+### CoNET是寄生於互聯網之中，通過第三方郵件服務器，節點之間使用郵件協議來進行通訊的匿名虛擬網絡，它的目標是：
+- 規避網絡監控和審查
 - 安全和隱私
 - 匿名
 - 穿越智能化防火牆
-- 幽靈網絡
+- 服務器免於DDoS攻擊
 
+節點通過公眾服務器來連結CoNET，所以CoNET不存在公開的IP地址或域名，有效的規避了CoNET自身被網絡屏蔽，在一個允許郵件通訊的網絡中，CoNET可以進行高可靠性和穩定的通訊。在網絡審查者和規避審查者之間的，這場貓捉老鼠遊戲之中，CoNET比基於IP地址混淆技術的VPN和Tor有更大的勝算優勢。CoNET還提供互聯網路由出口，讓節點可以通過CoNET來訪問互聯網。
 
-CoNET是一個虛擬路由器形成的虛擬網絡，在CoNET網絡中各個節點的路由，拋開了傳統的IP地址，而以Email地址作為各個節點之間的發現和通訊的依據。由於CoNET本身不提供Email服務器，它是寄生於現有網絡Email通訊系統，這意味著CoNET無IP地址無域名，在一個還允許郵件通訊的網絡之中，很難對CoNET的通訊進行檢測和封鎖。它的技術被稱為折射網絡技術(Refraction network)，可以幫助用戶逃避被網絡監控，訪問被網絡屏蔽的服務器。是網絡監控與被監控的這場貓捉老鼠遊戲之中，VPN和其他規避工具均處於劣勢的當前形勢下，重新佔據優勢的希望。
-
-CoNET核心網絡管理雲由於沒有對外服務的IP地址，從互聯網角度來說它像是一個看不見的幽靈般的存在，傳統意義上的網絡攻擊工具在CoNET面前均失去作用，而CoNET和各節點在郵件服務器的地位相同，相互窺視探測IP地址變得困難，所以CoNET具有高安全性和可靠性。CoNET目前只對應知名公眾郵箱，讓使用郵箱來攻擊CoNET行動也變得異常困難。CoNET提供接入CoNET網絡的服務器以郵箱作為訪問地址、提供匿名的服務器訪問服務，讓網絡媒體在遭受DDoS攻擊的情況下，都能夠繼續服務與CoNET客戶端。
 ### CoNET IaaS BtoB service
 ![http protocol](/resources/coNETIaas1.png?raw=true)
 ***

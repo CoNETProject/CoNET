@@ -1,6 +1,6 @@
 {
   "name": "conet",
-  "version": "2.0.17",
+  "version": "2.0.18",
   "license": "MIT",
   "description": "CoNET",
   "repository": {
@@ -21,13 +21,11 @@
     "cookie-parser": "^1.4.3",
     "express": "^4.16.3",
     "jimp": "^0.2.28",
-    "net-ping": "^1.2.1",
     "node-uuid": "^1.4.8",
     "nodemailer": "^4.6.5",
     "openpgp":"3.0.11",
     "portastic": "^1.0.1",
     "pug": "^2.0.3",
-    "raw-socket": "^1.6.0",
     "socket.io": "^2.1.1",
     "twitter-text": "^2.0.4",
     "merge-descriptors":"^1.0.1"
