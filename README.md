@@ -1,3 +1,4 @@
+![http protocol](/resources/CoNET_icon.png?raw=true)
 # CoNet
 [![Gitter](https://img.shields.io/badge/chat-on%20gitter-blue.svg)](https://gitter.im/QTGate/Lobby)
 [![npm version](https://badge.fury.io/js/conet.svg)](https://badge.fury.io/js/conet)
