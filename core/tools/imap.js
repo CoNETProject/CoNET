@@ -31,7 +31,7 @@ const Fs = require("fs");
 const Tool = require("./initSystem");
 const Upload = require("./uploadFile");
 const MAX_INT = 9007199254740992;
-const debug = false;
+const debug = true;
 const pingFailureTime = 1000 * 60;
 const ErrorLogFile = path_1.join(Tool.QTGateFolder, 'imap.log');
 const ErrorLogFileStream = path_1.join(Tool.QTGateFolder, 'imapStream.log');
@@ -519,7 +519,7 @@ class ImapServerSwitchStream extends Stream.Transform {
         };
         timers_1.clearTimeout(this.idleResponsrTime);
         this.commandProcess = (text, cmdArray, next, _callback) => {
-            console.log(`_logout doing this.commandProcess `);
+            //console.log (`_logout doing this.commandProcess `)
             this.isImapUserLoginSuccess = false;
             return _callback();
         };
@@ -749,8 +749,8 @@ class ImapServerSwitchStream extends Stream.Transform {
             return this._logout(callback);
         };
         if (this.imapServer.listenFolder && this.runningCommand) {
-            console.trace();
-            saveLog(`logout_process [${this.imapServer.imapSerialID}] this.imapServer.listenFolder && this.runningCommand = [${this.runningCommand}]`);
+            //console.trace ()
+            //saveLog  (`logout_process [${ this.imapServer.imapSerialID }] this.imapServer.listenFolder && this.runningCommand = [${ this.runningCommand }]`)
             this.idleCallBack = doLogout;
             return this.idleStop();
         }
@@ -848,7 +848,7 @@ class qtGateImap extends Event.EventEmitter {
         this.imapSerialID = Crypto.createHash('md5').update(this.listenFolder + this.writeFolder).digest('hex').toUpperCase();
         this.port = typeof this.IMapConnect.imapPortNumber === 'object' ? this.IMapConnect.imapPortNumber[0] : this.IMapConnect.imapPortNumber;
         this.connectTimeOut = null;
-        saveLog(`new qtGateImap imapSerialID [${this.imapSerialID}] listenFolder [${this.listenFolder}] writeFolder [${this.writeFolder}]`, true);
+        //saveLog ( `new qtGateImap imapSerialID [${ this.imapSerialID }] listenFolder [${ this.listenFolder }] writeFolder [${ this.writeFolder }]`, true )
         this.connect();
         this.once(`error`, err => {
             saveLog(`[${this.imapSerialID}] this.on error ${err && err.message ? err.message : null}`);
@@ -911,7 +911,7 @@ class qtGateImap extends Event.EventEmitter {
     }
 }
 exports.qtGateImap = qtGateImap;
-const appendFromFile = (imap, fileName, CallBack) => {
+const appendFromFile1 = (imap, fileName, CallBack) => {
     return Fs.stat(fileName, (err, stat) => {
         if (err) {
             saveLog(`[]appendFromFile s.stat got error! [${err.message}]`);
@@ -992,7 +992,7 @@ class qtGateImapwrite extends qtGateImap {
             });
         }
         this.canAppend = false;
-        return appendFromFile(this.imapStream, fileName, err => {
+        return appendFromFile1(this.imapStream, fileName, err => {
             this.canAppend = true;
             //saveLog ( `qtGateImapwrite appendFromFile CallBack err = [${ err && err.message ? err.message : null }]`)
             CallBack(err);
@@ -1437,7 +1437,7 @@ class imapPeer extends Event.EventEmitter {
         //saveLog ( `====== > newWriteImap`, true )
         this.wImap = new qtGateImapwrite(this.imapData, this.writeBox);
         this.wImap.once('end', err => {
-            saveLog(`this.wImap.once end ! [${err && err.message ? err.message : null}]!`, true);
+            console.log(`this.wImap.once end ! [${err && err.message ? err.message : null}]!`, true);
             //return this.destroy ( 1 )
         });
         this.wImap.once('error', err => {
@@ -1465,7 +1465,7 @@ class imapPeer extends Event.EventEmitter {
             return saveLog(`newReadImap have rImap.imapStream.readable = true, stop!`, true);
         }
         this.makeRImap = true;
-        saveLog(`=====> newReadImap!`, true);
+        //saveLog ( `=====> newReadImap!`, true )
         this.rImap = new qtGateImapRead(this.imapData, this.listenBox, false, email => {
             this.mail(email);
         });

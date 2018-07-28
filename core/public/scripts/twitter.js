@@ -362,6 +362,7 @@ var twitter_layout;
             this.newTwitterFieldError = ko.observable();
             this.addATwitterAccount = ko.observable(false); //      doing add a new account 
             this.processBarTime = null;
+            this.postWaitLine = ko.observableArray([]);
             this.unknowError = ko.observable(false);
             this.config = ko.observable({
                 firstRun: true,
@@ -416,15 +417,26 @@ var twitter_layout;
                     return self.config(data);
                 });
             });
-            socketIo.on('getTimelines', function (data) {
-                return self.twitterPostReturn(data);
+            socketIo.on('getTimelines', function (data, post) {
+                return self.twitterPostReturn(data, post);
             });
             socketIo.on('getTimelinesEnd', function () {
                 return self.bottomEventLoader(false);
             });
             self.newTwitterField.push(new twitterField(self));
         }
-        twitterPostReturn(data) {
+        getNumberFormat(num) {
+            if (num < 1000) {
+                return num.toString();
+            }
+            const u = Math.round(num / 100);
+            if (u < 10000) {
+                return `${u / 10} K`;
+            }
+            const v = Math.round(num / 100000);
+            return `${v / 10} M`;
+        }
+        twitterPostReturn(data, post) {
             const self = this;
             this.showServerError(false);
             //      Error
@@ -483,10 +495,19 @@ var twitter_layout;
             data.favoritedLoader_ko = ko.observable(false);
             this.currentTimelines.push(data);
             $('.row.ui.shape').shape();
-            $('.ui.sidebar.twitterTimes').sidebar('toggle');
-            return this.currentTimelines.sort(function (a, b) {
+            this.currentTimelines.sort(function (a, b) {
                 return b.id - a.id;
             });
+            $(`#${data.id_str} .ui.sidebar`).sidebar({
+                context: $(`#${data.id_str}`)
+            }).sidebar('attach events', `.${data.id_str}`).sidebar('setting', 'exclusive', false);
+            $(`.${data.id_str}`).click(function (e) {
+                e.preventDefault();
+            });
+            //      post data 
+            if (post) {
+                scrollToTop();
+            }
         }
         getTimeLinesNext() {
             this.showServerError(false);
@@ -726,7 +747,8 @@ var twitter_layout;
                 images: twiData.images(),
                 videoSize: twiData.videoSize,
                 videoFileName: twiData.videoFileName(),
-                media_data: []
+                media_data: [],
+                uuid: uuid_generate()
             };
             return TwitterData;
         }
@@ -735,26 +757,19 @@ var twitter_layout;
             const data = [];
             this.shownewTwitterApprove(false);
             $('#newTwitterWindow').modal('hide');
-            $('#newTwitterWindow').modal('hide');
             this.newTwitterField().forEach(function (n) {
                 const nn = self.newTwitterData(n);
                 if (!nn) {
                     return self.newTwitterField([new twitterField(this)]);
                 }
                 data.push(nn);
+                this.postWaitLine.push(new postWaitLine(nn.uuid));
             });
             if (!data.length) {
                 return this.newTwitterField([new twitterField(this)]);
             }
             this.newTwitterField([new twitterField(this)]);
-            return socketIo.emit11('twitter_postNewTweet', this.twitterData()[0], data, function (err, data) {
-                if (err) {
-                    return alert(err);
-                }
-                if (data) {
-                    return self.twitterPostReturn(data);
-                }
-            });
+            //return socketIo.emit11 ( 'twitter_postNewTweet', this.twitterData()[0], data )
         }
         timelinesViewSharp(id_str) {
             return $(`.shape[sharp-id='${id_str}']`).shape('flip over');

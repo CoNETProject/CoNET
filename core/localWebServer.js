@@ -262,7 +262,7 @@ class localServer {
         return this.CoNETConnectCalss.requestCoNET(cmd, (err, res) => {
             saveLog(`request response [${cmd.command}]`);
             if (err) {
-                this.socketServer.emit('CoNET_offline');
+                CallBack(err);
                 return saveLog(`QTClass.request error! [${err}]`);
             }
             return CallBack(null, res);
@@ -469,7 +469,6 @@ class localServer {
                 Args: [],
                 error: null
             };
-            console.log(`socket.on ( 'getAvaliableRegion') no this.connectCommand`);
             return this.sendRequest(socket, com, (err, res) => {
                 if (err) {
                     return saveLog(`getAvaliableRegion QTClass.request callback error! STOP [${err}]`);
@@ -671,7 +670,7 @@ class localServer {
         });
     }
     getMedia(mediaString, CallBack) {
-        saveLog(` getMedia mediaString = [${mediaString}]`);
+        //saveLog (` getMedia mediaString = [${ mediaString }]`)
         if (/^http[s]*\:\/\//.test(mediaString)) {
             return CallBack(null, mediaString);
         }
@@ -734,7 +733,7 @@ class localServer {
         }, CallBack);
     }
     createTweetData_next(tweet, err, data, CallBack) {
-        saveLog(`createTweetData_next CallBack: data = [${data.map(n => { return n.length; })}]`);
+        //saveLog ( `createTweetData_next CallBack: data = [${ data.map ( n => { return n.length })}]`)
         tweet.user.profile_image_url_https = `data:image/png;base64,${data[0]}`;
         if (tweet.retweeted && tweet.retweeted.user) {
             tweet.retweeted.user.profile_image_url_https = `data:image/png;base64,${data[1]}`;
@@ -913,6 +912,7 @@ class localServer {
                 error: null,
                 requestSerial: Crypto.randomBytes(10).toString('hex')
             };
+            console.log(`[twitter_post]\n${Util.inspect(postData)}`);
             /*
             Imap.imapGetMediaFilesFromString ( this.localServer.QTClass.imapData, postData.videoFileName, QTGateVideo, ( err1, data ) => {
                 if ( err1 ) {
@@ -931,16 +931,17 @@ class localServer {
         }
         return post(null);
     }
-    tweetTimeCallBack(socket, err, tweets) {
+    tweetTimeCallBack(socket, err, tweets, postReturn) {
         if (err) {
             socket.emit('getTimelines', err);
-            return saveLog(`socket.on ( 'getTimelines' return [${err.message}]`);
+            return console.log(`socket.on ( 'getTimelines' return [${err}]`);
         }
         return this.createTweetData(tweets, (err, tweet) => {
             if (err) {
                 return console.log(`getTweetCount error`, err);
             }
-            return socket.emit('getTimelines', tweet);
+            console.log(`*************** socket.emit [${tweet.CoNET_totalTwitter}:${tweet.CoNET_currentTwitter + 1}]`);
+            return socket.emit('getTimelines', tweet, postReturn);
         });
     }
     listenAfterTwitterLogin(socket) {
@@ -984,7 +985,7 @@ class localServer {
             delete item['twitter_verify_credentials'];
             this.setCurrentTwitterAccount(item);
             return this.getTimelines(socket, item, (err, tweets) => {
-                return this.tweetTimeCallBack(socket, err, tweets);
+                return this.tweetTimeCallBack(socket, err, tweets, false);
             });
         });
         socket.on('mediaFileUpdata', (uploadId, data, part, CallBack1) => {
@@ -1004,7 +1005,7 @@ class localServer {
         socket.on('getTimelinesNext', (item, maxID, CallBack1) => {
             CallBack1();
             return this.getTimelinesNext(socket, item, maxID, (err, tweets) => {
-                return this.tweetTimeCallBack(socket, err, tweets);
+                return this.tweetTimeCallBack(socket, err, tweets, false);
             });
         });
         socket.on('twitter_postNewTweet', (account, postData, CallBack1) => {
@@ -1012,12 +1013,27 @@ class localServer {
             if (!account || !postData.length) {
                 return console.log('on twitter_postNewTweet but format error!');
             }
-            return this.postTweetViaQTGate(socket, account, postData[0], (err, data) => {
-                return socket.emit('twitter_postNewTweet', err);
+            console.log(Util.inspect(postData, false, 4, true));
+            return this.postTweetViaQTGate(socket, account, postData[0], (err, res) => {
+                if (res.Args && res.Args.length > 0) {
+                    let uu = null;
+                    try {
+                        uu = JSON.parse(Buffer.from(res.Args[0], 'base64').toString());
+                    }
+                    catch (ex) {
+                        return socket.emit('getTimelines', 2);
+                    }
+                    console.log(`postTweetViaQTGate return\n`, Util.inspect(uu));
+                    uu.user.profile_image_url_https = this.twitterData[this.currentTwitterAccount].twitter_verify_credentials.profile_image_url_https;
+                    return socket.emit('getTimelines', uu, true);
+                }
+                if (err) {
+                    return socket.emit('twitter_postNewTweet', err);
+                }
             });
         });
         socket.on('getTwitterTextLength', (twitterText, CallBack1) => {
-            return CallBack1();
+            CallBack1();
             return socket.emit('getTwitterTextLength', Twitter_text.parseTweet(twitterText));
         });
         return socket.on('saveAccounts', (twitterAccounts, CallBack1) => {

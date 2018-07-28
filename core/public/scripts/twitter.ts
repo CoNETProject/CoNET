@@ -349,6 +349,8 @@ module twitter_layout {
 			})
         }
 
+        
+
         public textAreaClick () {
             this.twitter.newTwitterField().forEach ( function ( n ) {
                 n.showToolBar ( false )
@@ -405,6 +407,7 @@ module twitter_layout {
         public newTwitterFieldError = ko.observable ()
         public addATwitterAccount = ko.observable ( false )         //      doing add a new account 
         private processBarTime: NodeJS.Timer = null
+        public postWaitLine: KnockoutObservableArray< postWaitLine > = ko.observableArray ([])
         public unknowError = ko.observable ( false )
         public config: KnockoutObservable < install_config> = ko.observable ({
             firstRun: true,
@@ -428,11 +431,23 @@ module twitter_layout {
             lastConnectType: 1
         })
 
+        public getNumberFormat ( num: number ) {
+            if ( num < 1000 ) {
+                return num.toString ()
+            }
+            const u = Math.round ( num / 100 )
+            if ( u < 10000 ) {
+                return `${ u / 10 } K`
+            }
+            const v = Math.round ( num / 100000 )
+            return `${ v / 10 } M`
+        }
+
         private requestNewTimelinesCount = 0
         public QTGateConnect1 = ko.observable ('')
         private bottomEventLoader = ko.observable ( false )
 
-        private twitterPostReturn ( data: twitter_post ) {
+        private twitterPostReturn ( data: twitter_post, post: boolean ) {
             const self = this
             this.showServerError ( false )
 
@@ -501,10 +516,22 @@ module twitter_layout {
             data.favoritedLoader_ko = ko.observable ( false )
             this.currentTimelines.push ( data )
             $('.row.ui.shape').shape()
-            $('.ui.sidebar.twitterTimes').sidebar('toggle')
-            return this.currentTimelines.sort ( function ( a, b ) {
+            
+            this.currentTimelines.sort ( function ( a, b ) {
                 return b.id - a.id
             })
+            $(`#${ data.id_str } .ui.sidebar`).sidebar({
+                context: $(`#${ data.id_str }`)
+            
+            }).sidebar( 'attach events', `.${ data.id_str }`).sidebar ( 'setting', 'exclusive', false )
+            $(`.${ data.id_str }`).click ( function(e) {
+                e.preventDefault();
+            })
+
+            //      post data 
+            if ( post ) {
+                scrollToTop ()
+            }
         }
 
         constructor () {
@@ -519,9 +546,9 @@ module twitter_layout {
                 })
             })
 
-            socketIo.on ( 'getTimelines', function ( data: twitter_post ) {
+            socketIo.on ( 'getTimelines', function ( data: twitter_post, post: boolean ) {
 
-                return self.twitterPostReturn ( data )
+                return self.twitterPostReturn ( data, post )
             })
 
             socketIo.on ( 'getTimelinesEnd', function () {
@@ -844,38 +871,34 @@ module twitter_layout {
                 images: twiData.images (),
                 videoSize: twiData.videoSize,
                 videoFileName: twiData.videoFileName(),
-                media_data: []
+                media_data: [],
+                uuid: uuid_generate ()
+                
             }
             return TwitterData
         }
 
         public newTwitterClick () {
 			const self = this
-            const data = []
+            const data: twitter_postData [] = []
             this.shownewTwitterApprove ( false )
             $( '#newTwitterWindow' ).modal ( 'hide' )
-            $( '#newTwitterWindow' ).modal ( 'hide' )
+            
             this.newTwitterField().forEach ( function ( n ) {
                 const nn = self.newTwitterData ( n )
                 if ( !nn ) {
                     return self.newTwitterField ([ new twitterField ( this )])
                 }
                 data.push ( nn )
+                this.postWaitLine.push ( new postWaitLine ( nn.uuid ))
             })
             if ( !data.length ) {
                 return this.newTwitterField ([ new twitterField ( this )])
             }
             
             this.newTwitterField ([ new twitterField ( this )])
-
-            return socketIo.emit11 ( 'twitter_postNewTweet', this.twitterData()[0], data, function ( err: Error, data ) {
-                if ( err ) {
-                    return alert ( err )
-                }
-                if ( data ) {
-                    return self.twitterPostReturn ( data )
-                }
-            })
+            
+            //return socketIo.emit11 ( 'twitter_postNewTweet', this.twitterData()[0], data )
 
         }
 
@@ -885,6 +908,8 @@ module twitter_layout {
 
     }
 }
+
+
 
 const twitter_view = new twitter_layout.twitter ()
 ko.applyBindings ( twitter_view , document.getElementById ( 'body' ))
