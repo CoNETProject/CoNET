@@ -25,6 +25,8 @@ DDos Attack, Connecting Reset, Restrictive and Filtering, Surveillance, SSL man-
 
 Node connected to CoNET network through public email servers. CoNET do not provide email server let node to connecting. This provides a higher level of reliability and redundancy to the network itself. Node doing encrypted communication in CoNET based on standard IMAP protocol. Network monitor is hard to find out different about normal mail and CoNET communication email.
 
+[CoNET technology white paper](https://github.com/QTGate/QTGate-Desktop-Client/wiki/CoNET-white-paper)
+
 ### CoNETはインターネットの中公衆メールサーバーよりメールプロトコル(SMTP & IMAP)を通じての仮想ネットワークです。CoNETの目標は以下です：
 - インターネットの検閲、監視から脱出
 - 安全とプライバシーなオンライン環境

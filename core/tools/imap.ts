@@ -33,7 +33,7 @@ import * as Tool from './initSystem'
 import * as Upload from './uploadFile'
 
 const MAX_INT = 9007199254740992
-const debug = true
+const debug = false
 const pingFailureTime = 1000 * 60
 
 const ErrorLogFile = join ( Tool.QTGateFolder, 'imap.log' )
