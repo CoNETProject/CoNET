@@ -46,9 +46,9 @@ CoNET自身には公開されたIPアドレスがないです、インターネ�
 - 服務器免於DDoS攻擊
 
 節點通過公眾服務器來連結CoNET，所以CoNET不存在公開的IP地址或域名，有效的規避了CoNET自身被網絡屏蔽，在一個允許郵件通訊的網絡中，CoNET可以進行高可靠性和穩定的通訊。在網絡審查者和規避審查者之間的，這場貓捉老鼠遊戲之中，CoNET比基於IP地址混淆技術的VPN和Tor有更大的勝算優勢。CoNET還提供互聯網路由出口，讓節點可以通過CoNET來訪問互聯網。
-![http protocol](/resources/CoNET_refraction1.png?raw=true)
-### CoNET IaaS BtoB service
 ![](https://cdn-images-1.medium.com/max/1600/1*WjSeYJDZTZX2Ut5gJCPzEg.png)
+### CoNET IaaS BtoB service
+![](/resources/coNETIaas1.png?raw=true)
 ***
 ![http protocol](/resources/iaas1.png?raw=true)
 ### CoNETのBtoB　IaaS　サービス
