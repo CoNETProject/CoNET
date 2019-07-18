@@ -14,6 +14,9 @@
 
 ### CoNET是無IP地址讓設備相互連結的互聯網
 
+![http protocol](/resources/conet2.png?raw=true)
+
+
 ### [CoNET Platform, CoNETプラットフォーム, CoNET平台](https://github.com/QTGate/QTGate-Desktop-Client)
 - [CoNET Platform for laptop, CoNETプラットフォーム for PC, CoNET計算機OS平台](https://github.com/QTGate/QTGate-Desktop-Client)
 - CoNET Platform for iOS (come soon), CoNETプラットフォーム for iOS (開発中), iOS的CoNET平台開發中
