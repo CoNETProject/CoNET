@@ -20,13 +20,19 @@
 
 Node in CoNET provider for connectivity and exchange points, gateway for Internet.
 
+CoNET official provide a node that connect address is: QTGate@CoNETTech.ca
+
 ## ノードとエンドポイント
 
 CoNETのノードはISPのようなエンドポイントに接続サービスします。ノード間にデータのエクスチェンジ、エンドポイントの発見、インターネットのゲットウェイサービスです
 
+CoNET公式的なノード接続アドレスは: QTGate@CoNETTech.ca
+
 ## 節點和通訊端點
 
 在CoNET中節點提供設備接入服務,節點之間提供數據交換和路由信息,傳統互聯網的代理
+
+CoNET提供一個官方節點，它的接入地址是：QTGate@CoNETTech.ca
 
 ### [CoNET Platform, CoNETプラットフォーム, CoNET平台](https://github.com/QTGate/QTGate-Desktop-Client)
 - [CoNET Platform for laptop, CoNETプラットフォーム for PC, CoNET計算機OS平台](https://github.com/QTGate/QTGate-Desktop-Client)
