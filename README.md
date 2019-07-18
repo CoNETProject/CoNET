@@ -26,7 +26,7 @@ CoNET official provide a node that connect address is: QTGate@CoNETTech.ca
 
 CoNETのノードはISPのようなエンドポイントに接続サービスします。ノード間にデータのエクスチェンジ、エンドポイントの発見、インターネットのゲットウェイサービスです
 
-CoNET公式的なノード接続アドレスは: QTGate@CoNETTech.ca
+CoNET公式ノード接続アドレスは: QTGate@CoNETTech.ca
 
 ### 節點和通訊端點
 
