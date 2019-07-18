@@ -8,27 +8,27 @@
 
 ![http protocol](/resources/conet1.png?raw=true)
 
-## CoNET is global network that allow devices connect each other without IP address
+### CoNET is global network that allow devices connect each other without IP address
 
-## CoNETはIPアドレスなしで複数のデバイスを相互接続した情報通信網であります
+### CoNETはIPアドレスなしで複数のデバイスを相互接続した情報通信網であります
 
-## CoNET是無IP地址讓設備相互連結的互聯網
+### CoNET是無IP地址讓設備相互連結的互聯網
 
 ![http protocol](/resources/conet2.png?raw=true)
 
-## Node and endpoint
+### Node and endpoint
 
 Node in CoNET provider for connectivity and exchange points, gateway for Internet.
 
 CoNET official provide a node that connect address is: QTGate@CoNETTech.ca
 
-## ノードとエンドポイント
+### ノードとエンドポイント
 
 CoNETのノードはISPのようなエンドポイントに接続サービスします。ノード間にデータのエクスチェンジ、エンドポイントの発見、インターネットのゲットウェイサービスです
 
 CoNET公式的なノード接続アドレスは: QTGate@CoNETTech.ca
 
-## 節點和通訊端點
+### 節點和通訊端點
 
 在CoNET中節點提供設備接入服務,節點之間提供數據交換和路由信息,傳統互聯網的代理
 
