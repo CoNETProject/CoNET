@@ -1484,16 +1484,18 @@ class imapPeer extends Event.EventEmitter {
             }
         });
         this.rImap.once('end', err => {
-            console.log(`imapPeer rImap on END!`);
             this.rImap = null;
             this.makeRImap = false;
             if (!this.doingDestroy && !err) {
+                saveLog(`imapPeer rImap on END! restart imapPeer rImap!`);
                 return this.newReadImap();
             }
             if (typeof this.exit === 'function') {
+                saveLog(`imapPeer rImap on END! doing this.exit()!`);
                 this.exit(err);
                 return this.exit = null;
             }
+            saveLog(`imapPeer rImap on END! but this.exit !== function`);
         });
     }
     makeWriteFolder(CallBack) {

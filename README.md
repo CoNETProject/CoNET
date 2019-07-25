@@ -8,11 +8,18 @@
 
 ![http protocol](/resources/conet1.png?raw=true)
 
-### CoNET is global network that allow devices connect each other without IP address
+### CoNET is global network that allow devices connected each other without IP address
+
+CoNET project create a new Internet that provide devices have Anonymous, Stealth, Secure communication.
+
 
 ### CoNETはIPアドレスなしで複数のデバイスを相互接続した情報通信網であります
 
+CoNETは新インターネットという【匿名】【隱身】【セキュア】な通信ネットワークであります
+
 ### CoNET是無IP地址讓設備相互連結的互聯網
+
+CoNET項目旨在創建一個全新的互聯網，用戶在其中可以【匿名】【隱身】【安全】的相互通訊
 
 ![http protocol](/resources/conet2.png?raw=true)
 
