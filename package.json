@@ -24,7 +24,7 @@
     "merge-descriptors": "^1.0.1",
     "node-uuid": "^1.4.8",
     "nodemailer": "^4.7.0",
-    "openpgp": "3.0.11",
+    "openpgp": "4.2.1",
     "portastic": "^1.0.1",
     "pug": "^2.0.4",
     "socket.io": "^2.2.0",
