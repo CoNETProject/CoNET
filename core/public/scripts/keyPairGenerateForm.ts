@@ -140,7 +140,7 @@ class keyPairGenerateForm {
 		})
 	}
 
-	constructor ( private exit: ( keyPair ) => void ) {
+	constructor ( private exit: ( keyPair, sessionHash: string ) => void ) {
 		const self = this
 		this.SystemAdministratorEmailAddress.subscribe ( function ( newValue ) {
 			return self.checkEmailAddress ( newValue )
@@ -148,9 +148,11 @@ class keyPairGenerateForm {
 		this.SystemAdministratorNickName.subscribe ( function ( newValue ) {
 			return self.checkNickname ( newValue )
 		})
+		/*
 		this.systemSetup_systemPassword.subscribe ( function ( newValue ) {
 			return self.checkPassword ( newValue )
 		})
+		*/
 	}
 	public form_AdministratorEmail_submit () {
 		const self = this
@@ -181,19 +183,17 @@ class keyPairGenerateForm {
 					return doingProcessBar ()
 			}, timeSet )
 		}
-
 		
-		socketIo.once ( 'newKeyPairCallBack', function ( keyPair ) {
+
+		_view.connectInformationMessage.sockEmit ( 'NewKeyPair', sendData, function ( err, keyPair, newKeyPairCallBack ) {
 			self.stopDoingProcessBar ()
 			self.keyPairGenerateFormMessage ( true )
 			if ( !keyPair ) {
 				return self.message_keyPairGenerateError ( true )
 			}
-			self.exit ( keyPair )
+			self.exit ( keyPair, newKeyPairCallBack )
 			return self.message_keyPairGenerateSuccess ( true )
-		})
-
-		socketIo.emit11 ( 'NewKeyPair', sendData ) 
+		}) 
 		
 		return doingProcessBar ()
 	}

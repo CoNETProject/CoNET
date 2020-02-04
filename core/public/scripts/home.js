@@ -23,7 +23,8 @@ const InitKeyPair = function () {
         email: null,
         passwordOK: false,
         verified: false,
-        publicKeyID: null
+        publicKeyID: null,
+        _password: null
     };
     return keyPair;
 };
@@ -31,41 +32,43 @@ const url = 'https://api.github.com/repos/QTGate/QTGate-Desktop-Client/releases/
 const makeKeyPairData = function (view, keypair) {
     const length = keypair.publicKeyID.length;
     keypair.publicKeyID = keypair.publicKeyID.substr(length - 16);
-    let keyPairPasswordClass = new keyPairPassword(function (_imapData) {
+    let keyPairPasswordClass = new keyPairPassword(function (_imapData, passwd, sessionHash) {
         //      password OK
         keypair.keyPairPassword(keyPairPasswordClass = null);
         keypair.passwordOK = true;
+        keypair._password = passwd;
         keypair.showLoginPasswordField(false);
-        view.showIconBar(true);
+        view.keyPairCalss = new encryptoClass(keypair);
         view.showKeyPair(false);
         if (_imapData && _imapData.imapTestResult) {
-            return view.imapSetupClassExit(_imapData);
+            return view.imapSetupClassExit(_imapData, sessionHash);
         }
         let uu = null;
         return view.imapSetup(uu = new imapForm(keypair.email, _imapData, function (imapData) {
             view.imapSetup(uu = null);
-            view.imapSetupClassExit(imapData);
+            view.imapSetupClassExit(imapData, sessionHash);
         }));
     });
     keypair.keyPairPassword = ko.observable(keyPairPasswordClass);
     keypair.showLoginPasswordField = ko.observable(false);
     keypair.delete_btn_view = ko.observable(true);
     keypair.showConform = ko.observable(false);
+    keypair['showDeleteKeyPairNoite'] = ko.observable(false);
     keypair.delete_btn_click = function () {
         keypair.delete_btn_view(false);
         return keypair.showConform(true);
     };
     keypair.deleteKeyPairNext = function () {
-        socketIo.emit11('deleteKeyPairNext');
-        view.showIconBar(false);
-        view.connectedCoNET(false);
-        view.connectToCoNET(false);
-        return keypair.delete_btn_view(false);
+        view.connectInformationMessage.sockEmit('deleteKeyPairNext', () => {
+            view.showIconBar(false);
+            view.connectedCoNET(false);
+            view.connectToCoNET(false);
+            view.CoNETConnect(view.CoNETConnectClass = null);
+            view.imapSetup(view.imapFormClass = null);
+            keypair.showDeleteKeyPairNoite(false);
+            return keypair.delete_btn_view(false);
+        });
     };
-    socketIo.once('deleteKeyPairNoite', function () {
-        return keypair.showDeleteKeyPairNoite(true);
-    });
-    keypair.showDeleteKeyPairNoite = ko.observable(false);
 };
 const initPopupArea = function () {
     const popItem = $('.activating.element').popup('hide');
@@ -79,6 +82,7 @@ const initPopupArea = function () {
 };
 const appList = [
     {
+        //                      1
         name: 'CoGate',
         likeCount: ko.observable(0),
         liked: ko.observable(false),
@@ -86,13 +90,14 @@ const appList = [
         titleColor: '#0066cc',
         css: 'width: 6em;height: 6em;display: block;',
         comeSoon: false,
-        show: true,
+        show: false,
         click: function (view) {
-            return view.CoGateClick();
+            return;
         },
         image: '/images/CoGate.png'
     }, {
-        name: 'CoMsg',
+        //                      2
+        name: 'CoChat',
         likeCount: ko.observable(0),
         liked: ko.observable(false),
         commentCount: ko.observable(0),
@@ -103,6 +108,7 @@ const appList = [
         image: '/images/CoMsg.png',
         click: function (view) { return; },
     }, {
+        //                      3
         name: 'CoBox',
         likeCount: ko.observable(0),
         liked: ko.observable(false),
@@ -114,6 +120,7 @@ const appList = [
         image: '/images/CoBox.png',
         click: function (view) { return; },
     }, {
+        //                      4
         name: 'CoMail',
         likeCount: ko.observable(0),
         liked: ko.observable(false),
@@ -121,11 +128,12 @@ const appList = [
         titleColor: '#09b83e',
         comeSoon: true,
         css: 'width: 6em;height: 6em;display: block;',
-        show: true,
+        show: false,
         image: '/images/coMail.png',
         click: function (view) { return; },
     },
     {
+        //                      5
         name: 'coNews',
         likeCount: ko.observable(0),
         liked: ko.observable(false),
@@ -133,11 +141,68 @@ const appList = [
         titleColor: 'grey',
         comeSoon: true,
         css: 'width: 6em;height: 6em;display: block;',
-        show: true,
+        show: false,
         image: '/images/coNews.png',
         click: function (view) { return; },
     },
     {
+        //                      7
+        name: 'CoSearch',
+        likeCount: ko.observable(0),
+        liked: ko.observable(false),
+        commentCount: ko.observable(0),
+        titleColor: '#4885ed',
+        comeSoon: false,
+        css: 'width: 6em;height: 6em;display: block;',
+        show: true,
+        image: '/images/CoSearchIcon.svg',
+        click: function (view) {
+            return window.open(`/coSearch?sessionHash=${view.sessionHash}`, '_blank');
+        },
+    }, {
+        //                      8
+        name: 'CoTweet',
+        likeCount: ko.observable(0),
+        liked: ko.observable(false),
+        commentCount: ko.observable(0),
+        titleColor: '#00aced',
+        comeSoon: false,
+        css: 'width: 6em;height: 6em;display: block;',
+        show: false,
+        image: '/images/Twitter_Logo_Blue.svg',
+        click: function (view) {
+            return;
+            //return window.open ('/twitter', '_blank')
+        }
+    },
+    {
+        //                      9
+        name: 'CoYoutube',
+        likeCount: ko.observable(0),
+        liked: ko.observable(false),
+        titleColor: '#00aced',
+        comeSoon: true,
+        css: 'width: 6em;height: 6em;display: block;',
+        show: false,
+        image: '/images/1024px-YouTube_Logo_2017.svg.png',
+        click: function (view) {
+            return;
+            //return window.open ('/youtube', '_blank')
+        },
+    },
+    {
+        name: 'CoWallet',
+        likeCount: ko.observable(0),
+        liked: ko.observable(false),
+        titleColor: '#00aced',
+        comeSoon: true,
+        css: 'width: 6em;height: 6em;display: block;',
+        show: true,
+        image: '/images/wallet.png',
+        click: function (view) { return; },
+    },
+    {
+        //                      6
         name: 'CoCustom',
         likeCount: ko.observable(0),
         liked: ko.observable(false),
@@ -148,60 +213,13 @@ const appList = [
         show: true,
         image: '/images/512x512.png',
         click: function (view) { return; },
-    }, {
-        name: 'CoGoogle',
-        likeCount: ko.observable(0),
-        liked: ko.observable(false),
-        commentCount: ko.observable(0),
-        titleColor: '#4885ed',
-        comeSoon: true,
-        css: 'width: 6em;height: 6em;display: block;',
-        show: true,
-        image: '/images/Google__G__Logo.svg',
-        click: function (view) { return; },
-    }, {
-        name: 'CoTweet',
-        likeCount: ko.observable(0),
-        liked: ko.observable(false),
-        commentCount: ko.observable(0),
-        titleColor: '#00aced',
-        comeSoon: false,
-        css: 'width: 6em;height: 6em;display: block;',
-        show: true,
-        image: '/images/Twitter_Logo_Blue.svg',
-        click: function (view) {
-            return window.open('/twitter', '_blank');
-        }
-    },
-    {
-        name: 'CoYoutube',
-        likeCount: ko.observable(0),
-        liked: ko.observable(false),
-        titleColor: '#00aced',
-        comeSoon: false,
-        css: 'width: 6em;height: 6em;display: block;',
-        show: true,
-        image: '/images/1024px-YouTube_Logo_2017.svg.png',
-        click: function (view) {
-            return window.open('/youtube', '_blank');
-        },
-    },
-    {
-        name: 'CoYoutube',
-        likeCount: ko.observable(0),
-        liked: ko.observable(false),
-        titleColor: '#00aced',
-        comeSoon: true,
-        css: 'width: 6em;height: 6em;display: block;',
-        show: true,
-        image: '/images/wallet.png',
-        click: function (view) { return; },
     }
 ];
 var view_layout;
 (function (view_layout) {
     class view {
         constructor() {
+            this.connectInformationMessage = new connectInformationMessage('/');
             this.sectionLogin = ko.observable(false);
             this.sectionAgreement = ko.observable(false);
             this.sectionWelcome = ko.observable(true);
@@ -209,7 +227,6 @@ var view_layout;
             this.QTTransferData = ko.observable(false);
             this.LocalLanguage = 'up';
             this.menu = Menu;
-            this.CoNETLocalServerError = ko.observable(false);
             this.modalContent = ko.observable('');
             this.keyPairGenerateForm = ko.observable();
             this.tLang = ko.observable(initLanguageCookie());
@@ -222,40 +239,25 @@ var view_layout;
             this.connectToCoNET = ko.observable(false);
             this.connectedCoNET = ko.observable(false);
             this.showKeyPair = ko.observable(false);
-            this.CoGate = ko.observable(false);
-            this.CoGateClass = ko.observable(null);
-            this.showCoGateButton = ko.observable(false);
-            this.showCoGate = ko.observable(false);
+            this.CoNETConnectClass = null;
+            this.imapFormClass = null;
             this.CoNETConnect = ko.observable(null);
+            this.appMenuObj = {};
+            this.bodyBlue = ko.observable(true);
+            this.keyPairCalss = null;
+            this.appsManager = ko.observable(null);
             this.AppList = ko.observable(false);
-            this.CoGateRegionStoped = ko.observable(false);
             this.imapData = null;
             this.newVersion = ko.observable(null);
+            this.sessionHash = '';
+            this.showLanguageSelect = ko.observable(true);
             this.socketListen();
-        }
-        systemError() {
-            this.modalContent(infoDefine[this.languageIndex()].emailConform.formatError[10]);
-            $('#CoNETError').modal('setting', 'closable', false).modal('show');
-            return this.CoNETLocalServerError(true);
         }
         afterInitConfig() {
             this.keyPair(this.localServerConfig().keypair);
             if (this.keyPair() && this.keyPair().keyPairPassword() && typeof this.keyPair().keyPairPassword().inputFocus === 'function') {
                 this.keyPair().keyPairPassword().inputFocus(true);
-            }
-        }
-        listingConnectStage(err, stage) {
-            if (stage > -1) {
-                this.showIconBar(true);
-                this.connectToCoNET(true);
-                this.showKeyPair(false);
-                if (stage === 4) {
-                    this.connectToCoNET(false);
-                    this.connectedCoNET(true);
-                    if (this.showCoGate()) {
-                        this.homeClick();
-                    }
-                }
+                this.sectionLogin(false);
             }
         }
         initConfig(config) {
@@ -280,7 +282,7 @@ var view_layout;
                  */
                 this.clearImapData();
                 config.keypair = null;
-                let _keyPairGenerateForm = new keyPairGenerateForm(function (_keyPair) {
+                let _keyPairGenerateForm = new keyPairGenerateForm(function (_keyPair, sessionHash) {
                     /**
                      *      key pair ready
                      */
@@ -290,13 +292,12 @@ var view_layout;
                     _keyPair.keyPairPassword(keyPairPassword = null);
                     config.keypair = _keyPair;
                     self.keyPair(_keyPair);
-                    self.showIconBar(true);
                     self.showKeyPair(false);
                     initPopupArea();
                     let uu = null;
                     self.imapSetup(uu = new imapForm(config.account, null, function (imapData) {
                         self.imapSetup(uu = null);
-                        return self.imapSetupClassExit(imapData);
+                        return self.imapSetupClassExit(imapData, sessionHash);
                     }));
                     return self.keyPairGenerateForm(_keyPairGenerateForm = null);
                 });
@@ -311,41 +312,18 @@ var view_layout;
         }
         socketListen() {
             let self = this;
-            socketIo.once('reconnect_failed', function (err) {
-                if (self.CoNETLocalServerError()) {
+            this.connectInformationMessage.sockEmit('init', (err, config) => {
+                if (err) {
                     return;
                 }
-                return self.systemError();
-            });
-            socketIo.on('reconnect_attempt', function () {
-                //return self.systemError()
-            });
-            socketIo.once('CoNET_systemError', function () {
-                return self.systemError();
-            });
-            socketIo.on('init', function (err, config) {
-                $.getJSON(url)
-                    .done(function (json) {
-                    if (!json) {
-                        return;
-                    }
-                    const localVersion = config.version;
-                    json.tag_name = /^v/i.test(json.tag_name) ? json.tag_name.substr(1) : json.tag_name;
-                    if (cmpVersions(localVersion, json.tag_name) < 0) {
-                        self.newVersion(json.tag_name);
-                    }
-                });
                 return self.initConfig(config);
             });
-            socketIo.on('CoNET_offline', function () {
-                self.modalContent(infoDefine[self.languageIndex()].emailConform.formatError[5]);
-                $('#CoNETError').modal('setting', 'closable', false).modal('show');
-                return self.CoNETLocalServerError(true);
+            this.connectInformationMessage.socketIo.on('init', (err, config) => {
+                if (err) {
+                    return;
+                }
+                return self.initConfig(config);
             });
-            socketIo.on('disconnectClick', function (region) {
-                self.CoGateRegionStoped(true);
-            });
-            socketIo.emit11('init');
         }
         //          change language
         selectItem(that, site) {
@@ -371,31 +349,26 @@ var view_layout;
         }
         //          start click
         openClick() {
-            this.sectionWelcome(false);
-            if (this.localServerConfig().firstRun) {
-                return this.sectionAgreement(true);
+            if (!this.connectInformationMessage.socketIoOnline) {
+                return this.connectInformationMessage.showSystemError();
             }
+            this.sectionWelcome(false);
+            /*
+            if ( this.localServerConfig().firstRun ) {
+                return this.sectionAgreement ( true )
+            }
+            */
             this.sectionLogin(true);
             return initPopupArea();
         }
+        deletedKeypairResetView() {
+            this.imapSetup(null);
+        }
         agreeClick() {
-            socketIo.emit11('agreeClick');
+            this.connectInformationMessage.sockEmit('agreeClick');
             this.sectionAgreement(false);
             this.localServerConfig().firstRun = false;
             return this.openClick();
-        }
-        CoGateClick() {
-            this.showKeyPair(false);
-            if (this.CoGate()) {
-                let uu = this.CoGateClass();
-                if (uu.doingCommand || uu.CoGateRegion()) {
-                    return;
-                }
-                this.CoGate(false);
-                return this.CoGateClass(uu = null);
-            }
-            this.CoGateClass(new CoGateClass(conetImapAccount.test(this.imapData.imapUserName)));
-            this.CoGate(true);
         }
         refresh() {
             if (typeof require === 'undefined') {
@@ -403,40 +376,31 @@ var view_layout;
                 return this.hacked(true);
             }
             const { remote } = require('electron');
-            return remote.app.quit();
+            if (remote && remote.app && typeof remote.app.quit === 'function') {
+                return remote.app.quit();
+            }
         }
         showKeyInfoClick() {
+            this.sectionLogin(true);
             this.showKeyPair(true);
-            this.CoGate(false);
             this.AppList(false);
-            let uu = this.CoGateClass();
-            return this.CoGateClass(uu = null);
+            this.appsManager(null);
         }
-        imapSetupClassExit(_imapData) {
+        imapSetupClassExit(_imapData, sessionHash) {
             const self = this;
-            let uu = null;
             this.imapData = _imapData;
-            return this.CoNETConnect(uu = new CoNETConnect(_imapData.imapUserName, this.keyPair().verified, _imapData.confirmRisk, this.keyPair().email, function ConnectReady(err, showCoGate) {
+            this.sessionHash = sessionHash;
+            return this.CoNETConnect(this.CoNETConnectClass = new CoNETConnect(_imapData.imapUserName, this.keyPair().verified, _imapData.confirmRisk, this.keyPair().email, function ConnectReady(err) {
                 if (typeof err === 'number' && err > -1) {
-                    let coGate = self.CoGateClass(null);
-                    coGate = null;
-                    self.CoGateClass();
-                    if (showCoGate) {
-                        self.CoNETConnect(uu = null);
-                        return self.imapSetup(uu = new imapForm(_imapData.account, null, function (imapData) {
-                            self.imapSetup(uu = null);
-                            return self.imapSetupClassExit(imapData);
-                        }));
-                    }
-                    return;
+                    self.CoNETConnect(this.CoNETConnectClass = null);
+                    return self.imapSetup(this.imapFormClass = new imapForm(_imapData.account, null, function (imapData) {
+                        self.imapSetup(this.imapFormClass = null);
+                        return self.imapSetupClassExit(imapData, sessionHash);
+                    }));
                 }
-                this.connectedCoNET(true);
-                //self.showCoGate ( showCoGate )
-                if (showCoGate) {
-                    self.showCoGate(true);
-                    return self.homeClick();
-                }
+                self.connectedCoNET(true);
                 self.AppList(true);
+                self.appsManager(new appsManager(self.appMenuObj));
                 $('.dimmable').dimmer({ on: 'hover' });
                 $('.comeSoon').popup({
                     on: 'focus',
@@ -444,6 +408,7 @@ var view_layout;
                     position: 'top left',
                     inline: true
                 });
+                _view.connectInformationMessage.socketIo.removeEventListener('tryConnectCoNETStage', self.CoNETConnectClass.listenFun);
             }));
         }
         reFreshLocalServer() {
@@ -451,7 +416,8 @@ var view_layout;
         }
         homeClick() {
             this.AppList(true);
-            this.CoGate(false);
+            this.sectionLogin(false);
+            this.appsManager(new appsManager(this.appMenuObj));
             this.showKeyPair(false);
             $('.dimmable').dimmer({ on: 'hover' });
             $('.comeSoon').popup({

@@ -83,11 +83,11 @@ exports.decrypt = (data, masterkey, CallBack) => {
     }
 };
 exports.packetBuffer = (bit0, _serial, id, buffer) => {
-    const _buffer = new Buffer(6);
+    const _buffer = Buffer.allocUnsafe(6);
     _buffer.fill(0);
     _buffer.writeUInt8(bit0, 0);
     _buffer.writeUInt32BE(_serial, 1);
-    const uuid = new Buffer(id, 'utf8');
+    const uuid = Buffer.from(id);
     _buffer.writeUInt8(id.length, 5);
     if (buffer && buffer.length)
         return Buffer.concat([_buffer, uuid, buffer]);
@@ -259,7 +259,7 @@ class getDecryptClientStreamFromHttp extends Stream.Transform {
         return null;
     }
     _transform(chunk, encode, cb) {
-        this.text += chunk.toString('utf8');
+        this.text += chunk.toString();
         const line = this.text.split('\r\n\r\n');
         while (this.first && line.length > 1 || !this.first && line.length) {
             if (this.first) {

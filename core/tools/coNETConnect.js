@@ -1,4 +1,19 @@
 "use strict";
+/*!
+ * Copyright 2018 CoNET Technology Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 Object.defineProperty(exports, "__esModule", { value: true });
 const Imap = require("./imap");
 const Tool = require("./initSystem");
@@ -17,7 +32,7 @@ const saveLog = (err, _console = false) => {
 };
 const timeOutWhenSendConnectRequestMail = 1000 * 60;
 const commandRequestTimeOutTime = 1000 * 10;
-const requestTimeOut = 1000 * 10;
+const requestTimeOut = 1000 * 60;
 class default_1 extends Imap.imapPeer {
     constructor(imapData, sockerServer, openKeyOption, doNetSendConnectMail, cmdResponse, _exit) {
         super(imapData, imapData.clientFolder, imapData.serverFolder, (encryptText, CallBack) => {
@@ -25,7 +40,6 @@ class default_1 extends Imap.imapPeer {
         }, (decryptText, CallBack) => {
             return Tool.decryptoMessage(openKeyOption, decryptText, CallBack);
         }, err => {
-            console.log(`coNETConnect IMAP class exit with err: [${err}] doing this.exit(err)!`);
             return this.exit1(err);
         });
         this.imapData = imapData;
@@ -34,23 +48,13 @@ class default_1 extends Imap.imapPeer {
         this.doNetSendConnectMail = doNetSendConnectMail;
         this.cmdResponse = cmdResponse;
         this._exit = _exit;
-        this.commandCallBackPool = new Map();
         this.CoNETConnectReady = false;
         this.connectStage = -1;
         this.alreadyExit = false;
         this.ignorePingTimeout = false;
         saveLog(`=====================================  new CoNET connect() doNetSendConnectMail = [${doNetSendConnectMail}]\n`, true);
-        this.newMail = (ret) => {
-            //		have not requestSerial that may from system infomation
-            if (!ret.requestSerial) {
-                return this.cmdResponse(ret);
-            }
-            const poolData = this.commandCallBackPool.get(ret.requestSerial);
-            if (!poolData || typeof poolData.CallBack !== 'function') {
-                return saveLog(`QTGateAPIRequestCommand got commandCallBackPool ret.requestSerial [${ret.requestSerial}] have not callback `);
-            }
-            clearTimeout(poolData.timeout);
-            return poolData.CallBack(null, ret);
+        this.newMail = (mail, hashCode) => {
+            return this.cmdResponse(mail, hashCode);
         };
         this.on('wImapReady', () => {
             console.log('on imapReady !');
@@ -63,7 +67,8 @@ class default_1 extends Imap.imapPeer {
             saveLog('Connected CoNET!', true);
             this.connectStage = 4;
             this.sockerServer.emit('tryConnectCoNETStage', null, 4, cmdResponse ? false : true);
-            return this.sendFeedback();
+            this.sockerServer.emit('systemErr', 'connectedToCoNET');
+            return;
         });
         this.on('pingTimeOut', () => {
             if (this.ignorePingTimeout) {
@@ -73,9 +78,7 @@ class default_1 extends Imap.imapPeer {
         });
         this.ignorePingTimeout = doNetSendConnectMail;
         this.sockerServer.emit('tryConnectCoNETStage', null, this.connectStage = 0);
-    }
-    sendFeedback() {
-        return;
+        this.sockerServer.emit('systemErr', 'connectingToCoNET');
     }
     checkConnect(CallBack) {
         if (this.wImap && this.wImap.imapStream && this.wImap.imapStream.writable &&
@@ -106,77 +109,69 @@ class default_1 extends Imap.imapPeer {
     exit1(err) {
         if (!this.alreadyExit) {
             this.alreadyExit = true;
-            console.log(`CoNETConnect class exit1 doing this._exit()`);
+            console.log(`CoNETConnect class exit1 doing this._exit() success!`);
             return this._exit(err);
         }
         console.log(`exit1 cancel already Exit [${err}]`);
     }
-    requestCoNET(command, CallBack) {
-        command.requestTimes = command.requestTimes || 0;
-        command.requestTimes++;
-        if (command.requestTimes > 3) {
-            saveLog(`request command [${command.command}] did too many times!`, true);
-            return CallBack(new Error(`CoNET looks offline!`));
-        }
-        Async.waterfall([
-            next => Tool.myIpServer(next),
-            (ip, next) => this.checkConnect(next),
+    requestCoNET_v1(uuid, text, CallBack) {
+        const self = this;
+        return Async.waterfall([
+            next => self.checkConnect(next),
             next => {
-                saveLog(`request command [${command.command}] requestSerial [${command.requestSerial}]`, true);
-                if (command.requestSerial) {
-                    const poolData = {
-                        CallBack: CallBack,
-                        timeout: setTimeout(() => {
-                            saveLog(`request command [${command.command}] timeout! do again`, true);
-                            this.commandCallBackPool.delete(command.requestSerial);
-                            return this.requestCoNET(command, CallBack);
-                        }, requestTimeOut)
-                    };
-                    this.commandCallBackPool.set(command.requestSerial, poolData);
-                }
-                return Tool.encryptMessage(this.openKeyOption, JSON.stringify(command), next);
-            },
-            (data, next) => this.trySendToRemote(Buffer.from(data), next)
+                return self.trySendToRemote(Buffer.from(text), uuid, next);
+            }
         ], (err) => {
             if (err) {
-                saveLog(`request got error [${err.message ? err.message : null}]`, true);
-                this.commandCallBackPool.delete(command.requestSerial);
+                saveLog(`requestCoNET_v1 got error [${err.message ? err.message : null}]`);
                 if (typeof err.message === 'string') {
                     switch (err.message) {
                         case 'no network': {
-                            return this.sockerServer.emit('tryConnectCoNETStage', 0);
+                            return self.sockerServer.emit('tryConnectCoNETStage', 0);
                         }
                         default: {
-                            return this.sockerServer.emit('tryConnectCoNETStage', 5);
+                            return self.sockerServer.emit('tryConnectCoNETStage', 5);
                         }
                     }
                 }
                 return CallBack(err);
             }
-            console.log(`request success!`);
+            CallBack();
         });
     }
     tryConnect1() {
         this.connectStage = 1;
         this.sockerServer.emit('tryConnectCoNETStage', null, this.connectStage = 1);
-        return Tool.myIpServer((err, localIpAddress) => {
+        if (this.doNetSendConnectMail) {
+            //	 wait long time to get response from CoNET
+            console.log(`this.doNetSendConnectMail = true`);
+        }
+        console.log(`doing checkConnect `);
+        return this.checkConnect(err => {
             if (err) {
-                console.log(`Tool.myIpServer callback error`, err);
-                this.connectStage = 0;
-                return this.sockerServer.emit('tryConnectCoNETStage', 0);
+                return this.exit1(err);
             }
-            console.log(`tryConnect success Tool.myIpServer [${localIpAddress}]`, true);
-            if (this.doNetSendConnectMail) {
-                //	 wait long time to get response from CoNET
-                console.log(`this.doNetSendConnectMail = true`);
+        });
+    }
+    getFile(fileName, CallBack) {
+        let callback = false;
+        if (this.alreadyExit) {
+            return CallBack(new Error('alreadyExit'));
+        }
+        const rImap = new Imap.qtGateImapRead(this.imapData, fileName, true, mail => {
+            const attr = Imap.getMailAttached(mail);
+            console.log(`====================================>\n\nImap.imapPeer getFile return new mail ==> [${mail.length}] attr ==> [${attr.length}]\n\n`);
+            CallBack(null, attr);
+            callback = true;
+            return rImap.destroyAll(null);
+        });
+        rImap.once('error', err => {
+            if (!callback) {
+                return CallBack(err);
             }
-            console.log(`doing checkConnect `);
-            return this.checkConnect(err => {
-                console.log(`tryConnect1 success!`);
-                if (err) {
-                    return this.exit1(err);
-                }
-            });
+        });
+        rImap.once('end', () => {
+            return console.log(`Connect Class GetFile_rImap on end!`);
         });
     }
 }

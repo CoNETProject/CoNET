@@ -1,3 +1,19 @@
+/*!
+ * Copyright 2018 CoNET Technology Inc. All Rights Reserved.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 const uuid_generate = function () {
     let lut: Array < string > = [];
     for ( let i = 0; i < 256; i++ ) {
@@ -12,6 +28,87 @@ const uuid_generate = function () {
         lut [ d2 & 0x3f | 0x80 ]+ lut [ d2 >> 8 & 0xff ] + '-' + lut [ d2 >> 16 & 0xff]+ lut [ d2 >> 24 & 0xff ] +
         lut [ d3 & 0xff ]+ lut [ d3 >> 8 & 0xff ] + lut [ d3 >> 16 & 0xff] + lut [ d3 >> 24 & 0xff ];
 }
+
+const bingIcon = `
+    <svg viewBox="-650 800 900 400">
+    <path style="fill:#008373;fill-opacity:1;stroke:none" d="m -311.5,796.16903 80.6273,28.36401 0,283.80836 113.56729,-65.5599 -55.67962,-26.1246 -35.12739,-87.43067 178.939297,62.86452 0,91.39515 -201.653597,116.3102 -80.67328,-44.875 z" />
+    </svg>
+`
+
+const googleIcon = `<svg viewBox="-40 0 150 150">
+  <path fill="#4285F4" d="M35.29 41.41V32H67c.31 1.64.47 3.58.47 5.68 0 7.06-1.93 15.79-8.15 22.01-6.05 6.3-13.78 9.66-24.02 9.66C16.32 69.35.36 53.89.36 34.91.36 15.93 16.32.47 35.3.47c10.5 0 17.98 4.12 23.6 9.49l-6.64 6.64c-4.03-3.78-9.49-6.72-16.97-6.72-13.86 0-24.7 11.17-24.7 25.03 0 13.86 10.84 25.03 24.7 25.03 8.99 0 14.11-3.61 17.39-6.89 2.66-2.66 4.41-6.46 5.1-11.65l-22.49.01z"></path>
+  </svg>
+`
+
+const duckduckgoIcon = `
+  <svg viewBox="-6 0 210 210" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(-24.5 -19)">
+        <circle cx="127" cy="79" fill="#de5833" r="60"/>
+        <path d="m177.8 57.5c-2.8-6.6-6.8-12.5-11.8-17.5-5.1-5.1-11-9-17.5-11.8-6.8-2.9-14-4.3-21.5-4.3-7.4 0-14.7 1.5-21.5 4.3-6.6 2.7-12.5 6.7-17.5 11.8-5.1 5.1-9 11-11.8 17.5-2.9 6.8-4.3 14-4.3 21.5 0 7.5 1.5 14.7 4.3 21.5 2.8 6.6 6.8 12.5 11.8 17.5 5.1 5.1 11 9 17.5 11.8 6.8 2.9 14 4.3 21.5 4.3 7.4 0 14.7-1.5 21.5-4.3 6.5-2.8 12.4-6.8 17.5-11.8 5.1-5.1 9-11 11.8-17.5 2.9-6.8 4.3-14 4.3-21.5 0-7.5-1.4-14.7-4.3-21.5zm-38.8 71c-3.2-5.4-11.6-20.5-11.6-31.7 0-25.8 17.3-3.7 17.3-24.3 0-4.9-2.4-22.1-17.4-25.7-3.7-4.9-12.4-9.6-26.2-7.7 0 0 2.3.7 4.9 2 0 0-5 .7-5.2 4.1 0 0 9.9-.5 15.5 1.3-12.9 1.7-19.5 8.5-18.3 20.8 1.7 17.5 9.1 48.7 11.7 59.6-19.6-7-33.7-25.8-33.7-47.9 0-28.1 22.8-51 51-51 28.2 0 51 22.8 51 51-.1 24-16.7 44.1-39 49.5z" fill="#fff"/>
+        <path clip-rule="evenodd" d="m124.2 87.3c0-6.6 9-8.7 12.4-8.7 9.2 0 22.2-5.9 25.4-5.8 3.3.1 5.4 1.4 5.4 2.9 0 2.2-18.4 10.5-25.5 9.8-6.8-.6-8.4.1-8.4 2.9 0 2.4 4.9 4.6 10.3 4.6 8.1 0 16-3.6 18.4-1.9 2.1 1.5-5.5 6.9-14.2 6.9-8.7 0-23.8-4.1-23.8-10.7z" fill="#fed30a" fill-rule="evenodd"/>
+        <path d="m140.2 59.3c-2.4-3.1-6.7-3.2-8.2.4 2.3-1.8 5.1-2.2 8.2-.4z" fill="#2d4f8d"/>
+        <path d="m113.5 59.4c-3.3-2-8.8-2.2-8.5 4.1 1.6-3.9 3.8-4.6 8.5-4.1z" fill="#2d4f8d"/>
+        <path d="m138.2 65.2c-1.8 0-3.3 1.5-3.3 3.3 0 1.8 1.5 3.3 3.3 3.3 1.8 0 3.3-1.5 3.3-3.3 0-1.8-1.5-3.3-3.3-3.3zm1.2 3.1c-.5 0-1-.4-1-1 0-.5.4-1 1-1 .6 0 1 .4 1 1-.1.5-.5 1-1 1z" fill="#2d4f8d"/>
+        <path d="m112.6 67c-2.1 0-3.8 1.7-3.8 3.8 0 2.1 1.7 3.8 3.8 3.8 2.1 0 3.8-1.7 3.8-3.8 0-2.1-1.7-3.8-3.8-3.8zm1.4 3.5c-.6 0-1.1-.5-1.1-1.1 0-.6.5-1.1 1.1-1.1.6 0 1.1.5 1.1 1.1 0 .6-.5 1.1-1.1 1.1z" fill="#2d4f8d"/>
+        <path d="m104.3 50.8c-4.8 3.5-7 8.9-6.3 16.5 1.7 17.5 9.1 48.8 11.7 59.7.9.3 1.8.6 2.7.9-1.6-6.6-9.3-38.8-12.7-63.5-.9-6.6 1.7-10.5 4.6-13.6z" fill="#d5d7d8"/>
+        <path d="m116.2 46.5c.4 0 .7-.1.7-.1-5.2-2.5-13.4-2.6-15.6-2.6-.2.4-.4.9-.4 1.4-.1.1 9.6-.5 15.3 1.3z" fill="#d5d7d8"/>
+        <path d="m106.8 41.1c-1.6-1.1-2.9-1.8-3.7-2.2-.7.1-1.3.1-2 .2 0 0 2.3.7 4.9 2 0 0-.1 0-.2 0 .7 0 1 0 1 0z" fill="#d5d7d8"/>
+        <path d="m147.1 107.6c-1.7-.4-8.3 4.3-10.8 6.1-.1-.5-.2-.9-.3-1.1-.3-1-6.7-.4-8.2 1.2-4-1.9-12-5.6-12.1-3.3-.3 3 0 15.5 1.6 16.4 1.2.7 8-3 11.4-4.9 0 0 0 0 .1 0 2.1.5 6 0 7.4-.9.2-.1.3-.3.4-.5 3.1 1.2 9.8 3.6 11.2 3.1 1.8-.5 1.4-15.6-.7-16.1z" fill="#67bd47"/>
+        <path d="m128.8 122c-2.1-.4-1.4-2.5-1.4-7.4 0 0 0 0 0 0-.5.3-.9.7-.9 1.1 0 4.9-.8 7.1 1.4 7.4 2.1.5 6 0 7.6-.9.3-.2.4-.5.5-1-1.5.9-5.2 1.3-7.2.8z" fill="#43a347"/>                         
+    </g>
+  </svg>
+`
+
+const YahooIcon = `
+  <svg viewBox="-75 0 240 240" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="t" y2="1819.8" gradientUnits="userSpaceOnUse" x2="-190.68" gradientTransform="matrix(.60986 0 0 .60986 -1015.1 -735.2)" y1="1808.7" x1="-209.43">
+      <stop stop-color="#1b0041" offset="0"/>
+      <stop stop-color="#21004f" offset="1"/>
+      </linearGradient>
+      <linearGradient id="u" y2="1877.2" gradientUnits="userSpaceOnUse" x2="-249.85" gradientTransform="matrix(.60986 0 0 .60986 -1015.1 -735.2)" y1="1667.8" x1="-149.7">
+      <stop stop-color="#5500bd" offset="0"/>
+      <stop stop-color="#47008d" offset="1"/>
+      </linearGradient>
+      <linearGradient id="v" y2="1877.6" gradientUnits="userSpaceOnUse" x2="-250.33" gradientTransform="matrix(.60986 0 0 .60986 -1015.1 -735.2)" y1="1669.7" x1="-349.94">
+      <stop stop-color="#5100b2" offset="0"/>
+      <stop stop-color="#5500bd" offset="1"/>
+      </linearGradient>
+      <linearGradient id="w" y2="1838.7" gradientUnits="userSpaceOnUse" x2="-273.09" gradientTransform="matrix(.60986 0 0 .60986 -1015.1 -735.2)" y1="1850.7" x1="-291.09">
+      <stop stop-color="#27005d" stop-opacity=".98039" offset="0"/>
+      <stop stop-color="#2b005d" offset=".31767"/>
+      <stop stop-color="#280055" offset=".59756"/>
+      <stop stop-color="#24004d" offset=".80878"/>
+      <stop stop-color="#230049" offset="1"/>
+      </linearGradient>
+      <linearGradient id="y" y2="2047" gradientUnits="userSpaceOnUse" x2="-253.6" gradientTransform="matrix(.60986 0 0 .60986 -1015.1 -735.2)" y1="1878.8" x1="-253.6">
+      <stop stop-color="#210045" offset="0"/>
+      <stop stop-color="#25004d" offset=".25"/>
+      <stop stop-color="#2b005c" offset=".5"/>
+      <stop stop-color="#340071" offset=".74854"/>
+      <stop stop-color="#3e0088" offset="1"/>
+      </linearGradient>
+      <linearGradient id="x" y2="2047.3" gradientUnits="userSpaceOnUse" x2="-227.23" gradientTransform="matrix(.60986 0 0 .60986 -1015.1 -735.2)" y1="1877.2" x1="-248.82">
+      <stop stop-color="#5500bd" offset="0"/>
+      <stop stop-color="#5300b5" offset="1"/>
+      </linearGradient>
+    </defs>
+    <g transform="translate(1009.8 -337.49)">
+    <g transform="matrix(.5 0 0 .5 -379.18 197.8)">
+      <g>
+          <path d="m-1106.6 282.03 6.7084 15.246 17.076-7.9282 6.9443-7.3183c-10.985 2.4918-20.893 2.5746-30.729 0z" fill="#6700e8"/>
+          <path d="m-1154.8 414.97-11.587 4.269-7.3183-12.807 72.573-115.87 5.1886-1.7772c7.1618-1.6184 14.973-3.354 20.061-6.7608-11.525 15.569-53.493 88.344-78.917 132.95z" fill="url(#t)"/>
+          <path d="m-1170.6 413.15 3.0493-3.0493 71.795-121.34-10.809-6.7347c-8.6682 16.146-40.638 68.392-60.986 101.85l-9.7578 18.296z" fill="url(#u)"/>
+          <path d="m-1228.5 282.03c15.916 28.207 40.349 67.667 60.986 101.85v26.224l-4.8789 4.8789-71.354-126.85z" fill="url(#v)"/>
+          <path d="m-1240.3 289.7 11.761-7.6717c-12.62 2.6914-17.899 2.8627-30.493 0l4.8789 5.4887z" fill="#6700e8"/>
+          <path d="m-1167.6 410.1-5.4887 7.9282-7.3184-3.0493c-13.625-23.55-53.678-95.287-78.672-132.95 5.0665 3.6714 11.911 5.686 19.817 6.9699z" fill="url(#w)"/>
+          <path fill="url(#x)" d="m-1152.9 513.16-20.735-9.7578 1.8296-86.6 4.269-6.7085 12.807 4.8789z"/>
+          <path d="m-1167.6 506.45-14.637 6.7085 1.8295-98.187 12.807-4.8789z" fill="url(#y)"/>
+      </g>
+      </g>
+      </g>
+  </svg>
+`
 
 const uuID = function () {
     return uuid_generate().replace( /-/g,'')
@@ -347,6 +444,39 @@ const getCurrentPlanUpgradelBalance = function ( expiration: string, planName: s
 
 const infoDefine = [
 	{
+        coSearch: {
+            searchInputPlaceholder: '请输入检索关键字组合或网址',
+            SearchText:'搜索',
+            totalResults: ['大约有','条记录'],
+            moreResults: '更多结果',
+            SearchesRelated: ['','的相关搜索'],
+            label_HTML: 'HTML代码',
+            label_picture: '图片',
+            imageSize: '图片尺寸：',
+            unSafe: ['安全浏览','非安全浏览（非推荐）'],
+            similarImages: '外观类似的图片',
+            errorMessage: [
+                '无效请求',
+                '您的图片格式无法处理，请尝试选择其他图片',
+                '您的请求已达最大值，请稍后再试'
+            ],
+            coSearchConfigMenu: ['搜索设定','指定检索引擎'],
+            coSearchConfigIcon:['google',''],
+            coSearchEngineName: ['谷歌',''],
+            searchToolBarMenu: [
+                "网站", "新闻","图片","视频"
+            ],
+            timeUnit: {
+                hours: '小时前',
+                day: '天前',
+                mins: '分钟前'
+            },
+            TimeTolocalTime: function ( time: string ) {
+                return new Date ( time ).toLocaleDateString ('zh-Hans', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+            }
+
+
+        },
         youtube: {
             startup: {
                 title: '欢迎使用Co油管',
@@ -363,6 +493,12 @@ const infoDefine = [
         },
         perment:{
             serverTitle:'服务器'
+        },
+        appsManager: {
+            mainLoading: '正在获取节点信息...',
+            nodeName: '您进入的节点名：',
+            connectAddress:'节点接入地址：',
+            serviceList:'提供服务一览'
         },
 
         twitter: {
@@ -524,8 +660,8 @@ const infoDefine = [
                     header: null,
                     detail: '使用我们的服务并不让您拥有我们的服务或您所访问的内容的任何知识产权。除非您获得相关内容所有者的许可或通过其他方式获得法律的许可，否则您不得使用服务中的任何内容。本条款并未授予您使用我们服务中所用的任何商标或标志的权利。请勿删除、隐藏或更改我们服务上显示的或随服务一同显示的任何法律声明。'
                 },{
-                    header: '关于OPN无IP通讯技术和隐私保护的局限性',
-                    detail: 'OPN是CoNET世界首创的使用Email的IMAP协议建造一个无IP通讯环境，在您利用CoNET进行通讯过程中，CoNET无法获得您目前所使用的IP地址（使用iOPN来连结CoNET代理服务器时，您需要向CoNET系统提供您当前的IP地址），可以最大限度的保障您的个人隐私。但是这项技术并不能够保证您的信息绝对的不被泄露，因为您的IP地址有可能被记录在您所使用的Email服务供应商，如果持有加拿大法院令寻求CoNET的Log公开，再和Email服务供应商的Log合并分析，可能会最终得到您的信息。 CoNET并不能够绝对保障您的隐私。 '
+                    header: '关于CoNET无IP通讯技术和隐私保护的局限性',
+                    detail: 'CoNET是世界首创的使用Email地址建造一个无IP通讯环境，在您利用CoNET进行通讯过程中，CoNET无法获得您目前所使用的IP地址，可以最大限度的保障您的个人隐私。但是这项技术并不能够保证您的信息绝对的不被泄露，因为您的IP地址有可能被记录在您所使用的Email服务供应商，如果持有加拿大法院令寻求CoNET的Log公开，再和Email服务供应商的Log合并分析，可能会最终得到您的信息。 CoNET并不能够绝对保障您的隐私。 '
                 },
                 {
                     header: '关于个人隐私保护，系统日志和接收CoNET传送的信息',
@@ -596,7 +732,7 @@ const infoDefine = [
         imapInformation: {
             title: '通讯专用Email邮箱设置',
             tempImapAccount: `申请临时邮箱有困难？您可以暂时使用<a href="#" onclick="return linkClick ('https://github.com/QTGate/QTGate-Desktop-Client/wiki/iCloud%E8%87%A8%E6%99%82%E5%B8%B3%E6%88%B6')">CoNET提供的临时IMAP帐号供各位测试使用</a>`,
-            infomation: `请设置CoNET通讯专用Email邮箱信息。由于此账户的用户名和密码信息会提交给CoNET系统，为了防止您的个人信息被泄漏，请新申请一个临时Email账户。目前CoNET技术对应<a href="#" onclick="return linkClick ('https://www.icloud.com/')">苹果iCloud</a>，<a href="#" onclick="return linkClick ('https://www.microsoft.com/zh-tw/outlook-com/')">微软OUTLOOK</a>，<a href="#" onclick="return linkClick ('https://tw.mail.yahoo.com/')">雅虎邮箱</a>，<a href="#" onclick="return linkClick ('https://www.zoho.com/mail/')">俄罗斯ZOHO邮箱</a>，<a href="#" onclick=" return linkClick ('https://gmail.com')">Google邮箱</a>，<a href="#" onclick="return linkClick ('https://www.gmx.com/mail/#.1559516-header-nav1-2')">美国在线GMX邮箱</a>，CoNET强力推荐使用苹果公司的Email可以达到最佳速度(@OPN无IP连结技术只对应苹果公司iCloud邮箱)。密码请使用Email服务商的<a href="#" onclick="return linkClick ('https://tw.help.yahoo.com/kb/SLN15241.html')">应用密码</a>。对于Email供应商在应用密码申请时，须<a href="#" onclick="return linkClick ('https://tw.help.yahoo.com/kb/%E9%96%8B%E5%95%9F%E5%85%A9%E6%AD%A5%E9%A9%9F%E9%A9%97%E8%AD%89-sln5013.html')" >二步认证</a>并提供手机号码接受验证码，为保护您的隐私，建议使用免费在线代理接收验证码服务。( 如<a href="#" onclick="return linkClick('http://receive-sms-online.com/')">receive-sms-online.com</a>, <a href="#" onclick="return linkClick('https://sms-online.co/receive-free-sms')" >sms-online.co</a>, <a href="#" onclick="return linkClick('https://receive-a-sms.com/')" >receive-a-sms.com</a> ) 更多请 <a href="#" onclick="return linkClick ('http://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=0&rsv_idx=1&tn=baidu&wd=%E5%85%8D%E8%B4%20%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%20%E7%A0%81&rsv_pq=e94f47a50001f66f&rsv_t=b03ePiy3rHH0T4FVoWB8Hx9vrVdZLzVhhErWOo4xdBpjDw%2BtGri%2BViTaVAw&rqlang=cn&rsv_enter=1&rsv_sug3=42&rsv_sug1=5&rsv_sug7=100')">百度查找</a>，<a href="#" onclick="return linkClick ('https://www.google.com/search?q=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&oq=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&aqs=chrome..69i57j69i60.254j0j4&sourceid=chrome&ie=UTF-8')">Google查找</a>。`,
+            infomation: `请设置CoNET通讯专用Email邮箱信息。由于此账户的用户名和密码信息会提交给CoNET系统，为了防止您的个人信息被泄漏，请新申请一个临时Email账户。目前CoNET技术对应<a href="#" onclick="return linkClick ('https://www.icloud.com/')">苹果iCloud</a>，<a href="#" onclick="return linkClick ('https://www.microsoft.com/zh-tw/outlook-com/')">微软OUTLOOK</a>，<a href="#" onclick="return linkClick ('https://tw.mail.yahoo.com/')">雅虎邮箱</a>，<a href="#" onclick="return linkClick ('https://www.zoho.com/mail/')">俄罗斯ZOHO邮箱</a>，<a href="#" onclick=" return linkClick ('https://gmail.com')">Google邮箱</a>，<a href="#" onclick="return linkClick ('https://www.gmx.com/mail/#.1559516-header-nav1-2')">美国在线GMX邮箱</a>，CoNET强力推荐使用苹果公司的Email可以达到最佳速度。密码请使用Email服务商的<a href="#" onclick="return linkClick ('https://tw.help.yahoo.com/kb/SLN15241.html')">应用密码</a>。对于Email供应商在应用密码申请时，须<a href="#" onclick="return linkClick ('https://tw.help.yahoo.com/kb/%E9%96%8B%E5%95%9F%E5%85%A9%E6%AD%A5%E9%A9%9F%E9%A9%97%E8%AD%89-sln5013.html')" >二步认证</a>并提供手机号码接受验证码，为保护您的隐私，建议使用免费在线代理接收验证码服务。( 如<a href="#" onclick="return linkClick('http://receive-sms-online.com/')">receive-sms-online.com</a>, <a href="#" onclick="return linkClick('https://sms-online.co/receive-free-sms')" >sms-online.co</a>, <a href="#" onclick="return linkClick('https://receive-a-sms.com/')" >receive-a-sms.com</a> ) 更多请 <a href="#" onclick="return linkClick ('http://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=0&rsv_idx=1&tn=baidu&wd=%E5%85%8D%E8%B4%20%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%20%E7%A0%81&rsv_pq=e94f47a50001f66f&rsv_t=b03ePiy3rHH0T4FVoWB8Hx9vrVdZLzVhhErWOo4xdBpjDw%2BtGri%2BViTaVAw&rqlang=cn&rsv_enter=1&rsv_sug3=42&rsv_sug1=5&rsv_sug7=100')">百度查找</a>，<a href="#" onclick="return linkClick ('https://www.google.com/search?q=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&oq=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&aqs=chrome..69i57j69i60.254j0j4&sourceid=chrome&ie=UTF-8')">Google查找</a>。`,
             serverDetail: '详细设定：',
             imapServer: 'IMAP服务器设定',
             imapServerInput: 'IMAP服务器IP或域名',
@@ -620,6 +756,7 @@ const infoDefine = [
             connectImap: '连接CoNET',
             cancelConnect: '终止CoNET连接',
             imapItemTitle: '通讯用邮箱详细信息',
+            loaderText:['正','在','和','C','o','N','E','T','建','立','通','讯','管','道','...'],
             imapCheckingStep: [
                 /* 0 */'正在尝试连接email服务器',
                 /* 1 */'邮件服务器IMAP连接成功, 正在等待CoNET对接。',
@@ -655,10 +792,10 @@ const infoDefine = [
             localIpAddress: '本机',
             nextPage:'下一页',
             agree: '同意协议并继续',
-            emailAddress: '作为Q梯账号的Email地址',
+            emailAddress: '作为CoNET账号的Email地址',
             systemAdministratorEmail:'RSA密钥生成',
             SystemAdministratorNickName: '昵称或组织名',
-            systemPassword: 'Q梯客户端密码设定',
+            systemPassword: 'CoNET客户端密码设定',
             creatKeyPair: '创建密钥对...',
             imapEmailAddress: '邮箱账户名',
             cancel: '放弃操作',
@@ -807,7 +944,7 @@ const infoDefine = [
         /*8*/   '本地Proxy服务器，其他手机电脑和IPad等可通过连结此端口来使用CoNET服务。请设定为3001至65535之间的数字。',
         /*9*/   '通过设置PATH链接路径可以简单给您的Proxy服务器增加安全性，拒绝没有提供PATH的访问者使用您的Proxy服务器。',
         /*10*/  '同时使用多条代理线路数，可以有效降低大流量集中在一个代理服务线路，降低被网络监控者发现的风险。此选项仅供收费会员使用。',
-        /*11*/  '指定同Q梯代理进行通讯使用的端口号，通过此设置可以规避您所在网段被通讯屏蔽的端口。',
+        /*11*/  '指定同CoNET代理进行通讯使用的端口号，通过此设置可以规避您所在网段被通讯屏蔽的端口。',
         /* 12*/ 'Web实时通讯(WebRTC)客户端浏览器之间通过IP地址直接高速通讯技术，有时被恶意泄漏您的真实IP地址。'
                 ]
             
@@ -846,8 +983,8 @@ const infoDefine = [
 
         thirdParty: {
             comesoon:'即将推出',
-            information: 'CoNET平台',
-            app: ['Co定制代理','CoChat','Co云存储','Co邮件','Co新闻频道','CoNET定制业务','Co谷歌','Co推特', 'Co油管','Co加密货币钱包'],
+            information: '欢迎来到CoNET网络',
+            app: ['Co定制代理','酷茶','酷存','Co邮件','Co新闻频道','酷检索','Co推特', 'Co油管','酷钱包','CoNET定制业务'],
             qtgateGateway: 'CoNET提供的高质量上网技术iOPN和@OPN，在CoNET全球16个区域，当场定制您专属的代理服务器，变换您的IP地址隐身无障碍的访问互联网',
             dimmer: [
                 '高质量量身定制代理服务器业务，让您隐身安全不受注意的网上冲浪。 ',
@@ -856,10 +993,10 @@ const infoDefine = [
                 '隐身匿名邮件客户端，可免翻墙访问Gmail',
                 '免翻墙隐身匿名访问世界头条新闻',
                 'QTG承接定制各类公众服务类及跨国企业私有APP业务',
-                '免翻墙匿名隐身谷歌检索客户端',
+                '免翻墙匿名隐身网页检索',
                 '免翻墙匿名隐身推特客户端',
                 '免翻墙匿名隐身Youtube客户端，可下载视频',
-                '免翻墙匿名隐身加密货币钱包和交易所'
+                'CoNET加密货币钱包和交易所'
             ]
         }, 
 
@@ -1010,6 +1147,46 @@ const infoDefine = [
         }
         
 	},{
+
+        coSearch: {
+            searchInputPlaceholder: 'サーチキーワードまたはウェーブアドレス',
+            SearchText:'検索',
+            totalResults: ['約','件'],
+            moreResults: '結果をさらに表示',
+            SearchesRelated: ['','に関連する検索キーワード'],
+            label_HTML: 'HTMLコード',
+            label_picture: 'イメージ',
+            imageSize: 'イメージサイズ:',
+            unSafe: ['安全浏览','非安全浏览（非推荐）'],
+            similarImages: '類似の画像',
+            errorMessage: [
+                '無効なレクエスト',
+                '選択された画像は処理ができません、ほかの画像をしてください',
+                'レクエスト回数は制限にかかった、後ほど改めてお試しください'
+            ],
+            coSearchConfigMenu: ['検索の設定', '使用する検索エンジン'],
+            coSearchConfigIcon:[ 'google',''],
+            coSearchEngineName: [ 'Google',''],
+            searchToolBarMenu: [
+                "ウェイブ", "ニュース","画像","ビデオ"
+            ],
+            timeUnit: {
+                hours: '時間前',
+                day: '天前',
+                mins: '分前'
+            },
+            TimeTolocalTime: function ( time: string ) {
+                return new Date ( time ).toLocaleDateString ('ja', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+            }
+        },
+
+        appsManager: {
+            mainLoading: 'ノードのサービスを取得中...',
+            nodeName: 'ノードの名前：',
+            connectAddress:'ノードに接続アドレス：',
+            serviceList:'サービス一覧'
+        },
+
         youtube: {
             startup: {
                 title: 'Co for Youtubeへようこそ',
@@ -1050,9 +1227,9 @@ const infoDefine = [
         
         thirdParty: {
             comesoon:'まもなく登場します。',
-            information: 'CoNETプラットフォーム',
+            information: 'CoNETネットワークへようこそ',
             qtgateGateway:'CoNETご提供する高品質カスタムゲットウェイサービス、グローバルに１６区域とCoNET独自のiOPNと@OPN技術により、貴方のIPアドレスをカバーして、静かに無障害にインターネットの世界へ可能です。',
-            app:['CoGate', 'CoMsg', 'CoBox','CoMail','CoNews','Coカスタム','Co for','Co for','Co for','Coウォレット'],
+            app:['CoGate', 'CoChat', 'CoBox','CoMail','CoNews','Co検索','Co for','Co for','Coウォレット','Coカスタム'],
             
             dimmer: [
                 '高品質カスタムゲットウェイサービス、自由になるインターネットの世界へ',
@@ -1061,7 +1238,7 @@ const infoDefine = [
                 '匿名メール端末',
                 'グロバールニュースをチェック',
                 'CoNETに公衆及び私有ビジネスカスタム業務',
-                '匿名Googleサーチ端末',
+                '匿名ウェーブサーチ端末',
                 '匿名Tweet端末',
                 '匿名Youtube端末、ビデオダウンロードをサポート',
                 '匿名ブロックチェーンウォレットとエクスチェンジ'
@@ -1326,8 +1503,8 @@ const infoDefine = [
                     header: null,
                     detail: 'ユーザーは、法律（輸出、再輸出に関して適用される法規制を含みます）で認められている場合に限り、本サービスを利用することができます。ユーザーがCoNETの規約やポリシーを遵守しない場合、またはCoNETが不正行為と疑う行為について調査を行う場合に、CoNETはユーザーに対する本サービスの提供を一時停止または停止することができます。'
                 },{
-                    header: '無IP通信技術OPNネットワークはプライベートに限界があります',
-                    detail: 'OPN無IP通信は弊社の革新的技術であります。あなたはCoNET端末ソフトを使ってCoNETシステムとのコミニュケーションはお客さんが無IPでプライベートな通信を行います。（但しiOPN技術を選択してゲットウェーに接続した場合は、お客さんのIPアドレスをCoNETシステムに提示するのが必要です。）でもお客さんのIPアドレスはeメールプロバイダーのログに記録していたかもしれません。裁判所命令を持つカナダの法執行機関はCoNETのログを得て、eメールプロバイダーのログと合併して、お客さんのプライベートインフォメーションを入手することも可能です。'
+                    header: '無IP通信技術CoNETネットワークはプライベートに限界があります',
+                    detail: '無IP通信は弊社の革新的技術であります。あなたはCoNET端末ソフトを使ってCoNETシステムとのコミニュケーションはお客さんが無IPでプライベートな通信を行います。でもお客さんのIPアドレスはeメールプロバイダーのログに記録していたかもしれません。裁判所命令を持つカナダの法執行機関はCoNETのログを得て、eメールプロバイダーのログと合併して、お客さんのプライベートインフォメーションを入手することも可能です。'
                 },
                 {
                     header: null,
@@ -1412,7 +1589,7 @@ const infoDefine = [
         imapInformation: {
             title: '通信専用Emailアカウントを登録',
             tempImapAccount: `IMAPのアカウント設定に困るなら、<a href="#" onclick="return linkClick ('https://github.com/QTGate/QTGate-Desktop-Client/wiki/IMAP%E9%80%9A%E4%BF%A1%E5%B0%82%E7%94%A8%E4%B8%80%E6%99%82%E7%9A%84%E3%81%AAiCloud%E3%82%A2%E3%82%AB%E3%83%B3%E3%82%A6%E3%83%88')">CoNETご提供している一時iCloudアカンウトをテストのご利用いただけます。</a>`,
-            infomation:`CoNET通信専用emailアカンウトを設定します。このemailアカウントはあなたとCoNETお互い情報交換するのために、ユーザ名とパスワードをCoNETシステムへ提供します。個人情報漏洩の恐れ、一時的なemailアカウントを新たにつくてください。CoNET技術は只今<a href="#" onclick="return linkClick ('https://icloud.com')">Apple iCloud</a>, <a href="#" onclick="return linkClick ('https://www.microsoft.com/ja-jp/outlook-com/')">Outlook</a>, <a href="#" onclick="return linkClick ('https://login.yahoo.co.jp/config/login?.src=ym&.done=https%3A%2F%2Fmail.yahoo.co.jp%2F')">Yahoo Mail</a>, <a href="#" onclick="return linkClick ('https://gmail.com')">GMAIL</a>, <a href="#" onclick="return linkClick ('https://www.gmx.com/mail/#.1559516-header-nav1-2')">GMX</a>, <a href="#" onclick="return linkClick ('https://www.zoho.com/mail/')">HOZO</a>対応しております、APPLEのiCloudを使うお勧めです。( @OPN IPなし通信技術はiCloudのみ対応しております）</span>メールアカウントのパスワードについて、<a href="#" onclick="return linkClick ('https://support.microsoft.com/ja-jp/help/12409/microsoft-account-app-passwords-two-step-verification')">アプリパスワード</a>をご利用のをお勧めです。アプリパスワードを申請する際に、<a href="#" onclick="return linkClick ('https://support.microsoft.com/ja-jp/help/12408')">2段階認証プロセス</a>に必要なスマートフォン番号を提示が必要な場合、個人プライバシーを守るのため、( <a href="#" onclick="return linkClick('http://receive-sms-online.com/')">receive-sms-online.com</a>, <a href="#" onclick="return linkClick('https://sms-online.co/receive-free-sms')" >sms-online.co</a>, <a href="#" onclick="return linkClick('https://receive-a-sms.com/')" >receive-a-sms.com</a> ) など<a href="#" onclick="return linkClick ('http://jpnpay.com/archives/561')">オンライン無料SMS受信サービス</a>をお勧めします。`,
+            infomation:`CoNET通信専用emailアカンウトを設定します。このemailアカウントはあなたとCoNETお互い情報交換するのために、ユーザ名とパスワードをCoNETシステムへ提供します。個人情報漏洩の恐れ、一時的なemailアカウントを新たにつくてください。CoNET技術は只今<a href="#" onclick="return linkClick ('https://icloud.com')">Apple iCloud</a>, <a href="#" onclick="return linkClick ('https://www.microsoft.com/ja-jp/outlook-com/')">Outlook</a>, <a href="#" onclick="return linkClick ('https://login.yahoo.co.jp/config/login?.src=ym&.done=https%3A%2F%2Fmail.yahoo.co.jp%2F')">Yahoo Mail</a>, <a href="#" onclick="return linkClick ('https://gmail.com')">GMAIL</a>, <a href="#" onclick="return linkClick ('https://www.gmx.com/mail/#.1559516-header-nav1-2')">GMX</a>, <a href="#" onclick="return linkClick ('https://www.zoho.com/mail/')">HOZO</a>対応しております、APPLEのiCloudを使うお勧めです。</span>メールアカウントのパスワードについて、<a href="#" onclick="return linkClick ('https://support.microsoft.com/ja-jp/help/12409/microsoft-account-app-passwords-two-step-verification')">アプリパスワード</a>をご利用のをお勧めです。アプリパスワードを申請する際に、<a href="#" onclick="return linkClick ('https://support.microsoft.com/ja-jp/help/12408')">2段階認証プロセス</a>に必要なスマートフォン番号を提示が必要な場合、個人プライバシーを守るのため、( <a href="#" onclick="return linkClick('http://receive-sms-online.com/')">receive-sms-online.com</a>, <a href="#" onclick="return linkClick('https://sms-online.co/receive-free-sms')" >sms-online.co</a>, <a href="#" onclick="return linkClick('https://receive-a-sms.com/')" >receive-a-sms.com</a> ) など<a href="#" onclick="return linkClick ('http://jpnpay.com/archives/561')">オンライン無料SMS受信サービス</a>をお勧めします。`,
             serverDetail: '詳細設定：',
             imapServer: 'IMAP設定',
             imapServerInput: 'IMAPサーバー名又はIP',
@@ -1436,6 +1613,7 @@ const infoDefine = [
             connectImap: 'CoNETに接続にします',
             cancelConnect: 'CoNETとの接続を中止します',
             imapItemTitle: '通信用Email詳細設定',
+            loaderText:['C','o','N','E','T','へ','接','続','を','し','て','い','ま','す','...'],
             imapCheckingStep: [
                 /* 0 */'emailサーバへ接続しています。',
                 /* 1 */'emailサーバへIMAP接続しました、CoNETからレスポンスを待ちます。',
@@ -1675,6 +1853,44 @@ const infoDefine = [
         },
 
 	},{
+        coSearch: {
+            searchInputPlaceholder: 'Search or type a URL',
+            SearchText:'Search',
+            totalResults: ['About','results'],
+            moreResults: 'More Results',
+            SearchesRelated: [ 'Searches related to ','' ],
+            label_HTML: '</>',
+            imageSize: 'Image size:',
+            label_picture: 'Picture',
+            similarImages: 'Visually similar images',
+            unSafe: ['Safe viewer','Unsafe viewer'],
+            errorMessage: [
+                'Invalid request.',
+                'This image have issue of format. Select other one please.',
+                'Request maximum error. Try again later.'
+            ],
+            coSearchConfigMenu: ['Search setup','Search engines'],
+            coSearchConfigIcon:[ 'google',''],
+            coSearchEngineName: [ 'Google',''],
+            searchToolBarMenu: [
+                "Website", "News","Picture","Video"
+            ],
+            timeUnit: {
+                hours: 'hours ago',
+                day: 'days ago',
+                mins: 'minutes ago'
+            },
+            TimeTolocalTime: function ( time: string ) {
+                return new Date ( time ).toLocaleDateString ('en', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+            }
+        },
+
+        appsManager: {
+            mainLoading: 'Loading node information...',
+            nodeName: 'Node name: ',
+            connectAddress:'Node address: ',
+            serviceList:'Service list'
+        },
         youtube: {
             startup: {
                 title: 'Welcome to Co for Youtube',
@@ -1714,10 +1930,10 @@ const infoDefine = [
             accountError:'Twitter return error: Invalid or expired token. error. Please check your account APP information and try again.'
         },
         thirdParty: {
-            information: 'CoNET Platform',
+            information: 'Welcome to CoNET.',
             comesoon:'Come soon.',
             qtgateGateway: 'CoGate gateway service. High speed, total privacy, ultra secure and easy to use. Your gateway to a secure and open internet.',
-            app:['CoGate', 'CoMsg', 'CoBox', 'CoMail', 'CoNews','Co Custom', 'Co for', 'Co for','Co for','CoWallet'],
+            app:['CoGate', 'CoChat', 'CoBox', 'CoMail', 'CoNews', 'CoSearch', 'Co for','Co for','CoWallet','Co Custom'],
             
             dimmer: [
                 'Advanced private custom gateway service',
@@ -1726,10 +1942,10 @@ const infoDefine = [
                 'Privacy email client',
                 'Discover your world every day',
                 'Custom business solution for public or private APPs in CoNET',
-                'Privacy Google search client',
+                'Web search client',
                 'Privacy Tweet client',
                 'Privacy Youtube client. May download Youtube video via 3rd-party webside.',
-                'Privacy blockchain wallet'
+                'CoNET Cryptocurrency wallet'
             ]
         }, 
         account:{
@@ -2117,7 +2333,7 @@ const infoDefine = [
         imapInformation: {
             title: 'Email account to use by OPN.',
             tempImapAccount: `Have problem with your IMAP enabled email account? <a href="#" onclick="return linkClick ('https://github.com/QTGate/QTGate-Desktop-Client/wiki/iCloud-temporary-account')"> Get temporary account.</a>`,
-            infomation: `Please provide an IMAP enabled email account to be used to communication with CoNET network. The account name and password will be required. For your personal privacy, please consider registering a new email account to use. CoNET currently supports <a href="#" onclick="return linkClick('https://www.icloud.com/')">Apple iCloud</a>, <a href="#" onclick="return linkClick('https://outlook.live.com/owa/')">Outlook Mail</a>, <a href="#" onclick="return linkClick('https://login.yahoo.com/')">Yahoo Mail</a>, <a href="#" onclick="return linkClick('https://mail.google.com')">GMAIL</a>, <a href="#" onclick="return linkClick('https://www.gmx.com/')">GMX</a>, <a href="#" onclick="return linkClick('https://www.zoho.com/mail/')">ZOHO</a>. (@OPN currently supports iCloud mail only.) For passwords, it is recommended use a <a href="#" onclick="return linkClick('https://help.yahoo.com/kb/SLN15241.html')">generated app-specific password.</a> If using <a href="#" onclick="return linkClick('https://help.yahoo.com/kb/two-step-verification-sln5013.html')">2-step verification</a>, we recommend using a free anonymous SMS receiving site to receive SMS codes, ( such as <a href="#" onclick="return linkClick('http://receive-sms-online.com/')">receive-sms-online.com</a>, <a href="#" onclick="return linkClick('https://sms-online.co/receive-free-sms')" >sms-online.co</a>, <a href="#" onclick="return linkClick('https://receive-a-sms.com/')" >receive-a-sms.com</a>, or <a href="#" onclick="return linkClick('https://www.google.com/search?q=free+anonymous+SMS+receiving+site&oq=free+anonymous+SMS+receiving+site&aqs=chrome..69i57.268j0j4&sourceid=chrome&ie=UTF-8')" >others</a> ).`,
+            infomation: `Please provide an IMAP enabled email account to be used to communication with CoNET network. The account name and password will be required. For your personal privacy, please consider registering a new email account to use. CoNET currently supports <a href="#" onclick="return linkClick('https://www.icloud.com/')">Apple iCloud</a>, <a href="#" onclick="return linkClick('https://outlook.live.com/owa/')">Outlook Mail</a>, <a href="#" onclick="return linkClick('https://login.yahoo.com/')">Yahoo Mail</a>, <a href="#" onclick="return linkClick('https://mail.google.com')">GMAIL</a>, <a href="#" onclick="return linkClick('https://www.gmx.com/')">GMX</a>, <a href="#" onclick="return linkClick('https://www.zoho.com/mail/')">ZOHO</a>. For passwords, it is recommended use a <a href="#" onclick="return linkClick('https://help.yahoo.com/kb/SLN15241.html')">generated app-specific password.</a> If using <a href="#" onclick="return linkClick('https://help.yahoo.com/kb/two-step-verification-sln5013.html')">2-step verification</a>, we recommend using a free anonymous SMS receiving site to receive SMS codes, ( such as <a href="#" onclick="return linkClick('http://receive-sms-online.com/')">receive-sms-online.com</a>, <a href="#" onclick="return linkClick('https://sms-online.co/receive-free-sms')" >sms-online.co</a>, <a href="#" onclick="return linkClick('https://receive-a-sms.com/')" >receive-a-sms.com</a>, or <a href="#" onclick="return linkClick('https://www.google.com/search?q=free+anonymous+SMS+receiving+site&oq=free+anonymous+SMS+receiving+site&aqs=chrome..69i57.268j0j4&sourceid=chrome&ie=UTF-8')" >others</a> ).`,
             serverDetail: 'settings:',
             imapServer: 'IMAP server setup',
             imapServerInput: 'IMAP server name or IP address',
@@ -2141,6 +2357,7 @@ const infoDefine = [
             connectImap: 'Connect to CoNET',
             cancelConnect: 'Stop connecting to CoNET.',
             imapItemTitle: 'Email account details:',
+            loaderText:['C','o','n','n','e','c','t',' ','t','o',' ','C','o','N','E','T',' ','n','e','t','w','o','r','k','...'],
             imapCheckingStep: [
                 /* 0 */'Trying to connect to email server.',
                 /* 1 */'Connected to email server with IMAP. Waiting response from CoNET.',
@@ -2268,7 +2485,7 @@ const infoDefine = [
             reSendRequest:'Request verification email',
             formatError: [
                         'Format error! Copy all content from [-----BEGIN PGP MESSAGE-----] ... to [-----END PGP MESSAGE-----]. Paste into this text box.',
-                        'Oops. Find the lasest mail from CoNET in your key pair email mailbox. Or delete this key pair and rebuild new key pair please.',
+                        'Decrypt message failed. Find the lasest mail from CoNET in your key pair email mailbox. Or delete this key pair and rebuild new key pair please.',
                         'Connection to CoNET had an error!. Please exit and restart CoNET.',
                         'This secret verification code was invalid. If you received more then one email from CoNET, please choose the newest email. Do validate again!',
                         'Your CoNET account may have a problem, Please delete your key pair and setup again!',
@@ -2384,6 +2601,55 @@ const infoDefine = [
         },
 
 	},{
+        coSearch: {
+            searchInputPlaceholder: '請輸入檢索關鍵字組合或網址',
+            SearchText:'搜尋',
+            totalResults: ['大約有','條記錄'],
+            moreResults: '更多結果',
+            SearchesRelated: ['','的相關搜尋'],
+            label_HTML: 'HTML代碼',
+            imageSize: '圖片尺寸',
+            label_picture:'圖片',
+            similarImages: '看起來相似的圖片',
+            errorMessage: [
+                '無效請求',
+                '您的圖片格式無法處理，請嘗試選擇其他圖片',
+                '您的請求已達最大值，請稍後再試'
+            ],
+            coSearchConfigMenu: ['搜尋設定','搜尋引擎指定'],
+            coSearchEngineSelectArray: [
+                {
+                    name: 'google',
+                    icon: 'google',
+                    iconColor: '',
+                    textColor: '',
+                    showName: 'Google',
+                    image: null
+                }
+            ],
+            coSearchConfigIcon:['google','images/bing.svg',''],
+            coSearchEngineName: ['Google','',''],
+            searchToolBarMenu: [
+                "網頁", "新聞","圖片","視頻"
+            ],
+            timeUnit: {
+                hours: '小時前',
+                day: '天前',
+                mins: '分鐘前'
+            },
+            TimeTolocalTime: function ( time: string ) {
+                return new Date ( time ).toLocaleDateString ('zh-TW', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })
+            }
+
+        },
+
+        appsManager: {
+            mainLoading: '正在獲取結點信息...',
+            nodeName: '您進入的節點名：',
+            connectAddress:'接入地址：',
+            welcomeTextSub: '',
+            serviceList:'提供服務一覽'
+        },
         youtube: {
             startup: {
                 title: '歡迎使用Co for Youtube',
@@ -2423,9 +2689,9 @@ const infoDefine = [
             
         },
         thirdParty: {
-            information: 'CoNET平台',
+            information: '歡迎來到CoNET網絡',
             comesoon:'即將登場',
-            app:['CoGate','CoChat','Co云存储','Co邮箱','Co新闻频道','CoNet業務訂製','Co谷歌','Co推特','Co for','Co加密貨幣錢包'],
+            app:['CoGate','酷茶','酷存','Co邮箱','Co新闻频道','酷檢索','酷推特','Co for','酷錢包','CoNet業務訂製'],
             qtgateGateway: 'CoNET提供的高質量上網技術iOPN和@OPN，在CoNET全球16個區域，當場定制您專屬的代理服務器，變換您的IP地址隱身無障礙的訪問互聯網',
             
             dimmer: [
@@ -2435,10 +2701,10 @@ const infoDefine = [
                 '隱身匿名邮件客户端，可免翻牆访问Gmail',
                 '免翻墙隱身匿名訪問世界頭條新闻',
                 'QTG承接定制各類公眾服務類及跨國企業私有APP業務',
-                '免翻牆匿名隱身谷歌檢索客戶端',
+                '免翻牆匿名隱身網頁檢索',
                 '免翻牆匿名隱身推特客戶端',
                 '免翻牆匿名隱身Youtube客戶端',
-                '免翻牆匿名隱身加密貨幣錢包和交易所'
+                'CoNET加密貨幣錢包'
                 
             ]
         }, 
@@ -2706,8 +2972,8 @@ const infoDefine = [
                     header: null,
                     detail: '使用我們的服務並不讓您擁有我們的服務或您所訪問的內容的任何知識產權。除非您獲得相關內容所有者的許可或通過其他方式獲得法律的許可，否則您不得使用服務中的任何內容。本條款並未授予您使用我們服務中所用的任何商標或標誌的權利。請勿刪除、隱藏或更改我們服務上顯示的或隨服務一同顯示的任何法律聲明。'
                 },{
-                    header: '關於OPN無IP通訊技術和隱私保護的局限性',
-                    detail: 'OPN是CoNET世界首創的使用Email的IMAP協議建造一個無IP通訊環境，在您利用CoNET進行通訊過程中，CoNET無法獲得您目前所使用的IP地址（使用iOPN來連結CoNET代理服務器時，您需要向CoNET系統提供您當前的IP地址），可以最大限度的保障您的個人隱私。但是這項技術並不能夠保證您的信息絕對的不被洩露，因為您的IP地址有可能被記錄在您所使用的Email服務供應商，如果持有加拿大法院令尋求CoNET的Log公開，再和Email服務供應商的Log合併分析，可能會最終得到您的信息。CoNET並不能夠絕對保障您的隱私。'
+                    header: '關於CoNET無IP通訊技術和隱私保護的局限性',
+                    detail: 'CoNET世界首創的使用Email的IMAP協議建造一個無IP通訊環境，在您利用CoNET進行通訊過程中，CoNET無法獲得您目前所使用的IP地址，可以最大限度的保障您的個人隱私。但是這項技術並不能夠保證您的信息絕對的不被洩露，因為您的IP地址有可能被記錄在您所使用的Email服務供應商，如果持有加拿大法院令尋求CoNET的Log公開，再和Email服務供應商的Log合併分析，可能會最終得到您的信息。CoNET並不能夠絕對保障您的隱私。'
                 },{
                     header: '關於個人隱私保護，系統日誌和接收CoNET傳送的信息',
                     detail: '在您使用服務的過程中，我們可能會向您發送服務公告、管理消息和其他信息。您可以選擇不接收上述某些信息。'
@@ -2772,7 +3038,7 @@ const infoDefine = [
         imapInformation: {
             title: '通訊專用Email郵箱設置',
             tempImapAccount: `臨時郵箱申請有困難？您可以暫時使用<a href="#" onclick="return linkClick ('https://github.com/QTGate/QTGate-Desktop-Client/wiki/iCloud%E8%87%A8%E6%99%82%E5%B8%B3%E6%88%B6')">CoNET網絡提供的臨時IMAP帳號供各位測試</a>`,
-            infomation: `請設置CoNET網絡通訊專用Email郵箱信息。由於此賬戶的用戶名和密碼信息會提交給CoNET網絡，為了防止您的個人信息被洩漏，請新申請一個臨時Email賬戶。目前CoNET網絡技術對應<a href="#" onclick="return linkClick ('https://www.icloud.com/')">Apple iCloud</a>，<a href="#" onclick="return linkClick ('https://www.microsoft.com/zh-tw/outlook-com/mobile/?WT.mc_id=mscom')">微軟OUTLOOK</a>，<a href="#" onclick="return linkClick ('http://tw.mail.yahoo.com/')">雅虎郵箱</a>，<a href="#" onclick="return linkClick ('https://www.zoho.com/mail/')">俄羅斯ZOHO郵箱</a>，<a href="#" onclick="return linkClick ('https://gmail.com')">Google郵箱</a>，<a href="#" onclick="return linkClick ('https://www.gmx.com/mail/#.1559516-header-nav1-2')">美國在線GMX郵箱</a>，CoNET強力推薦使用蘋果公司的Email可以達到最佳速度(@OPN無IP連結技術只對應蘋果公司iCloud郵箱)。密碼請使用Email服務商的<a href="#" onclick="return linkClick ('https://tw.help.yahoo.com/kb/SLN15241.html')">應用密碼</a>。對於Email供應商在應用密碼申請時，須打開<a href="#" onclick="return linkClick ('https://tw.help.yahoo.com/kb/%E9%96%8B%E5%95%9F%E5%85%A9%E6%AD%A5%E9%A9%9F%E9%A9%97%E8%AD%89-sln5013.html')">二步認證</a>並必須提供手機號碼接受驗證碼，為保護您的隱私，建議使用免費在線代理接收驗證碼服務。如 ( <a href="#" onclick="return linkClick('http://receive-sms-online.com/')">receive-sms-online.com</a>, <a href="#" onclick="return linkClick('https://sms-online.co/receive-free-sms')" >sms-online.co</a>, <a href="#" onclick="return linkClick('https://receive-a-sms.com/')" >receive-a-sms.com</a> ) 更多請 <a href="#" onclick="return linkClick ('http://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=0&rsv_idx=1&tn=baidu&wd=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&rsv_pq=e94f47a50001f66f&rsv_t=b03ePiy3rHH0T4FVoWB8Hx9vrVdZLzVhhErWOo4xdBpjDw%2BtGri%2BViTaVAw&rqlang=cn&rsv_enter=1&rsv_sug3=42&rsv_sug1=5&rsv_sug7=100')">百度查找</a>，<a href="#" onclick="return linkClick ('https://www.google.com/search?q=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&oq=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&aqs=chrome..69i57j69i60.254j0j4&sourceid=chrome&ie=UTF-8')">Google查找</a>。`,
+            infomation: `請設置CoNET網絡通訊專用Email郵箱信息。由於此賬戶的用戶名和密碼信息會提交給CoNET網絡，為了防止您的個人信息被洩漏，請新申請一個臨時Email賬戶。目前CoNET網絡技術對應<a href="#" onclick="return linkClick ('https://www.icloud.com/')">Apple iCloud</a>，<a href="#" onclick="return linkClick ('https://www.microsoft.com/zh-tw/outlook-com/mobile/?WT.mc_id=mscom')">微軟OUTLOOK</a>，<a href="#" onclick="return linkClick ('http://tw.mail.yahoo.com/')">雅虎郵箱</a>，<a href="#" onclick="return linkClick ('https://www.zoho.com/mail/')">俄羅斯ZOHO郵箱</a>，<a href="#" onclick="return linkClick ('https://gmail.com')">Google郵箱</a>，<a href="#" onclick="return linkClick ('https://www.gmx.com/mail/#.1559516-header-nav1-2')">美國在線GMX郵箱</a>，CoNET強力推薦使用蘋果公司的Email可以達到最佳速度。密碼請使用Email服務商的<a href="#" onclick="return linkClick ('https://tw.help.yahoo.com/kb/SLN15241.html')">應用密碼</a>。對於Email供應商在應用密碼申請時，須打開<a href="#" onclick="return linkClick ('https://tw.help.yahoo.com/kb/%E9%96%8B%E5%95%9F%E5%85%A9%E6%AD%A5%E9%A9%9F%E9%A9%97%E8%AD%89-sln5013.html')">二步認證</a>並必須提供手機號碼接受驗證碼，為保護您的隱私，建議使用免費在線代理接收驗證碼服務。如 ( <a href="#" onclick="return linkClick('http://receive-sms-online.com/')">receive-sms-online.com</a>, <a href="#" onclick="return linkClick('https://sms-online.co/receive-free-sms')" >sms-online.co</a>, <a href="#" onclick="return linkClick('https://receive-a-sms.com/')" >receive-a-sms.com</a> ) 更多請 <a href="#" onclick="return linkClick ('http://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=0&rsv_idx=1&tn=baidu&wd=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&rsv_pq=e94f47a50001f66f&rsv_t=b03ePiy3rHH0T4FVoWB8Hx9vrVdZLzVhhErWOo4xdBpjDw%2BtGri%2BViTaVAw&rqlang=cn&rsv_enter=1&rsv_sug3=42&rsv_sug1=5&rsv_sug7=100')">百度查找</a>，<a href="#" onclick="return linkClick ('https://www.google.com/search?q=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&oq=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&aqs=chrome..69i57j69i60.254j0j4&sourceid=chrome&ie=UTF-8')">Google查找</a>。`,
             serverDetail: '詳細設定：',
             imapServer: 'IMAP伺服器設定',
             UserName: '登陸用戶名稱',
@@ -2796,6 +3062,7 @@ const infoDefine = [
             connectImap: '連結CoNET網絡',
             cancelConnect: '終止CoNET網絡連接',
             imapItemTitle: '通訊用郵箱詳細信息',
+            loaderText:['正','在','和','C','o','N','E','T','建','立','通','訊','管','道','...'],
             imapCheckingStep: [
                 /* 0 */'正在尝试连接邮件伺服器',
                 /* 1 */'邮件伺服器IMAP連接成功，正在等待CoNET對接。',
@@ -2851,14 +3118,14 @@ const infoDefine = [
             nextPage:'下一頁',
             agree: '同意協議並繼續',
             imapEmailAddress:'郵箱帳戶名',
-            emailAddress: 'Q梯帳戶名稱(Email地址,必填)',
+            emailAddress: 'CoNET帳戶名稱(Email地址,必填)',
             stopCreateKeyPair: '停止生成密鑰對',
             creatKeyPair: '創建密鑰對..',
             keyPairCancel: '生成密鑰對被中止',
             keyPairGenerateError: '生成密鑰對發生系統錯誤，請重試！ ',
             keyPairGenerateSuccess: '完成生成密鑰對',
             cancel: '放棄操作',
-            systemPassword: 'Q梯客戶端密碼設置',
+            systemPassword: 'CoNET客戶端密碼設置',
             continueCreateKeyPair: '繼續生成',
             SystemAdministratorNickName: '帳戶暱稱(必填)',
             KeypairLength: '請選擇加密通訊用密鑰對長度：這個數字越大，通訊越難被破解，但會增加通訊量和運算時間。',
@@ -2981,7 +3248,7 @@ const infoDefine = [
         /*8*/   '本地Proxy服务器，其他手机电脑和IPad等可通過连结此端口來使用CoNET服务。請設定為3001至65535之間的數字',
         /*9*/   '通過設置PATH鏈接路徑可以簡單給您的Proxy伺服器增加安全性，拒絕沒有提供PATH的訪問者使用您的Proxy伺服器。',
         /*10*/  '同時使用多條代理線路數，可以有效降低大流量集中在一個代理服務線路，降低被網絡監控者發現的風險。此選項僅供收費會員使用。',
-        /*11*/  '指定同Q梯代理進行通訊使用的連接埠，通過此設置可以規避您所在網段被通訊屏蔽的連接埠。',
+        /*11*/  '指定同CoNET代理進行通訊使用的連接埠，通過此設置可以規避您所在網段被通訊屏蔽的連接埠。',
         /*12*/  'Web实时通讯(WebRTC)是客戶端的瀏覽器之間，通過IP地址直接高速通訊技術，有時被惡用洩漏您的真實IP地址。'
             ]
         },
@@ -3058,7 +3325,7 @@ function scrollToTop () {
     document.documentElement.scrollTop = 0; // For Chrome, Firefox, IE and Opera
 }
 
-const socketIo = io ({ reconnectionAttempts: 5, timeout: 500, autoConnect: true })
+
 const QTGateRegionsSetup: IQTGateRegionsSetup[] = [
     {
         title: '@OPN'
@@ -3067,34 +3334,6 @@ const QTGateRegionsSetup: IQTGateRegionsSetup[] = [
         title: 'iOPN'
     }
 ]
-
-socketIo.emit11 = function ( eventName: string, ...args ) {
-    
-    let CallBack = args.pop ()
-    if ( typeof CallBack !== 'function') {
-        CallBack ? args.push ( CallBack ) : null
-        CallBack = null
-    }
-
-    const localTimeOut = setTimeout ( function () {
-        let uu = eventName
-        //twitter_view.systemError()
-    }, 10000 )
-
-    const _CallBack = function ( err ) {
-        clearTimeout ( localTimeOut )
-        
-        if ( CallBack ) {
-            socketIo.once ( eventName, function ( ...args ) {
-                return CallBack ( ...args )
-            })
-        }
-        
-    }
-    args.length
-    ? socketIo.emit ( eventName, ...args, _CallBack ) 
-    : socketIo.emit ( eventName, _CallBack )
-}
 
 const _QTGateRegions: QTGateRegions[] = [
     {

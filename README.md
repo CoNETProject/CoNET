@@ -3,31 +3,27 @@
 [![Gitter](https://img.shields.io/badge/chat-on%20gitter-blue.svg)](https://gitter.im/QTGate/Lobby)
 [![npm version](https://badge.fury.io/js/conet.svg)](https://badge.fury.io/js/conet)
 [![Build Status](https://travis-ci.org/QTGate/CoNET.svg?branch=master)](https://travis-ci.org/QTGate/CoNET)
-[![Coverage Status](https://coveralls.io/repos/github/QTGate/CoNET/badge.svg?branch=master)](https://coveralls.io/github/QTGate/CoNET?branch=master)
-[![Known Vulnerabilities](https://snyk.io/test/github/qtgate/conet/badge.svg?targetFile=package.json)](https://snyk.io/test/github/qtgate/conet?targetFile=package.json)
 
 ![http protocol](/resources/conet1.png?raw=true)
 
-### CoNET is global network that allow devices connected each other without IP address
+### CoNET is global network that allow devices connected each other with email address
 
-CoNET project create a new Internet that provide devices have Anonymous, Stealth, Secure communication.
+CoNet is a computer network, privacy-enhancing technology that has been designed to network nodes that utilize an email address as the origin/termination of communication. This offers a work-around from the use of an IP address as the origin/termination of communication which is a system that has been compromised on the most fundamental level allowing for censorship and outright blocking of specific communications.
 
 
-### CoNETはIPアドレスなしで複数のデバイスを相互接続した情報通信網であります
+### CoNETはメールアドレスで複数のデバイスを相互接続した情報通信網であります
 
-CoNETは新インターネットという【匿名】【隱身】【セキュア】な通信ネットワークであります
+CoNETは新たに設計された情報通信網であります，匿名、隱身、セキュア、ネット検閲から逃げる能力です
 
-### CoNET是無IP地址讓設備相互連結的互聯網
+### CoNET是使用郵箱地址讓設備相互連結的新互聯網
 
-CoNET項目旨在創建一個全新的互聯網，用戶在其中可以【匿名】【隱身】【安全】的相互通訊
+CoNET項目旨在創建一個全新的，基於郵箱地址來相互連結的計算機通訊網絡，它天然具有匿名，隱身，安全和對抗網絡審查的環境
 
 ![http protocol](/resources/conet2.png?raw=true)
 
 ### Node and endpoint
+The CoNet node is an AP (access point) that provides the ability for users to connect to the CoNet network via a public email server like iCloud, Yahoo or Outlook. The node also maintains a routing table that helps the client and node find each other. All nodes connect to each other thereby building the core of the CoNet network in a similar fashion to an intronet. The CoNet node is an open source technology that will be open to development by any person or organization. They are then able to build their own node and to service their client via their private node. Additionally the CoNet node also makes possible the mining of CoNet cryptocurrency similar to how a traditional node in a blockchain operates.
 
-Node in CoNET provider for connectivity and exchange points, gateway for Internet.
-
-CoNET official provide a node that connect address is: QTGate@CoNETTech.ca
 
 ### ノードとエンドポイント
 

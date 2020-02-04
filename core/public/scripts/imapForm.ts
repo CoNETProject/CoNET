@@ -172,6 +172,7 @@ class keyPairSign {
 	public requestError = ko.observable (-1)
 	public conformTextErrorNumber = ko.observable ( -1 )
 	public activeing = ko.observable ( false )
+	public showRequestActivEmailButtonError = ko.observable ( false )
 	
 	constructor ( private exit: () => void ) {
 		const self = this
@@ -190,23 +191,69 @@ class keyPairSign {
 		this.activeing ( true )
 		
 		let text = this.conformText()
-		if ( / /.test ( text )) {
-			text = text.replace (/ PGP MESSAGE/g, '__PGP__MESSAGE').replace (/ /g, '\r\n').replace (/__/g, ' ')
-			text = text.replace (/ MESSAGE-----/,' MESSAGE-----\r\n')
+
+		const showFromatError = ( err ) => {
+			self.activeing ( false )
+			self.conformTextErrorNumber ( _view.connectInformationMessage.getErrorIndex ( err ))
+			self.conformTextError ( true )
+			return $( '.activating.element1' ).popup({
+				on: 'click',
+				onHidden: function () {
+					self.conformTextError ( false )
+				}
+			})
 		}
 		
-		return socketIo.emit11 ( 'checkActiveEmailSubmit', text, function ( err, req: QTGateAPIRequestCommand ) {
+
+		if ( ! text || ! text.length || !/^-----BEGIN PGP MESSAGE-----/.test ( text )) {
+			return showFromatError ( 'PgpMessageFormatError' )
+		}
+
+		//		support Outlook mail
+		if ( / /.test ( text )) {
+			text = text.replace ( / PGP MESSAGE/g, '__PGP__MESSAGE').replace (/ /g, '\r\n').replace (/__/g, ' ' )
+			text = text.replace ( / MESSAGE-----/,' MESSAGE-----\r\n' )
+		}
+
+		return _view.keyPairCalss.decryptMessage ( text, ( err, obj ) => {
+			if ( err ) {
+				return showFromatError ( 'PgpDecryptError' )
+			}
+			const com: QTGateAPIRequestCommand = {
+				command: 'activePassword',
+				Args: [ obj ],
+				error: null,
+				subCom: null
+			}
+
+			return _view.keyPairCalss.emitRequest ( com, ( err, com: QTGateAPIRequestCommand ) => {
+				if ( err ) {
+					return showFromatError ( err )
+				}
+
+				if ( com ) {
+					if ( com.error ) {
+						return showFromatError ( com.error )
+					}
+					return _view.connectInformationMessage.sockEmit ('checkActiveEmailSubmit', com.Args [0], ( err, data ) => {
+						const config =  _view.localServerConfig()
+						config.keypair.verified = true
+						
+						_view.keyPair ( config.keypair )
+						_view.sectionLogin ( false )
+						self.exit ()
+					})
+				}
+			})
+
+		})
+		/*
+		return _view.connectInformationMessage.sockEmit ( 'checkActiveEmailSubmit', text, function ( err, req: QTGateAPIRequestCommand ) {
 			self.activeing ( false )
 			if ( err !== null && err > -1 || req && req.error != null && req.error > -1 ) {
-				self.conformTextErrorNumber ( err !== null && err > -1 ? err :
-					 req.error )
-					 self.conformTextError ( true )
-				return $( '.activating.element1' ).popup({
-					on: 'click',
-					onHidden: function () {
-						self.conformTextError ( false )
-					}
-				})
+				self.conformTextErrorNumber ( err !== null && err > -1 ? err : req.error )
+				self.conformTextError ( true )
+				
 			}
 			if (!req ) {
 				const config =  _view.localServerConfig()
@@ -218,101 +265,62 @@ class keyPairSign {
 			}
 			
 		})
+		*/
 		
+	}
+
+	public clearError () {
+		_view.connectInformationMessage.hideMessage()
+		this.showRequestActivEmailButtonError ( false )
 		
 	}
 
 	public requestActivEmail () {
 		const self = this
 		this.requestActivEmailrunning ( true )
+		const com: QTGateAPIRequestCommand = {
+			command: 'requestActivEmail',
+			Args: [],
+			error: null,
+			subCom: null
+		}
+
+		const errorProcess = ( err ) => {
+			this.requestActivEmailrunning ( false )
+			this.showRequestActivEmailButtonError ( true )
+			_view.connectInformationMessage.showErrorMessage ( err )
+		}
+
 		
-		return socketIo.emit11 ( 'requestActivEmail', function ( err ) {
-			self.requestActivEmailrunning ( false )
-			if ( err !== null && err > -1 ) {
-				return self.requestError ( err )
+		
+		_view.keyPairCalss.emitRequest ( com,( err, com: QTGateAPIRequestCommand ) => {
+			if ( err ) {
+				return errorProcess ( err )
+			}
+			if ( !com ) {
+				return
+			}
+			if ( com.error ) {
+				return errorProcess ( err )
 			}
 			self.conformButtom ( false )
 			self.showSentActivEmail (1)
 			const u = self.showSentActivEmail()
 		})
-	}
-}
-
-class CoNETConnect {
-	public showSendImapDataWarning = ko.observable ( false )
-	public showConnectCoNETProcess = ko.observable ( true )
-	public connectStage = ko.observable ( 0 )
-	public connetcError = ko.observable ( -1 )
-	public connectedCoNET = ko.observable ( false )
-	public keyPairSign: KnockoutObservable< keyPairSign > = ko.observable ( null )
-	constructor ( public email: string, private isKeypairBeSign: boolean, confirmRisk: boolean, public account: string, private ready: ( err, showCoGate? ) => void ) {
-		const self = this
-		if ( !confirmRisk ) {
-			this.showSendImapDataWarning ( true )
-		} else {
-			this.imapConform ()
-		}
-
-		socketIo.on ( 'tryConnectCoNETStage', function ( err, stage, showCoGate: boolean ) {
-			return self.listingConnectStage ( err, stage, showCoGate )
-		})
-	}
-
-	public listingConnectStage ( err, stage, showCoGate: boolean ) {
-		const self = this
-		this.showConnectCoNETProcess ( true )
-		let processBarCount = 0
-		if ( typeof err === 'number' && err > -1 ) {
-			this.connectStage ( -1 )
-			this.ready ( err, false )
-			return this.connetcError ( err )
-		}
 		
-		if ( stage === 4 ) {
-			this.showConnectCoNETProcess ( false )
-			this.connectedCoNET ( true )
-			processBarCount = 67
-			if ( !this.isKeypairBeSign ) {
-				if ( !this.keyPairSign()) {
-					let u = null
-					return this.keyPairSign ( u = new keyPairSign (( function () {
-						
-						self.keyPairSign ( u = null )
-						self.ready ( null, showCoGate )
-					})))
-				}
-				return
+		/*
+		return _view.connectInformationMessage.sockEmit ( 'requestActivEmail', function ( err ) {
+			self.requestActivEmailrunning ( false )
+			if ( err !== null && err > -1 ) {
+				return self.requestError ( err )
 			}
-
-			return this.ready ( null, showCoGate )
-		}
-		
-		$('.keyPairProcessBar').progress ({
-			percent: processBarCount += 33
+			self.conformButtom ( false ),[h]
+			self.showSentActivEmail (1)
+			const u = self.showSentActivEmail()
 		})
-		if ( this.connectStage() === 3 ) {
-			return
-		}
-		return this.connectStage ( stage )
-		
-	}
-
-	public returnToImapSetup () {
-		return this.ready ( 0, true )
-	}
-
-	public imapConform () {
-		const self = this
-		
-		let sendconnectMail = false
-		this.showSendImapDataWarning ( false )
-		this.connetcError ( -1 )
-		this.showConnectCoNETProcess ( true )
-		return socketIo.emit11 ( 'tryConnectCoNET' )
+		*/
 	}
 }
-
-
 
 class imapForm {
 	public emailAddress = ko.observable ('')
@@ -367,9 +375,9 @@ class imapForm {
 		}
 
 		const removeAllListen = function () {
-			socketIo.removeEventListener ( 'smtpTest', smtpTest )
-			socketIo.removeEventListener ( 'imapTest', imapTest )
-			socketIo.removeEventListener ( 'imapTestFinish', imapTestFinish )
+			_view.connectInformationMessage.socketIo.removeEventListener ( 'smtpTest', smtpTest )
+			_view.connectInformationMessage.socketIo.removeEventListener ( 'imapTest', imapTest )
+			_view.connectInformationMessage.socketIo.removeEventListener ( 'imapTestFinish', imapTestFinish )
 		}
 
 		const errorProcess = function ( err ) {
@@ -377,10 +385,10 @@ class imapForm {
 			return self.checkImapError ( err )
 		}
 
-		socketIo.once ( 'smtpTest', smtpTest )
-		socketIo.once ( 'imapTest', imapTest )
-		socketIo.once ( 'imapTestFinish', imapTestFinish )
-		socketIo.emit11 ( 'checkImap', self.emailAddress (), self.password (), new Date ().getTimezoneOffset (), _view.tLang ())
+		_view.connectInformationMessage.socketIo.once ( 'smtpTest', smtpTest )
+		_view.connectInformationMessage.socketIo.once ( 'imapTest', imapTest )
+		_view.connectInformationMessage.socketIo.once ( 'imapTestFinish', imapTestFinish )
+		_view.connectInformationMessage.sockEmit ( 'checkImap', self.emailAddress (), self.password (), new Date ().getTimezoneOffset (), _view.tLang ())
 	}
 
 	private checkEmailAddress ( email: string ) {
