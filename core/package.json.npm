@@ -1,0 +1,51 @@
+{
+  "name": "conet",
+  "version": "3.0.20",
+  "license": "MIT",
+  "description": "CoNET",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/QTGate/CoNET.git"
+  },
+  "author": {
+    "name": "CoNET Technology Inc.",
+    "email": "info@CoNETTech.ca"
+  },
+  "main": "./main",
+  "bugs": {
+    "url": "https://github.com/QTGate/CoNET/issues"
+  },
+  "homepage": "https://www.CoNETTech.ca",
+  "dependencies": {
+    "async": "^3.1.0",
+    "cookie-parser": "^1.4.4",
+    "express": "^4.17.1",
+    "jimp": "^0.8.5",
+    "jszip": "^3.2.2",
+    "mime-types": "^2.1.24",
+    "node-uuid": "^1.4.8",
+    "nodemailer": "^6.3.1",
+    "openpgp": "^4.6.2",
+    "pug": "^2.0.4",
+    "socket.io": "^2.3.0",
+    "socket.io-client": "^2.3.0"
+  },
+  "scripts": {
+    "start": "node main false true"
+  },
+  "devDependencies": {
+    "@types/async": "^3.0.3",
+    "@types/cleave.js": "^1.4.1",
+    "@types/cookie-parser": "^1.4.2",
+    "@types/express": "^4.17.1",
+    "@types/jcanvas": "^15.2.2",
+    "@types/jquery": "^3.3.31",
+    "@types/jquery.cookie": "^1.4.31",
+    "@types/knockout": "^3.4.66",
+    "@types/openpgp": "^4.4.7",
+    "@types/semantic-ui": "^2.2.7",
+    "@types/socket.io": "^2.1.4",
+    "@types/socket.io-client": "^1.4.32",
+    "source-map-support": "^0.5.16"
+  }
+}

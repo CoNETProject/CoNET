@@ -1,3 +1,5 @@
+
+
 /*!
  * Copyright 2018 CoNET Technology Inc. All Rights Reserved.
  *
@@ -13,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
+export const CoNET_version = '3.2.0'
 import * as Fs from 'fs'
 import * as Path from 'path'
 import * as Os from 'os'
@@ -52,7 +54,8 @@ export const checkUrl = ( url ) => {
 
     const urlCheck = Url.parse ( url )
 
-    const ret = /^http:|^https:$/.test ( urlCheck.protocol ) && ! /^localhost|^127.0.0.1/.test ( urlCheck.hostname )
+	const ret = /^http:|^https:$/.test ( urlCheck.protocol ) && ! /^localhost|^127.0.0.1/.
+	test ( urlCheck.hostname )
     if ( ret ) {
         return true
     }
@@ -67,13 +70,13 @@ export const CoNETConnectLog = Path.join ( QTGateFolder, 'CoNETConnect.log' )
 export const imapDataFileName1 = Path.join ( QTGateFolder, 'imapData.pem' )
 
 export const CoNET_Home = Path.join ( __dirname )
-export const CoNET_PublicKey = Path.join ( CoNET_Home, '3C272D2E.pem')
+export const CoNET_PublicKey = Path.join ( CoNET_Home, '1231B119.pem')
 
 export const LocalServerPortNumber = 3000
 export const configPath = Path.join ( QTGateFolder, 'config.json' )
-const packageFilePath = Path.join ( '..', '..','package.json')
-export const packageFile = require ( packageFilePath )
-export const QTGateSignKeyID = /3acbe3cbd3c1caa9/i
+//const packageFilePath = Path.join ( __dirname,'package.json')
+//export const packageFile = require ( packageFilePath )
+export const QTGateSignKeyID = /3acbe3cbd3c1caa9|864662851231B119/i
 export const twitterDataFileName = Path.join ( QTGateFolder, 'twitterData.pem' )
 
 export const checkFolder = ( folder: string, CallBack: ( err?: Error ) => void ) => {
@@ -150,7 +153,7 @@ export const InitConfig = () => {
 		firstRun: true,
 		alreadyInit: false,
 		multiLogin: false,
-		version: packageFile.version,
+		version: CoNET_version,
 		newVersion: null,
 		newVerReady: false,
 		keypair: InitKeyPair (),
@@ -186,6 +189,7 @@ export const getQTGateSign = ( user: OpenPgp.key.users ) => {
 	}
 	let Certification = false
 	user.otherCertifications.forEach ( n => {
+		console.log (`user.otherCertifications\n${ n.issuerKeyId.toHex ().toLowerCase() }`)
 		if ( QTGateSignKeyID.test ( n.issuerKeyId.toHex ().toLowerCase())) {
 			return Certification = true
 		}
@@ -250,7 +254,7 @@ export const emitConfig = ( config: install_config, passwordOK: boolean ) => {
 		firstRun: config.firstRun,
 		alreadyInit: config.alreadyInit,
 		newVerReady: config.newVerReady,
-		version: config.version,
+		version: CoNET_version,
 		multiLogin: config.multiLogin,
 		freeUser: config.freeUser,
 		account: config.keypair && config.keypair.email ? config.keypair.email : null,
@@ -287,12 +291,12 @@ export const checkConfig = CallBack => {
 		
 		//		update?
 
-		config.version = packageFile.version
+		config.version = CoNET_version
 		config.newVerReady = false
 		config.newVersion = null
 		config.serverPort = LocalServerPortNumber
 		config.localIpAddress = getLocalInterface ()
-		config.firstRun = packageFile.firstRun || false
+		config.firstRun = false
 		if ( !config.keypair || ! config.keypair.publicKey ) {
 			return CallBack ( null, config )
 		}
@@ -316,7 +320,7 @@ export const newKeyPair = ( emailAddress: string, nickname: string, password: st
 	}
 	const option: OpenPgp.KeyOptions = {
 		passphrase: password,
-		userIds: [userId],
+		userIds: [ userId ],
 		curve: "ed25519",
 		aead_protect: true,
 		aead_protect_version: 4
@@ -717,7 +721,7 @@ export async function readEncryptoFile ( filename: string, savedPasswrod, config
 			try {
 				options11.message = await OpenPgp.message.readArmored ( data.toString ())
 			} catch ( ex ) {
-				console.log (`options.message error!\n${data.toString ()}`)
+				console.log (`options.message error!\n${ data.toString ()}`)
 				return CallBack ( ex )
 			}
 			let _return = false
@@ -802,11 +806,11 @@ const testSmtpAndSendMail = ( imapData: IinputData, CallBack ) => {
 	})
 }
 
-export const sendCoNETConnectRequestEmail = ( imapData: IinputData, openKeyOption, ver: string, toEmail: string, publicKey: string, CallBack ) => {
+export const sendCoNETConnectRequestEmail = ( imapData: IinputData, openKeyOption, publicKey, toEmail: string, CallBack ) => {
 
 	const qtgateCommand: QTGateCommand = {
 		account: imapData.account,
-		QTGateVersion: ver,
+		QTGateVersion: CoNET_version,
 		imapData: imapData,
 		command: 'connect',
 		error: null,
@@ -835,15 +839,16 @@ export const sendCoNETConnectRequestEmail = ( imapData: IinputData, openKeyOptio
 				debug: true
 			}
 			const transporter = Nodemailer.createTransport ( option )
-			console.log ( Util.inspect ( option ))
+			//console.log ( Util.inspect ( option ))
 			const mailOptions = {
 				from: imapData.smtpUserName,
 				to: toEmail,
-				subject:'CoNET',
+				subject:'node',
 				attachments: [{
 					content: _data
 				}]
 			}
+			//console.log ( Util.inspect ( mailOptions ) )
 			return transporter.sendMail ( mailOptions, next )
 		}
 	], CallBack )

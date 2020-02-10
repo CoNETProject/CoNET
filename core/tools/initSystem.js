@@ -1,4 +1,5 @@
 "use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
 /*!
  * Copyright 2018 CoNET Technology Inc. All Rights Reserved.
  *
@@ -14,14 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.CoNET_version = '3.2.0';
 const Fs = require("fs");
 const Path = require("path");
 const Os = require("os");
 const Async = require("async");
 const Crypto = require("crypto");
 const OpenPgp = require("openpgp");
-const Util = require("util");
 const Http = require("http");
 const Https = require("https");
 const Net = require("net");
@@ -47,7 +47,8 @@ const InitKeyPair = () => {
 };
 exports.checkUrl = (url) => {
     const urlCheck = Url.parse(url);
-    const ret = /^http:|^https:$/.test(urlCheck.protocol) && !/^localhost|^127.0.0.1/.test(urlCheck.hostname);
+    const ret = /^http:|^https:$/.test(urlCheck.protocol) && !/^localhost|^127.0.0.1/.
+        test(urlCheck.hostname);
     if (ret) {
         return true;
     }
@@ -61,12 +62,12 @@ exports.ErrorLogFile = Path.join(exports.QTGateFolder, 'systemError.log');
 exports.CoNETConnectLog = Path.join(exports.QTGateFolder, 'CoNETConnect.log');
 exports.imapDataFileName1 = Path.join(exports.QTGateFolder, 'imapData.pem');
 exports.CoNET_Home = Path.join(__dirname);
-exports.CoNET_PublicKey = Path.join(exports.CoNET_Home, '3C272D2E.pem');
+exports.CoNET_PublicKey = Path.join(exports.CoNET_Home, '1231B119.pem');
 exports.LocalServerPortNumber = 3000;
 exports.configPath = Path.join(exports.QTGateFolder, 'config.json');
-const packageFilePath = Path.join('..', '..', 'package.json');
-exports.packageFile = require(packageFilePath);
-exports.QTGateSignKeyID = /3acbe3cbd3c1caa9/i;
+//const packageFilePath = Path.join ( __dirname,'package.json')
+//export const packageFile = require ( packageFilePath )
+exports.QTGateSignKeyID = /3acbe3cbd3c1caa9|864662851231B119/i;
 exports.twitterDataFileName = Path.join(exports.QTGateFolder, 'twitterData.pem');
 exports.checkFolder = (folder, CallBack) => {
     Fs.access(folder, err => {
@@ -135,7 +136,7 @@ exports.InitConfig = () => {
         firstRun: true,
         alreadyInit: false,
         multiLogin: false,
-        version: exports.packageFile.version,
+        version: exports.CoNET_version,
         newVersion: null,
         newVerReady: false,
         keypair: InitKeyPair(),
@@ -168,6 +169,7 @@ exports.getQTGateSign = (user) => {
     }
     let Certification = false;
     user.otherCertifications.forEach(n => {
+        console.log(`user.otherCertifications\n${n.issuerKeyId.toHex().toLowerCase()}`);
         if (exports.QTGateSignKeyID.test(n.issuerKeyId.toHex().toLowerCase())) {
             return Certification = true;
         }
@@ -226,7 +228,7 @@ exports.emitConfig = (config, passwordOK) => {
         firstRun: config.firstRun,
         alreadyInit: config.alreadyInit,
         newVerReady: config.newVerReady,
-        version: config.version,
+        version: exports.CoNET_version,
         multiLogin: config.multiLogin,
         freeUser: config.freeUser,
         account: config.keypair && config.keypair.email ? config.keypair.email : null,
@@ -258,12 +260,12 @@ exports.checkConfig = CallBack => {
         }
         config.salt = Buffer.from(config.salt['data']);
         //		update?
-        config.version = exports.packageFile.version;
+        config.version = exports.CoNET_version;
         config.newVerReady = false;
         config.newVersion = null;
         config.serverPort = exports.LocalServerPortNumber;
         config.localIpAddress = exports.getLocalInterface();
-        config.firstRun = exports.packageFile.firstRun || false;
+        config.firstRun = false;
         if (!config.keypair || !config.keypair.publicKey) {
             return CallBack(null, config);
         }
@@ -714,10 +716,10 @@ const testSmtpAndSendMail = (imapData, CallBack) => {
         return CallBack();
     });
 };
-exports.sendCoNETConnectRequestEmail = (imapData, openKeyOption, ver, toEmail, publicKey, CallBack) => {
+exports.sendCoNETConnectRequestEmail = (imapData, openKeyOption, publicKey, toEmail, CallBack) => {
     const qtgateCommand = {
         account: imapData.account,
-        QTGateVersion: ver,
+        QTGateVersion: exports.CoNET_version,
         imapData: imapData,
         command: 'connect',
         error: null,
@@ -746,15 +748,16 @@ exports.sendCoNETConnectRequestEmail = (imapData, openKeyOption, ver, toEmail, p
                 debug: true
             };
             const transporter = Nodemailer.createTransport(option);
-            console.log(Util.inspect(option));
+            //console.log ( Util.inspect ( option ))
             const mailOptions = {
                 from: imapData.smtpUserName,
                 to: toEmail,
-                subject: 'CoNET',
+                subject: 'node',
                 attachments: [{
                         content: _data
                     }]
             };
+            //console.log ( Util.inspect ( mailOptions ) )
             return transporter.sendMail(mailOptions, next);
         }
     ], CallBack);

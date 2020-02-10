@@ -183,14 +183,16 @@ class keyPairSign {
                 }
             });
         };
-        if (!text || !text.length || !/^-----BEGIN PGP MESSAGE-----/.test(text)) {
+        if (!text || !text.length || !/^-+BEGIN PGP MESSAGE-+\n/.test(text)) {
             return showFromatError('PgpMessageFormatError');
         }
         //		support Outlook mail
-        if (/ /.test(text)) {
-            text = text.replace(/ PGP MESSAGE/g, '__PGP__MESSAGE').replace(/ /g, '\r\n').replace(/__/g, ' ');
-            text = text.replace(/ MESSAGE-----/, ' MESSAGE-----\r\n');
+        /*
+        if ( / /.test ( text )) {
+            text = text.replace ( / PGP MESSAGE/g, '__PGP__MESSAGE').replace (/ /g, '\r\n').replace (/__/g, ' ' )
+            text = text.replace ( / MESSAGE-----/,' MESSAGE-----\r\n' )
         }
+        /** */
         return _view.keyPairCalss.decryptMessage(text, (err, obj) => {
             if (err) {
                 return showFromatError('PgpDecryptError');
@@ -267,6 +269,15 @@ class keyPairSign {
             if (com.error) {
                 return errorProcess(err);
             }
+            if (com.Args[0] && com.Args[0].length) {
+                return _view.connectInformationMessage.sockEmit('checkActiveEmailSubmit', com.Args[0], () => {
+                    const config = _view.localServerConfig();
+                    config.keypair.verified = true;
+                    _view.keyPair(config.keypair);
+                    _view.sectionLogin(false);
+                    self.exit();
+                });
+            }
             self.conformButtom(false);
             self.showSentActivEmail(1);
             const u = self.showSentActivEmail();
@@ -316,8 +327,6 @@ class imapForm {
         this.passwordShowError(false);
     }
     checkImapSetup() {
-        const processBar = $('.keyPairProcessBar');
-        processBar.progress('reset');
         let self = this;
         this.checkProcessing(true);
         this.checkImapStep(0);
@@ -326,18 +335,12 @@ class imapForm {
                 return errorProcess(err);
             }
             self.checkImapStep(5);
-            $('.keyPairProcessBar').progress({
-                percent: 33
-            });
         };
         const smtpTest = function (err) {
             if (err !== null && err > -1) {
                 return errorProcess(err);
             }
             self.checkImapStep(2);
-            $('.keyPairProcessBar').progress({
-                percent: 66
-            });
         };
         const imapTestFinish = function (IinputData) {
             removeAllListen();
