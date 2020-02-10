@@ -28,11 +28,12 @@ The CoNet node is an AP (access point) that provides the ability for users to co
 
 CoNetアクセスポイントはエンドユーザーにCoNetへ接続サービスとCoNetの中継機能、エンドポイントの発見、インターネットのゲットウェイのサービスをするサーバーです。お互い接続しているCoNetノート同士やエンドポイントは、公衆メールサーバよって仮想的なトンネルを構築します。
 
-### 節點和通訊端點
+### 節點
 
-CoNet節點它提供設備接入到CoNet服務，同時節點之間提供網絡數據交換和路由信息。所有CoNet設備和節點都通過第三方公眾郵件服務器，建立虛擬通訊管道來連結，構成CoNet網絡
+CoNet節點它提供設備接入到CoNet服務，同時節點之間提供網絡數據交換和路由信息。所有CoNet設備和節點都通過第三方公眾郵件服務器，建立虛擬通訊管道來連結並構成CoNet網絡。
 
-### [CoNet Platform, CoNetプラットフォーム, CoNet平台](https://github.com/QTGate/QTGate-Desktop-Client)
+### CoNet client Platform / CoNetプラットフォーム / CoNet平台
+
 - [CoNet Platform for laptop, CoNetプラットフォーム for PC, CoNet計算機OS平台](https://github.com/QTGate/QTGate-Desktop-Client)
 - CoNet Platform for iOS (come soon), CoNetプラットフォーム for iOS (開発中), iOS的CoNet平台開發中
 - [CoNet Platform for Android, CoNetプラットフォーム for Android, 安卓系統的CoNet平台](https://github.com/QTGate/CoNETPlatform-Android)
