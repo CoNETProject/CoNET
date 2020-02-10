@@ -38,7 +38,7 @@ CoNet節點它提供設備接入到CoNet服務，同時節點之間提供網絡�
 - CoNet Platform for iOS (come soon), CoNetプラットフォーム for iOS (開発中), iOS的CoNet平台開發中
 - [CoNet Platform for Android, CoNetプラットフォーム for Android, 安卓系統的CoNet平台](https://github.com/QTGate/CoNETPlatform-Android)
 
-![http protocol](/resources/CoPlatform3.png?raw=true)
+![http protocol](/resources/CoPlatform4.png?raw=true)
 
 ### Donate us
 Email: info@CoNETTech.ca
