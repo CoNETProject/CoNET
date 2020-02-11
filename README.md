@@ -42,7 +42,7 @@ CoNet節點它提供設備接入到CoNet服務，同時節點之間提供網絡�
 
 ### White paper / ホワイトペーパー / 白皮書
 
-- [CoNET project](https://medium.com/@CoNET/conet-project-b54d33f82720)
+[CoNET project](https://medium.com/@CoNET/conet-project-b54d33f82720)
 
 ### Donate us
 Email: info@CoNETTech.ca
