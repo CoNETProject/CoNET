@@ -35,9 +35,7 @@ CoNet節點它提供設備接入到CoNet服務，同時節點之間提供網絡�
 
 ### CoNet user case / CoNet導入事例　/ CoNet用戶案例
 
-#### Kloak Platform / Kloakプラットフォーム / Kloak平台
-
-- [Kloak Platform](https://github.com/KloakIT/Kloak_platform)
+#### Kloak Platform / Kloakプラットフォーム / Kloak平台(https://github.com/KloakIT/Kloak_platform)
 
 ![http protocol](/resources/CoPlatform4.png?raw=true)
 
