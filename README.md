@@ -32,11 +32,12 @@ CoNetアクセスポイントはエンドユーザーにCoNetへ接続サービ�
 
 CoNet節點它提供設備接入到CoNet服務，同時節點之間提供網絡數據交換和路由信息。所有CoNet設備和節點都通過第三方公眾郵件服務器，建立虛擬通訊管道來連結並構成CoNet網絡。
 
-### CoNet client Platform / CoNetプラットフォーム / CoNet平台
 
-- [CoNet Platform for laptop, CoNetプラットフォーム for PC, CoNet計算機OS平台](https://github.com/QTGate/QTGate-Desktop-Client)
-- CoNet Platform for iOS (come soon), CoNetプラットフォーム for iOS (開発中), iOS的CoNet平台開發中
-- [CoNet Platform for Android, CoNetプラットフォーム for Android, 安卓系統的CoNet平台](https://github.com/QTGate/CoNETPlatform-Android)
+### CoNet user case / CoNet導入事例　/ CoNet用戶案例
+
+#### Kloak Platform / Kloakプラットフォーム / Kloak平台
+
+- [Kloak Platform](https://github.com/KloakIT/Kloak_platform)
 
 ![http protocol](/resources/CoPlatform4.png?raw=true)
 
