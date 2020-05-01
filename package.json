@@ -29,10 +29,13 @@
     "portastic": "^1.0.1",
     "pug": "^2.0.4",
     "socket.io": "^2.3.0",
-    "socket.io-client": "^2.3.0"
+    "socket.io-client": "^2.3.0",
+    "snyk": "^1.316.1"
   },
   "scripts": {
-    "test": "node core/main test"
+    "test": "node core/main test",
+    "snyk-protect": "snyk protect",
+    "prepublish": "npm run snyk-protect"
   },
   "devDependencies": {
     "@types/async": "^2.4.2",
@@ -50,5 +53,6 @@
     "istanbul": "^0.4.5",
     "nyc": "^11.9.0",
     "source-map-support": "^0.5.16"
-  }
+  },
+  "snyk": true
 }
