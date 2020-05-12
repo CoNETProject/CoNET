@@ -36,7 +36,8 @@
 		"socket.io-client": "^2.3.0"
 	},
 	"scripts": {
-		"test": "node core/main test"
+		"test": "node core/main test",
+		"start": "node core/main false true"
 	},
 	"devDependencies": {
 		"@types/async": "^2.4.2",
