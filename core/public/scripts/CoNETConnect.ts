@@ -33,13 +33,25 @@ class CoNETConnect {
 	public showNetworkError = ko.observable ( false )
 	public infoTextArray: KnockoutObservableArray < connectInfo > = ko.observableArray ([])
 	public keyPairSign: KnockoutObservable< keyPairSign > = ko.observable ( null )
-	constructor ( public email: string, private isKeypairBeSign: boolean, confirmRisk: boolean, public account: string, private ready: ( err ) => void ) {
+	private imapData:IinputData = this.view.imapData
+	public account = this.imapData.account
+	public email = this.imapData.imapUserName
+	public nodeEmail = "node@Kloak.app"
+	private inSendMail = false
+	private pingTimeOut () {
+		return this.listingConnectStage ( null, 0, null )
+	}
+
+	constructor ( private view: view_layout.view, private isKeypairBeSign: boolean, private ready: ( err ) => void ) {
 		const self = this
-		if ( !confirmRisk ) {
+		if ( !this.view.imapData.confirmRisk ) {
 			this.showSendImapDataWarning ( true )
 		} else {
 			this.imapConform ()
 			this.Loading ( true )
+			_view.connectInformationMessage.socketIo.on ( 'pingTimeOut', () => {
+				return self.pingTimeOut ()
+			})
 		}
 	}
 
@@ -47,14 +59,7 @@ class CoNETConnect {
 	public listingConnectStage ( err, stage, publicKeyMessage ) {
 		const self = this
 		this.showConnectCoNETProcess ( true )
-		/*
-		if ( typeof err === 'number' && err > -1 ) {
-			this.connectStage ( -1 )
-			this.ready ( err )
-			_view.connectInformationMessage.socketIo.removeListener ( 'tryConnectCoNETStage', this.listenFun )
-			return this.connetcError ( err )
-		}
-		*/
+		
 
 		switch ( stage ) {
 			case 1: {
@@ -80,6 +85,7 @@ class CoNETConnect {
 			case 3: {
 				
 				return this.infoTextArray.push ({ text: ko.observable ('sendConnectRequestMail'), err: ko.observable ( null )})
+				
 			}
 
 			/**
@@ -113,6 +119,7 @@ class CoNETConnect {
 								
 								self.keyPairSign ( u = null )
 								self.ready ( null )
+								return localStorage.setItem ( "config", JSON.stringify ( self.view.localServerConfig() ))
 							})))
 						}
 						return
@@ -160,14 +167,29 @@ class CoNETConnect {
 
 
 	public sendConnectMail () {
-		
+		const self = this
 		this.Loading ( true )
 		this.showTryAgain ( false )
-		_view.connectInformationMessage.sockEmit ( 'sendRequestMail', err => {
+		this.showSendConnectMail ( false )
+		const qtgateCommand: QTGateCommand = {
+			account: this.imapData.account,
+			QTGateVersion: CoNET_version,
+			imapData: this.imapData,
+			command: 'connect',
+			error: null,
+			callback: null,
+			language: this.imapData.language,
+			publicKey: this.view.keyPair().publicKey
+		}
+
+		return this.view.keyPairCalss.encrypt ( JSON.stringify ( qtgateCommand ), ( err, data ) => {
 			if ( err ) {
-				return this.listingConnectStage ( null, -1, null )
+				return self.listingConnectStage ( null, -1, "" )
 			}
+			return _view.connectInformationMessage.sockEmit ( 'sendRequestMail', data, self.imapData, this.nodeEmail )
 		})
+
+		
 	}
 
 	public tryAgain () {
@@ -184,8 +206,14 @@ class CoNETConnect {
 	}
 
 
-
 	public imapConform () {
+		if ( !this.view.imapData.confirmRisk ) {
+			this.view.imapData.confirmRisk = true
+			
+			this.view.keyPairCalss.saveImapIInputData ( err => {})
+			
+			return this.sendConnectMail ()
+		}
 		const self = this
 		this.showSendImapDataWarning ( false )
 		this.connetcError ( -1 )
@@ -200,12 +228,8 @@ class CoNETConnect {
 
 		_view.connectInformationMessage.socketIo.on ( 'tryConnectCoNETStage', this.listenFun )
 		
-		_view.connectInformationMessage.sockEmit ( 'tryConnectCoNET', err => {
-			if ( err ) {
-				return this.listingConnectStage ( null, -1, null )
-			}
-		})
-
+		_view.connectInformationMessage.sockEmit ( 'tryConnectCoNET', this.imapData )
+		
 	}
 
 	/**

@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 const availableImapServer = /imap\-mail\.outlook\.com$|imap\.mail\.yahoo\.(com|co\.jp|co\.uk|au)$|imap\.mail\.me\.com$|imap\.gmail\.com$|gmx\.(com|us|net)$|imap\.zoho\.com$/i
 /**
  * 			getImapSmtpHost
@@ -44,7 +45,7 @@ const getImapSmtpHost = function ( _email: string ) {
 	if ( emailSplit.length !== 2 ) 
 		return null
 		
-	const domain = yahoo ( emailSplit [1] )
+	const domain = yahoo ( emailSplit [1].toLowerCase() )
 	
 	const ret = {
 		imap: 'imap.' + domain,
@@ -61,10 +62,11 @@ const getImapSmtpHost = function ( _email: string ) {
 		//		yahoo domain have two different 
 		//		the yahoo.co.jp is different other yahoo.*
 		case 'yahoo.co.jp': {
-			ret.imap = 'imap.mail.yahoo.co.jp';
+			ret.imap = 'imap.mail.yahoo.co.jp'
 			ret.smtp = 'smtp.mail.yahoo.co.jp'
+			break
 		}
-		break;
+		
 
 		//			gmail
 		case 'google.com':
@@ -76,12 +78,15 @@ const getImapSmtpHost = function ( _email: string ) {
 				'https://support.google.com/accounts/answer/185833?hl=ja',
 				'https://support.google.com/accounts/answer/185833?hl=en'
 			]
+			break
 		}
-		break;
+		
 
-        case 'gandi.net':
-            ret.imap = ret.smtp = 'mail.gandi.net'
-        break
+        case 'gandi.net': {
+			ret.imap = ret.smtp = 'mail.gandi.net'
+        	break
+		}
+            
 		
 		//				yahoo.com
 		case 'rocketmail.com':
@@ -98,13 +103,16 @@ const getImapSmtpHost = function ( _email: string ) {
 				'https://help.yahoo.com/kb/SLN15241.html',
 				'https://help.yahoo.com/kb/SLN15241.html'
 			]
+			break
 		}
-		break;
+		
 
-        case 'mail.ee':
-            ret.smtp = 'mail.ee'
+        case 'mail.ee': {
+			ret.smtp = 'mail.ee'
             ret.imap = 'mail.inbox.ee'
-        break
+        	break
+		}
+            
 
 		
         //		gmx.com
@@ -113,48 +121,52 @@ const getImapSmtpHost = function ( _email: string ) {
 		case 'gmx.us':
 		case 'gmx.com' : {
             ret.smtp = 'mail.gmx.com'
-            ret.imap = 'imap.gmx.com'
+			ret.imap = 'imap.gmx.com'
+			break
         }
-        
-		break;
 		
 		//		aim.com
 		case 'aim.com': {
 			ret.imap = 'imap.aol.com'
+			break
 		}
-		break;
+		
 		
 		//	outlook.com
 		case 'windowslive.com':
 		case 'hotmail.com': 
 		case 'outlook.com': {
 			ret.imap = 'imap-mail.outlook.com'
-            ret.smtp = 'smtp-mail.outlook.com'
+			ret.smtp = 'smtp-mail.outlook.com'
+			break
 		}
-		break;
+		
 		
 		//			apple mail
         case 'icloud.com':
         case 'mac.com':
 		case 'me.com': {
 			ret.imap = 'imap.mail.me.com'
-            ret.smtp = 'smtp.mail.me.com'
+			ret.smtp = 'smtp.mail.me.com'
+			break
 		}
-		break;
+		
 		
 		//			163.com
 		case '126.com':
 		case '163.com': {
 			ret.imap = 'appleimap.' + domain
 			ret.smtp = 'applesmtp.' + domain
+			break
 		}
-		break;
+		
 		
 		case 'sina.com':
 		case 'yeah.net': {
 			ret.smtpSsl = false
+			break
 		}
-		break;
+		
 		
 	}
 	
@@ -237,14 +249,17 @@ class keyPairSign {
 					if ( com.error ) {
 						return showFromatError ( com.error )
 					}
-					return _view.connectInformationMessage.sockEmit ('checkActiveEmailSubmit', com.Args [0], ( err, data ) => {
-						const config =  _view.localServerConfig()
-						config.keypair.verified = true
-						
-						_view.keyPair ( config.keypair )
-						_view.sectionLogin ( false )
-						self.exit ()
-					})
+
+
+					
+					const keyPair: keypair = _view.localServerConfig ().keypair
+					keyPair.verified = true
+					keyPair.publicKey = Buffer.from ( com.Args[0],'base64').toString ()
+					_view.keyPair ( keyPair )
+					
+					_view.sectionLogin ( false )
+					self.exit ()
+					
 				}
 			})
 
@@ -295,7 +310,7 @@ class keyPairSign {
 
 		
 		
-		_view.keyPairCalss.emitRequest ( com,( err, com: QTGateAPIRequestCommand ) => {
+		_view.keyPairCalss.emitRequest ( com, ( err, com: QTGateAPIRequestCommand ) => {
 			if ( err ) {
 				return errorProcess ( err )
 			}
@@ -307,12 +322,13 @@ class keyPairSign {
 			}
 
 			if ( com.Args[0] && com.Args[0].length ) {
-				return _view.connectInformationMessage.sockEmit ('checkActiveEmailSubmit', com.Args [0], () => {
+				return _view.connectInformationMessage.sockEmit ( 'checkActiveEmailSubmit', com.Args [0], () => {
 					const config =  _view.localServerConfig()
 					config.keypair.verified = true
 					
 					_view.keyPair ( config.keypair )
 					_view.sectionLogin ( false )
+					localStorage.setItem ( "config", JSON.stringify ( config ))
 					self.exit ()
 				})
 			}
@@ -354,6 +370,21 @@ class imapForm {
 		this.EmailAddressErrorType (0)
 		this.passwordShowError ( false )
 	}
+
+	private errorProcess ( err ) {
+
+		//		Invalid login
+		if ( /Authentication|login/i.test ( err )) {
+			return this.checkImapError ( 1 )
+		}
+
+		//		Cannot connect to email server!
+		if ( /ENOTFOUND/i.test ( err )) {
+			return this.checkImapError ( 0 )
+		}
+
+		this.checkImapError ( 5 )
+	}
 	
 	private checkImapSetup () {
 		
@@ -362,7 +393,7 @@ class imapForm {
 		this.checkImapStep (0)
 		
 		const imapTest = function ( err ) {
-			if ( err !== null && err > -1 ) {
+			if ( err && typeof err === "string" || err !== null && err > -1 ) {
 				return errorProcess ( err )
 			}
 			self.checkImapStep (5)
@@ -371,16 +402,26 @@ class imapForm {
 
 		const smtpTest = function ( err ) {
 			
-			if ( err !== null && err > -1 ) {
+			if ( err && typeof err === "string" || err !== null && err > -1 ) {
 				return errorProcess ( err )
 			}
 			self.checkImapStep (2)
 			
 		}
 
-		const imapTestFinish = function ( IinputData: IinputData ) {
+		const imapTestFinish = function ( err: Error, IinputData: string ) {
+
 			removeAllListen ()
-			return self.exit ( IinputData )
+			if ( err ) {
+				return errorProcess ( err )
+			}
+			_view.keyPairCalss.decrypt_withLocalServerKey ( IinputData, ( err, data: IinputData ) => {
+				if ( err ) {
+					return errorProcess ( err )
+				}
+				return self.exit ( data )
+			})
+			
 		}
 
 		const removeAllListen = function () {
@@ -391,13 +432,51 @@ class imapForm {
 
 		const errorProcess = function ( err ) {
 			removeAllListen ()
-			return self.checkImapError ( err )
+			if ( typeof err === "number") {
+				return self.checkImapError ( err )
+			}
+			return self.errorProcess ( err )
 		}
 
-		_view.connectInformationMessage.socketIo.once ( 'smtpTest', smtpTest )
-		_view.connectInformationMessage.socketIo.once ( 'imapTest', imapTest )
-		_view.connectInformationMessage.socketIo.once ( 'imapTestFinish', imapTestFinish )
-		_view.connectInformationMessage.sockEmit ( 'checkImap', self.emailAddress (), self.password (), new Date ().getTimezoneOffset (), _view.tLang ())
+		_view.connectInformationMessage.socketIo.on ( 'smtpTest', smtpTest )
+		_view.connectInformationMessage.socketIo.on ( 'imapTest', imapTest )
+		_view.connectInformationMessage.socketIo.on ( 'imapTestFinish', imapTestFinish )
+
+		const imapServer = getImapSmtpHost( self.emailAddress())
+
+		const imapConnectData = {
+			email: self.account,
+			account: self.account,
+			smtpServer: imapServer.smtp,
+			smtpUserName:  self.emailAddress(),
+			smtpPortNumber: imapServer.SmtpPort,
+			smtpSsl: imapServer.smtpSsl,
+			smtpIgnoreCertificate: false,
+			smtpUserPassword: self.password (),
+			imapServer: imapServer.imap,
+			imapPortNumber: imapServer.ImapPort,
+			imapSsl: imapServer.imapSsl,
+			imapUserName: self.emailAddress(),
+			imapIgnoreCertificate: false,
+			imapUserPassword: self.password (),
+			timeZoneOffset: new Date ().getTimezoneOffset (),
+			language: _view.tLang (),
+			imapTestResult: null,
+			clientFolder: uuid_generate(),
+			serverFolder: uuid_generate(),
+			randomPassword: uuid_generate(),
+			uuid: uuid_generate(),
+			confirmRisk: false,
+			clientIpAddress: null,
+			ciphers: null,
+			sendToQTGate: false
+
+		}
+
+
+		_view.keyPairCalss.emitLocalCommand ( 'checkImap', imapConnectData, err => {
+			
+		})
 	}
 
 	private checkEmailAddress ( email: string ) {
@@ -408,11 +487,13 @@ class imapForm {
 			return initPopupArea ()
 		}
 		const imapServer = getImapSmtpHost ( email )
+		
 		if ( !availableImapServer.test ( imapServer.imap )) {
 			this.EmailAddressErrorType (2)
 			this.emailAddressShowError ( true )
 			return initPopupArea ()
 		}
+		
 	}
 
 	constructor ( private account: string, imapData: IinputData, private exit: ( IinputData: IinputData ) => void ) {

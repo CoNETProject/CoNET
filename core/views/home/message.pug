@@ -1,0 +1,159 @@
+extends ../shared/coreLayout.pug
+
+
+block jumbotron1
+	<!-- ko if: showLanguageSelect -->
+		.language( style="z-index: 999;top: 1.3em;right: 1em;position: fixed;width: 2em;")
+			.ui.text.shape.languageText( data-bind = " click: selectItem " )
+				.sides
+					span.ui.header.side.en.languageItem.languageTextCoverColor
+						i.flag.united.kingdom.large
+						//-span.languageItemSpan( data-bind = " text: menu[ 'en' ][0].showName " )
+					span.ui.header.side.tw.languageItem.languageTextCoverColor
+						i.flag.taiwan.large
+						//-span.languageItemSpan( data-bind = " text: menu[ 'tw' ][0].showName " )
+					span.ui.header.side.zh.languageItem.languageTextCoverColor
+						i.flag.china.large
+						//-span.languageItemSpan( data-bind = " text: menu[ 'zh' ][0].showName " )
+					span.ui.header.side.ja.languageItem.languageTextCoverColor
+						i.flag.japan.large
+						//-span.languageItemSpan( data-bind = " text: menu[ 'ja' ][0].showName " )
+	<!-- /ko -->
+	link(rel = "stylesheet", href = "https://unpkg.com/tailwindcss@0.3.0/dist/tailwind.min.css")
+	section.content
+		.font-sans.antialiased.h-screen.flex
+			.bg-indigo-darker.text-purple-lighter.flex-none.w-64.pb-6.hidden( class = "md:block")
+				.text-white.mb-2.mt-3.px-4.flex.justify-between
+					.flex-auto
+						h1.font-semibold.text-xl.leading-tight.mb-1.truncate New York Times
+						.flex.items-center.mb-6
+							svg.h-2.w-2.fill-current.text-green.mr-2( viewBox="0 0 20 20" )
+								<circle cx="10" cy="10" r="10">
+							span.text-white.opacity-50.text-sm Adam Wathan
+					.block
+						svg.h-6.w-6.fill-current.text-white.opacity-25( viewBox="0 0 20 20" )
+							<path d="M14 8a4 4 0 1 0-8 0v7h8V8zM8.027 2.332A6.003 6.003 0 0 0 4 8v6l-3 2v1h18v-1l-3-2V8a6.003 6.003 0 0 0-4.027-5.668 2 2 0 1 0-3.945 0zM12 18a2 2 0 1 1-4 0h4z" fill-rule="evenodd" />
+				.mb-8
+					.px-4.mb-2.text-white.flex.justify-between.items-center
+						.pacity-75 Channels
+						.block
+							svg.fill-current.h-4.w-4.opacity-50( xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" )
+								<path d="M11 9h4v2h-4v4H9v-4H5V9h4V5h2v4zm-1 11a10 10 0 1 1 0-20 10 10 0 0 1 0 20zm0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16z" />
+					
+					//.bg-teal-dark.py-1.mb-3.px-4.text-white # General
+					.flex.items-center.mb-3.px-4.text-white # General
+					.flex.items-center.mb-3.px-4.text-white
+						span.w-2.fill-current.mr-2
+							i.icon.small.grey.lock
+						span.opacity-75 Finance
+					.flex.items-center.mb-3.px-4
+						span.text-white.opacity-75 # Metro
+					.flex.items-center.mb-3.px-4
+						span.text-white.opacity-75 # Sports
+					.flex.items-center.mb-3.px-4
+						span.text-white.opacity-75 # Magazine
+					.bg-teal-dark.py-1.mb-3.px-4.text-white
+						span.opacity-75 # Newsroom
+
+
+				.mb-8
+					.px-4.mb-2.text-white.flex.justify-between.items-center
+						.pacity-75 Direct Messages
+						.block
+							svg.fill-current.h-4.w-4.opacity-50( xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" )
+								<path d="M11 9h4v2h-4v4H9v-4H5V9h4V5h2v4zm-1 11a10 10 0 1 1 0-20 10 10 0 0 1 0 20zm0-2a8 8 0 1 0 0-16 8 8 0 0 0 0 16z" />
+					.flex.items-center.mb-3.px-4
+						svg.h-2.w-2.fill-current.text-green.mr-2( viewBox="0 0 20 20" )
+							<circle cx="10" cy="10" r="10">
+						span.text-white.opacity-75 Adam Wathan
+							span.text-grey.text-sm ( you )
+					.flex.items-center.mb-3.px-4
+						svg.h-2.w-2.fill-current.text-green.mr-2( viewBox="0 0 20 20" )
+							<circle cx="10" cy="10" r="10">
+						span.text-white.opacity-75 David Hemphill
+					.flex.items-center.px-4.mb-6.opacity-50
+						svg.h-2.w-2.stroke-current.text-white.mr-2( viewBox="0 0 20 20" )
+							<circle cx="11" cy="11" r="9" fill="none" stroke-width="3">
+						span.text-white Steve Schoger
+				.mb-8
+					.pin-b.pin-r
+						img.ui.tiny.image( src="/images/kloak.png")
+			.flex-1.flex.flex-col.bg-white.overflow-hidden
+				.border-b.flex.px-6.py-2.items-center.flex-none
+					.flex.flex-col
+						h3.text-grey-darkest.mb-1.font-extrabold #Newsroom
+						.text-grey-dark.text-sm.truncate Got a confidential news tip?
+					.ml-auto.hidden( class="md:block" )
+						.relative( style="padding-right: 3em;")
+							.ui.icon.input
+								input( type="text" placeholder="Search..." )
+								i.search.icon
+				.px-6.py-4.flex-1.overflow-y-scroll
+					.ui.feed
+						.event
+							.label
+								img.ui.mini.circular.image( src="https://pbs.twimg.com/profile_images/782548497954398208/TdpbQU5u_400x400.jpg")
+							.content
+								.summary
+									a.user Samrat Aanand
+									.date 3 Hour Ago
+								.extra.text
+									span Thanks China for creating and hiding COVID-19......Zero Accountability !!
+								.meta
+									a.like
+										i.like.icon
+										span 13 Likes
+						.event
+							.label
+								img.ui.mini.circular.image( src="https://pbs.twimg.com/profile_images/1239030614738665473/IuVFSQr-_400x400.jpg")
+							.content
+								.summary
+									a.user Steven
+									.date 2 Hour Ago
+								.extra.text
+									span China gov didn’t hide this time, they are pretty transparent.
+								.meta
+									a.like
+										i.like.icon
+										span 32 Likes
+						.event
+							.label
+								img.ui.mini.circular.image( src="https://pbs.twimg.com/profile_images/881171921131364353/rVKkr-dX_400x400.jpg")
+							.content
+								.summary
+									a.user Marion Daze
+									.date 2 Hour Ago
+								.extra.text
+									span They actually did in the beginning. And the doctor that called it out passed away from the virus. He is now getting the recognition he deserves.
+								.meta
+									a.like
+										i.like.icon
+										span 3 Likes
+						.event
+							.label
+								img.ui.mini.circular.image( src="https://pbs.twimg.com/profile_images/1236387672/_________________400x400.jpg")
+							.content
+								.summary
+									a.user Marion Daze
+									.date 2 Hour Ago
+								.extra.text
+									span
+										a( href="http://news.v.daum.net/v/20200121104919057…") http://news.v.daum.net/v/20200121104919057…
+									span From 
+									span
+										a( href="https://facebook.com/jywife") https://facebook.com/jywife 
+									span Continue / In the den of criminals South korea, First new coronavirus patients touched with 44 peoples. ... 9 of them went another nations, already. 2020. 01. 21 news / Perhaps they went the Academy, the Oscar ceremony in USA.
+								.extra.text
+									a.ui.medium.image( href="#" )
+										img( src="https://pbs.twimg.com/card_img/1240122245378441216/0_lQSTLS?format=jpg&name=medium")
+								.meta
+									a.like
+										i.like.icon
+										span 8 Likes
+
+
+					
+				.pb-6.px-4.flex-none
+					.flex.rounded-lg.border-2.border-grey.overflow-hidden
+						.ui.input( style="width: 100%;")
+							input( type="text" placeholder="Message Adam Wathan" )

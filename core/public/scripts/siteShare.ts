@@ -644,8 +644,8 @@ const infoDefine = [
         },
 
         cover: {
-            firstTitle1: 'CoNET平台',
-            firstTitle2: '安全隐私自由的互联网',
+            firstTitle1: 'Kloak OS',
+            firstTitle2: '人类成就这互联网，互联网也属于人类',
             start: '开门',
             proxyStoped: 'CoGate定制代理服务器已经停止，如需使用请重新定制代理服务器。'
         },
@@ -733,7 +733,7 @@ const infoDefine = [
         imapInformation: {
             title: '通讯专用Email邮箱设置',
             tempImapAccount: `申请临时邮箱有困难？您可以暂时使用<a href="#" style = "margin-left: 0.5em;" class="ui label teal" onclick="return linkClick ('https://github.com/QTGate/QTGate-Desktop-Client/wiki/IMAP%E8%87%A8%E6%99%82%E5%B8%B3%E6%88%B6')">CoNET提供的临时IMAP帐号供各位测试使用</a>`,
-            infomation: `请设置CoNET通讯专用Email邮箱信息。由于此账户的用户名和密码信息会提交给CoNET系统，为了防止您的个人信息被泄漏，请新申请一个临时Email账户。目前CoNET技术对应<a href="#" class="ui label teal small" onclick="return linkClick ('https://www.icloud.com/')">苹果iCloud</a><a href="#" class="ui label teal small" onclick="return linkClick ('https://www.microsoft.com/zh-tw/outlook-com/')">微软OUTLOOK</a><a class="ui label teal small" href="#" onclick="return linkClick ('https://www.zoho.com/mail/')">俄罗斯ZOHO邮箱</a><a href="#" class="ui label teal small" onclick="return linkClick ('https://www.gmx.com/mail/#.1559516-header-nav1-2')">美国在线GMX邮箱</a>，CoNET强力推荐使用苹果公司的Email可以达到最佳速度。密码请使用Email服务商的<a href="#" onclick="return linkClick ('https://tw.help.yahoo.com/kb/SLN15241.html')">应用密码</a>。对于Email供应商在应用密码申请时，须<a href="#" onclick="return linkClick ('https://tw.help.yahoo.com/kb/%E9%96%8B%E5%95%9F%E5%85%A9%E6%AD%A5%E9%A9%9F%E9%A9%97%E8%AD%89-sln5013.html')" >二步认证</a>并提供手机号码接受验证码，为保护您的隐私，建议使用免费在线代理接收验证码服务。( 如<a href="#" onclick="return linkClick('http://receive-sms-online.com/')">receive-sms-online.com</a>, <a href="#" onclick="return linkClick('https://sms-online.co/receive-free-sms')" >sms-online.co</a>, <a href="#" onclick="return linkClick('https://receive-a-sms.com/')" >receive-a-sms.com</a> ) 更多请 <a href="#" onclick="return linkClick ('http://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=0&rsv_idx=1&tn=baidu&wd=%E5%85%8D%E8%B4%20%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%20%E7%A0%81&rsv_pq=e94f47a50001f66f&rsv_t=b03ePiy3rHH0T4FVoWB8Hx9vrVdZLzVhhErWOo4xdBpjDw%2BtGri%2BViTaVAw&rqlang=cn&rsv_enter=1&rsv_sug3=42&rsv_sug1=5&rsv_sug7=100')">百度查找</a>，<a href="#" onclick="return linkClick ('https://www.google.com/search?q=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&oq=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&aqs=chrome..69i57j69i60.254j0j4&sourceid=chrome&ie=UTF-8')">Google查找</a>。`,
+            infomation: `请设置CoNET通讯专用Email邮箱信息。由于此账户的用户名和密码信息会提交给CoNET系统，为了防止您的个人信息被泄漏，请新申请一个临时Email账户。目前CoNET技术对应<a href="#" class="ui label teal small" style = "margin-left: 0.5em;" onclick="return linkClick ('https://www.icloud.com/')">苹果iCloud</a><a href="#" class="ui label teal small" style="margin-left: 0.4em;" onclick="return linkClick ('https://mail.yahoo.com')">Yahoo</a><a href="#" class="ui label teal small" onclick="return linkClick ('https://www.google.com/intl/en-GB/gmail/about/')">Gmail</a><a href="#" class="ui label teal small" onclick="return linkClick ('https://www.microsoft.com/zh-tw/outlook-com/')">微软OUTLOOK</a><a class="ui label teal small" href="#" onclick="return linkClick ('https://www.zoho.com/mail/')">俄罗斯ZOHO邮箱</a><a href="#" class="ui label teal small" onclick="return linkClick ('https://www.gmx.com/mail/#.1559516-header-nav1-2')">美国在线GMX邮箱</a>，CoNET强力推荐使用苹果公司的Email可以达到最佳速度。密码请使用Email服务商的<a href="#" onclick="return linkClick ('https://tw.help.yahoo.com/kb/SLN15241.html')">应用密码</a>。对于Email供应商在应用密码申请时，须<a href="#" onclick="return linkClick ('https://tw.help.yahoo.com/kb/%E9%96%8B%E5%95%9F%E5%85%A9%E6%AD%A5%E9%A9%9F%E9%A9%97%E8%AD%89-sln5013.html')" >二步认证</a>并提供手机号码接受验证码，为保护您的隐私，建议使用免费在线代理接收验证码服务。( 如<a href="#" onclick="return linkClick('http://receive-sms-online.com/')">receive-sms-online.com</a>, <a href="#" onclick="return linkClick('https://sms-online.co/receive-free-sms')" >sms-online.co</a>, <a href="#" onclick="return linkClick('https://receive-a-sms.com/')" >receive-a-sms.com</a> ) 更多请 <a href="#" onclick="return linkClick ('http://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=0&rsv_idx=1&tn=baidu&wd=%E5%85%8D%E8%B4%20%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%20%E7%A0%81&rsv_pq=e94f47a50001f66f&rsv_t=b03ePiy3rHH0T4FVoWB8Hx9vrVdZLzVhhErWOo4xdBpjDw%2BtGri%2BViTaVAw&rqlang=cn&rsv_enter=1&rsv_sug3=42&rsv_sug1=5&rsv_sug7=100')">百度查找</a>，<a href="#" onclick="return linkClick ('https://www.google.com/search?q=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&oq=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&aqs=chrome..69i57j69i60.254j0j4&sourceid=chrome&ie=UTF-8')">Google查找</a>。`,
             serverDetail: '详细设定：',
             imapServer: 'IMAP服务器设定',
             imapServerInput: 'IMAP服务器IP或域名',
@@ -1488,8 +1488,8 @@ const infoDefine = [
         },
 
         cover: {
-            firstTitle1: 'CoNETプラットフォーム',
-            firstTitle2: '隠れて安全自由なネットワークへ',
+            firstTitle1: 'Kloak OS',
+            firstTitle2: '人がインターネットで集めた、人がインターネットを所有する',
             start: 'オプンドア',
             proxyStoped: 'カスタマーゲートウェイサーバーが停止しました、再作成をしてください。'
         },
@@ -1591,7 +1591,7 @@ const infoDefine = [
         imapInformation: {
             title: '通信専用Emailアカウントを登録',
             tempImapAccount: `IMAP設定に困るなら、<a href="#" style = "margin-left: 0.5em;" class="ui label teal" onclick="return linkClick ('https://github.com/QTGate/QTGate-Desktop-Client/wiki/IMAP%E9%80%9A%E4%BF%A1%E5%B0%82%E7%94%A8%E4%B8%80%E6%99%82%E7%9A%84%E3%81%AA%E3%82%A2%E3%82%AB%E3%83%B3%E3%82%A6%E3%83%88')">CoNETご提供している一時アカンウトをテストのご利用いただけます。</a>`,
-            infomation:`CoNET通信専用emailアカンウトを設定します。このemailアカウントはあなたとCoNETお互い情報交換するのために、ユーザ名とパスワードをCoNETシステムへ提供します。個人情報漏洩の恐れ、一時的なemailアカウントを新たにつくてください。CoNET技術は只今<a href="#" class="ui label teal small" onclick="return linkClick ('https://icloud.com')">Apple iCloud</a><a href="#" class="ui label teal small" onclick="return linkClick ('https://www.microsoft.com/ja-jp/outlook-com/')">Outlook</a><a href="#" class="ui label teal small" onclick="return linkClick ('https://www.gmx.com/mail/#.1559516-header-nav1-2')">GMX</a><a href="#" class="ui label teal small" onclick="return linkClick ('https://www.zoho.com/mail/')">HOZO</a>対応しております、APPLEのiCloudを使うお勧めです。</span>メールアカウントのパスワードについて、<a href="#" onclick="return linkClick ('https://support.microsoft.com/ja-jp/help/12409/microsoft-account-app-passwords-two-step-verification')">アプリパスワード</a>をご利用のをお勧めです。アプリパスワードを申請する際に、<a href="#" onclick="return linkClick ('https://support.microsoft.com/ja-jp/help/12408')">2段階認証プロセス</a>に必要なスマートフォン番号を提示が必要な場合、個人プライバシーを守るのため、( <a href="#" onclick="return linkClick('http://receive-sms-online.com/')">receive-sms-online.com</a>, <a href="#" onclick="return linkClick('https://sms-online.co/receive-free-sms')" >sms-online.co</a>, <a href="#" onclick="return linkClick('https://receive-a-sms.com/')" >receive-a-sms.com</a> ) など<a href="#" onclick="return linkClick ('http://jpnpay.com/archives/561')">オンライン無料SMS受信サービス</a>をお勧めします。`,
+            infomation:`CoNET通信専用emailアカンウトを設定します。このemailアカウントはあなたとCoNETお互い情報交換するのために、ユーザ名とパスワードをCoNETシステムへ提供します。個人情報漏洩の恐れ、一時的なemailアカウントを新たにつくてください。CoNET技術は只今<a href="#" class="ui label teal small" style="margin-left: 0.4em;" onclick="return linkClick ('https://www.icloud.com')">Apple iCloud</a><a href="#" class="ui label teal small" onclick="return linkClick ('https://mail.yahoo.com')">Yahoo</a><a href="#" class="ui label teal small" onclick="return linkClick ('https://www.google.com/intl/en-GB/gmail/about/')">Gmail</a><a href="#" class="ui label teal small" onclick="return linkClick ('https://www.microsoft.com/ja-jp/outlook-com/')">Outlook</a><a href="#" class="ui label teal small" onclick="return linkClick ('https://www.gmx.com/mail/#.1559516-header-nav1-2')">GMX</a><a href="#" class="ui label teal small" onclick="return linkClick ('https://www.zoho.com/mail/')">HOZO</a>対応しております、APPLEのiCloudを使うお勧めです。</span>メールアカウントのパスワードについて、<a href="#" onclick="return linkClick ('https://support.microsoft.com/ja-jp/help/12409/microsoft-account-app-passwords-two-step-verification')">アプリパスワード</a>をご利用のをお勧めです。アプリパスワードを申請する際に、<a href="#" onclick="return linkClick ('https://support.microsoft.com/ja-jp/help/12408')">2段階認証プロセス</a>に必要なスマートフォン番号を提示が必要な場合、個人プライバシーを守るのため、( <a href="#" onclick="return linkClick('http://receive-sms-online.com/')">receive-sms-online.com</a>, <a href="#" onclick="return linkClick('https://sms-online.co/receive-free-sms')" >sms-online.co</a>, <a href="#" onclick="return linkClick('https://receive-a-sms.com/')" >receive-a-sms.com</a> ) など<a href="#" onclick="return linkClick ('http://jpnpay.com/archives/561')">オンライン無料SMS受信サービス</a>をお勧めします。`,
             serverDetail: '詳細設定：',
             imapServer: 'IMAP設定',
             imapServerInput: 'IMAPサーバー名又はIP',
@@ -1933,7 +1933,7 @@ const infoDefine = [
             accountError:'Twitter return error: Invalid or expired token. error. Please check your account APP information and try again.'
         },
         thirdParty: {
-            information: 'Welcome to CoNET.',
+            information: 'Welcome to Kloak.',
             comesoon:'Come soon.',
             qtgateGateway: 'CoGate gateway service. High speed, total privacy, ultra secure and easy to use. Your gateway to a secure and open internet.',
             app:['CoGate', 'CoChat', 'CoBox', 'CoMail', 'CoNews', 'CoSearch', 'Co for','Co for','CoWallet','Co Custom'],
@@ -2085,8 +2085,8 @@ const infoDefine = [
         },
 
         cover: {
-            firstTitle1: 'CoNET Platform',
-            firstTitle2: 'Security Privacy And Freedom on the Internet',
+            firstTitle1: 'Kloak OS',
+            firstTitle2: 'All for the Internet, the Internet for All',
             start: 'ENTER NOW',
             proxyStoped: 'Gateway server shutdown. Please rebuild try again.'
         },
@@ -2336,7 +2336,7 @@ const infoDefine = [
         imapInformation: {
             title: 'Email account to use by OPN.',
             tempImapAccount: `Have problem with your IMAP enabled email account? <a href="#" style = "margin-left: 0.5em;" class="ui label teal" onclick="return linkClick ('https://github.com/QTGate/QTGate-Desktop-Client/wiki/IMAP-temporary-account')"> Get temporary account.</a>`,
-            infomation: `Please provide an IMAP enabled email account to be used to communication with CoNET network. The account name and password will be required. For your personal privacy, please consider registering a new email account to use. CoNET currently supports <a class="ui label teal small" href="#" onclick="return linkClick('https://www.icloud.com/')">Apple iCloud</a><a href="#" class="ui label teal small" onclick="return linkClick('https://outlook.live.com/owa/')">Outlook Mail</a><a href="#" class="ui label teal small" onclick="return linkClick('https://www.gmx.com/')">GMX</a><a href="#" class="ui label teal small" onclick="return linkClick('https://www.zoho.com/mail/')">ZOHO</a>. For passwords, it is recommended use a <a href="#" onclick="return linkClick('https://help.yahoo.com/kb/SLN15241.html')">generated app-specific password.</a> If using <a href="#" onclick="return linkClick('https://help.yahoo.com/kb/two-step-verification-sln5013.html')">2-step verification</a>, we recommend using a free anonymous SMS receiving site to receive SMS codes, ( such as <a href="#" onclick="return linkClick('http://receive-sms-online.com/')">receive-sms-online.com</a>, <a href="#" onclick="return linkClick('https://sms-online.co/receive-free-sms')" >sms-online.co</a>, <a href="#" onclick="return linkClick('https://receive-a-sms.com/')" >receive-a-sms.com</a>, or <a href="#" onclick="return linkClick('https://www.google.com/search?q=free+anonymous+SMS+receiving+site&oq=free+anonymous+SMS+receiving+site&aqs=chrome..69i57.268j0j4&sourceid=chrome&ie=UTF-8')" >others</a> ).`,
+            infomation: `Please provide an IMAP enabled email account to be used to communication with CoNET network. The account name and password will be required. For your personal privacy, please consider registering a new email account to use. CoNET currently supports <a class="ui label teal small" href="#" style="margin-left: 0.4em;" onclick="return linkClick('https://www.icloud.com/')">Apple iCloud</a><a href="#" class="ui label teal small" onclick="return linkClick ('https://mail.yahoo.com')">Yahoo</a><a href="#" class="ui label teal small" onclick="return linkClick ('https://www.google.com/intl/en-GB/gmail/about/')">Gmail</a><a href="#" class="ui label teal small" onclick="return linkClick('https://outlook.live.com/owa/')">Outlook Mail</a><a href="#" class="ui label teal small" onclick="return linkClick('https://www.gmx.com/')">GMX</a><a href="#" class="ui label teal small" onclick="return linkClick('https://www.zoho.com/mail/')">ZOHO</a>. For passwords, it is recommended use a <a href="#" onclick="return linkClick('https://help.yahoo.com/kb/SLN15241.html')">generated app-specific password.</a> If using <a href="#" onclick="return linkClick('https://help.yahoo.com/kb/two-step-verification-sln5013.html')">2-step verification</a>, we recommend using a free anonymous SMS receiving site to receive SMS codes, ( such as <a href="#" onclick="return linkClick('http://receive-sms-online.com/')">receive-sms-online.com</a>, <a href="#" onclick="return linkClick('https://sms-online.co/receive-free-sms')" >sms-online.co</a>, <a href="#" onclick="return linkClick('https://receive-a-sms.com/')" >receive-a-sms.com</a>, or <a href="#" onclick="return linkClick('https://www.google.com/search?q=free+anonymous+SMS+receiving+site&oq=free+anonymous+SMS+receiving+site&aqs=chrome..69i57.268j0j4&sourceid=chrome&ie=UTF-8')" >others</a> ).`,
             serverDetail: 'settings:',
             imapServer: 'IMAP server setup',
             imapServerInput: 'IMAP server name or IP address',
@@ -2348,7 +2348,7 @@ const infoDefine = [
             smtpServerInput: 'SMTP server name or IP address',
             emailServerPassword: 'Email account password ( app password )',
             Error_portNumber: 'Port number should be from 1 to 65535 and not be 22.',
-            imapAccountConform: function ( imap, account ) { return `<p class="ui small header brown">By clicking submit you are agreeing to:</p><p class="grey">This [<B class="red">${ imap }</B>] email is a temporary account for use with CoNET services. CoNET may have full access to this account in use of CoNET’s services.</p><p>CoNET platform will send a email include: [<B class="red">${ imap }</B>] & APP password, email [<B class="red">${ account }</B>] address, public key, timezone, used language.</p><p>You may receive emails from CoNET.</p>`},
+            imapAccountConform: function ( imap, account ) { return `<p class="ui small header brown">By clicking submit you are agreeing to:</p><p class="grey">This [<B class="red">${ imap }</B>] email is a temporary account for use with CoNET services. CoNET may have full access to this account in use of CoNET’s services.</p><p>Kloak platform will send a email include: [<B class="red">${ imap }</B>] & APP password, email [<B class="red">${ account }</B>] address, public key, timezone, used language.</p><p>You may receive emails from CoNET.</p>`},
             agree: `I understand and agree to continue.`,
             imapOtherCheckError: 'Cannot connect to email server! Server name, IP address or Port number may have a mistake. Please check the details of your email setup!',
             CertificateError: 'Certificate for this email server is not trusted. Please select "Keep connected even if certificate is not trusted" in settings if you still want to connect. Your email login information maybe leaked to this email server!',
@@ -2474,7 +2474,7 @@ const infoDefine = [
 
         emailConform: {
             activeViewTitle: 'Active your keypair.',
-            emailTitle: 'Welcome to CoNET.',
+            emailTitle: 'Welcome to Kloak.',
             info1_1: `Please complete key pair verification. Click the button 'Request verification email' to request mail. Please check your [`,
             info1_2: '] mailbox. If you received more then one email from CoNET, please choose the newest email. If you not find the email, please double check your key pair email address. If you have an error, you may delete your key pair and generate a new key pair.',
             info2: 'Copy all content from [-----BEGIN PGP MESSAGE-----] ... to [-----END PGP MESSAGE-----]. Paste into this text box.',
@@ -2498,7 +2498,7 @@ const infoDefine = [
                         'Selected region is unavailable, try again later.',
                         'Your IMAP account recieved an error. Please restart CoNET and try again. If the error is not fixed, You may need check your IMAP account setting to enable third party IMAP applications.',
                         'The page session has expired! Refresh page or restart CoNET plesee.',
-                        'Sorry looks CoNET platform failure, please restart CoNET.'
+                        'Sorry looks Kloak platform failure, please restart CoNET.'
                     ],
 
             activeing: 'sending...'
@@ -2954,8 +2954,8 @@ const infoDefine = [
         },
 
         cover: {
-            firstTitle1: 'CoNET平台',
-            firstTitle2: '安全隱私自由的互聯網',
+            firstTitle1: 'Kloak OS',
+            firstTitle2: '人類成就這互聯網，互聯網也屬於人類',
             start: '開門',
             proxyStoped: 'CoGate定制代理伺服器已經停止，如需使用請重新定制代理伺服器。'
         },
@@ -3041,7 +3041,7 @@ const infoDefine = [
         imapInformation: {
             title: '通訊專用Email郵箱設置',
             tempImapAccount: `臨時郵箱申請有困難？您可以暫時使用<a href="#" style = "margin-left: 0.5em;" class="ui label teal" onclick="return linkClick ('https://github.com/QTGate/QTGate-Desktop-Client/wiki/IMAP%E8%87%A8%E6%99%82%E5%B8%B3%E6%88%B6')">CoNET網絡提供的臨時IMAP帳號供各位測試</a>`,
-            infomation: `請設置CoNET網絡通訊專用Email郵箱信息。由於此賬戶的用戶名和密碼信息會提交給CoNET網絡，為了防止您的個人信息被洩漏，請新申請一個臨時Email賬戶。目前CoNET網絡技術對應<a class="ui label teal small" href="#" onclick="return linkClick ('https://www.icloud.com/')">Apple iCloud</a><a class="ui label teal small" href="#" onclick="return linkClick ('https://www.microsoft.com/zh-tw/outlook-com/mobile/?WT.mc_id=mscom')">微軟OUTLOOK</a><a class="ui label teal small" href="#" onclick="return linkClick ('https://www.zoho.com/mail/')">俄羅斯ZOHO郵箱</a><a href="#" class="ui label teal small" onclick="return linkClick ('https://www.gmx.com/mail/#.1559516-header-nav1-2')">美國在線GMX郵箱</a>，CoNET強力推薦使用蘋果公司的Email可以達到最佳速度。密碼請使用Email服務商的<a href="#" onclick="return linkClick ('https://tw.help.yahoo.com/kb/SLN15241.html')">應用密碼</a>。對於Email供應商在應用密碼申請時，須打開<a href="#" onclick="return linkClick ('https://tw.help.yahoo.com/kb/%E9%96%8B%E5%95%9F%E5%85%A9%E6%AD%A5%E9%A9%9F%E9%A9%97%E8%AD%89-sln5013.html')">二步認證</a>並必須提供手機號碼接受驗證碼，為保護您的隱私，建議使用免費在線代理接收驗證碼服務。如 ( <a href="#" onclick="return linkClick('http://receive-sms-online.com/')">receive-sms-online.com</a>, <a href="#" onclick="return linkClick('https://sms-online.co/receive-free-sms')" >sms-online.co</a>, <a href="#" onclick="return linkClick('https://receive-a-sms.com/')" >receive-a-sms.com</a> ) 更多請 <a href="#" onclick="return linkClick ('http://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=0&rsv_idx=1&tn=baidu&wd=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&rsv_pq=e94f47a50001f66f&rsv_t=b03ePiy3rHH0T4FVoWB8Hx9vrVdZLzVhhErWOo4xdBpjDw%2BtGri%2BViTaVAw&rqlang=cn&rsv_enter=1&rsv_sug3=42&rsv_sug1=5&rsv_sug7=100')">百度查找</a>，<a href="#" onclick="return linkClick ('https://www.google.com/search?q=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&oq=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&aqs=chrome..69i57j69i60.254j0j4&sourceid=chrome&ie=UTF-8')">Google查找</a>。`,
+            infomation: `請設置CoNET網絡通訊專用Email郵箱信息。由於此賬戶的用戶名和密碼信息會提交給CoNET網絡，為了防止您的個人信息被洩漏，請新申請一個臨時Email賬戶。目前CoNET網絡技術對應<a class="ui label teal small" href="#" style="margin-left: 0.4em;" onclick="return linkClick ('https://www.icloud.com/')">Apple iCloud</a><a href="#" class="ui label teal small" onclick="return linkClick ('https://mail.yahoo.com')">Yahoo</a><a href="#" class="ui label teal small" onclick="return linkClick ('https://www.google.com/intl/en-GB/gmail/about/')">Gmail</a><a class="ui label teal small" href="#" onclick="return linkClick ('https://www.microsoft.com/zh-tw/outlook-com/mobile/?WT.mc_id=mscom')">微軟OUTLOOK</a><a class="ui label teal small" href="#" onclick="return linkClick ('https://www.zoho.com/mail/')">俄羅斯ZOHO郵箱</a><a href="#" class="ui label teal small" onclick="return linkClick ('https://www.gmx.com/mail/#.1559516-header-nav1-2')">美國在線GMX郵箱</a>，CoNET強力推薦使用蘋果公司的Email可以達到最佳速度。密碼請使用Email服務商的<a href="#" onclick="return linkClick ('https://tw.help.yahoo.com/kb/SLN15241.html')">應用密碼</a>。對於Email供應商在應用密碼申請時，須打開<a href="#" onclick="return linkClick ('https://tw.help.yahoo.com/kb/%E9%96%8B%E5%95%9F%E5%85%A9%E6%AD%A5%E9%A9%9F%E9%A9%97%E8%AD%89-sln5013.html')">二步認證</a>並必須提供手機號碼接受驗證碼，為保護您的隱私，建議使用免費在線代理接收驗證碼服務。如 ( <a href="#" onclick="return linkClick('http://receive-sms-online.com/')">receive-sms-online.com</a>, <a href="#" onclick="return linkClick('https://sms-online.co/receive-free-sms')" >sms-online.co</a>, <a href="#" onclick="return linkClick('https://receive-a-sms.com/')" >receive-a-sms.com</a> ) 更多請 <a href="#" onclick="return linkClick ('http://www.baidu.com/s?ie=utf-8&f=8&rsv_bp=0&rsv_idx=1&tn=baidu&wd=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&rsv_pq=e94f47a50001f66f&rsv_t=b03ePiy3rHH0T4FVoWB8Hx9vrVdZLzVhhErWOo4xdBpjDw%2BtGri%2BViTaVAw&rqlang=cn&rsv_enter=1&rsv_sug3=42&rsv_sug1=5&rsv_sug7=100')">百度查找</a>，<a href="#" onclick="return linkClick ('https://www.google.com/search?q=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&oq=%E5%85%8D%E8%B4%B9%E5%9C%A8%E7%BA%BF%E6%8E%A5%E6%94%B6%E6%89%8B%E6%9C%BA%E9%AA%8C%E8%AF%81%E7%A0%81&aqs=chrome..69i57j69i60.254j0j4&sourceid=chrome&ie=UTF-8')">Google查找</a>。`,
             serverDetail: '詳細設定：',
             imapServer: 'IMAP伺服器設定',
             UserName: '登陸用戶名稱',

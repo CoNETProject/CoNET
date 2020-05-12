@@ -220,8 +220,11 @@
 	text-shadow: 10px 10px 30px rgba(0, 0, 0, 0.4);
 }
 
-.shadowText1 {
+.shadowText2 {
 	text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+}
+.shadowText1 {
+	text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
 }
 
   .plan:last-child {
@@ -354,29 +357,7 @@ ul.plan-features {
 	opacity: 0.4
  }
 
-@media only screen and ( max-width: 1144px ) {
-	.TimelinesView {
-	 background-color: white;
-	 padding: 0em;
-	 padding-top: 4em;
-	}
-	#QTGateStartScreen {
-	 display: block;
-   }
-	#QTGateStartScreen-Device {
-	  display: none;
-	}
-	#TimelinesView {
-	 max-width:100%;
-	 margin: 0px auto;
-	}
-	.itemContent {
-	 max-width: 90%;
-	}
- }
- @media only screen and (min-width: 992px) {
-   
- }
+
  
  @media screen and ( max-width: 801px ) {
    .TimelinesView {
@@ -419,9 +400,52 @@ ul.plan-features {
    }
  }
 
+ @media only screen and ( max-width: 1023px ) and ( min-width: 768px ) {
+	.TimelinesView {
+		background-color: white;
+		padding: 0em;
+		padding-top: 4em;
+	}
+	#QTGateStartScreen {
+		display: block;
+	}
+	#QTGateStartScreen-Device {
+		display: none;
+	}
+	#TimelinesView {
+		max-width:100%;
+		margin: 0px auto;
+	}
+	.itemContent {
+		max-width: 90%;
+	}
+}
 
-
-
+@media only screen and ( min-width: 1024 px ) {
+	.masonry {
+	  grid-template-columns: repeat( 3, minmax( 100 px,1fr ));
+	}
+}
+@media only screen and ( max-width: 755 px ) {
+	.masonry {
+	  grid-template-columns: repeat( 1, minmax( 100 px,1fr ));
+	}
+}
+@media only screen and ( min-width: 756 px ) and ( max-width: 1015 px ) {
+	.masonry {
+	  grid-template-columns: repeat( 3, minmax( 100px,1fr ));
+	}
+}
+@media only screen and ( min-width: 1015 px ) and ( max-width: 1260 px ) {
+	.masonry {
+	  grid-template-columns: repeat( 4, minmax( 100px,1fr ));
+	}
+}
+@media only screen and ( min-width: 1261 px ) and ( max-width: 1515 px ) {
+	.masonry {
+	  grid-template-columns: repeat( 5, minmax( 100px,1fr ));
+	}
+}
  .flapLeft, .flapeRight {
    position: relative;
    cursor: pointer;
@@ -879,20 +903,35 @@ ul.plan-features {
 	animation-timing-function: ease-in;
 	animation-fill-mode: forwards;
 }
+/**
+
+		terminalText 
+**/
+@-webkit-keyframes blink {
+	0% { opacity: 1.0; }
+	50% { opacity: 0.0; }
+	100% { opacity: 1.0; }
+}
+  
+@keyframes blink {
+	0% { opacity: 1.0; }
+	50% { opacity: 0.0; }
+	100% { opacity: 1.0; }
+}
 .terminalText { 
 	position: relative;
 	display: inline-block;
 	min-width: 360px;
-  }
+}
   
-  .terminalText::after {
+.terminalText::after {
 	content: "";
 	position: absolute;
 	/* Remove display: inline-block if not required to be on the same line as text etc */
 	display: inline-block;
 	background-color:grey;
 	top: 14px;
-	margin-left: 2px;
+	margin-left: 3px;
 	width: 10px;
 	/* Set height to the line height of .text */
 	height: 2px;
@@ -905,16 +944,223 @@ ul.plan-features {
 	*/
 	-webkit-animation: blink 1s step-end infinite;
 	animation: blink 1s step-end infinite;
+}
+  
+
+  /* ====================================================================================================================
+ANDY - MASONARY IMAGES
+======================================================================================================================= */
+
+.image-info {
+	max-width: 100%;
+	padding: 0.25rem 1rem;
+	background-color: rgba(0, 0, 0, 0.4);
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	z-index: 102;
+	border-top-right-radius: 13px;
+	display: flex;
+	align-items: center;
+	font-size: 0.85rem;
   }
   
-  @-webkit-keyframes blink {
-	0% { opacity: 1.0; }
-	50% { opacity: 0.0; }
-	100% { opacity: 1.0; }
+  .image-text {
+	color: ghostwhite;
+	margin: 0;
   }
   
-  @keyframes blink {
-	0% { opacity: 1.0; }
-	50% { opacity: 0.0; }
-	100% { opacity: 1.0; }
+  .image-link {
+	color: #cacad0;
+	text-decoration: underline;
+	cursor: pointer;
+	margin-left: 0.5rem;
   }
+  
+  .image-link:hover {
+	color: ghostwhite;
+	text-decoration: underline;
+  }
+  
+  .image-overlay {
+	position: absolute;
+	background-color: rgba(0, 0, 0, 0.4);
+	opacity: 1;
+	content: '';
+	width: 100%;
+	height: 100%;
+	z-index: 101;
+	transition: opacity 200ms ease-in-out;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 13px;
+  }
+  
+  .image-btn-link {
+	background-color: ghostwhite;
+	color: #35383a;
+	border: none;
+	font-size: 1rem;
+	padding: 0.5rem;
+	cursor: pointer;
+	display: flex;
+	align-items: center;
+	max-width: 70%;
+	height: 2rem;
+  }
+  
+  .border-left {
+	border-top-left-radius: 8px;
+	border-bottom-left-radius: 8px;
+  }
+  
+  .border-right {
+	border-top-right-radius: 8px;
+	border-bottom-right-radius: 8px;
+  }
+  
+  .image-btn-link:focus {
+	outline: none;
+  }
+  
+  .images-wrapper {
+	-webkit-column-count: 9;
+	-webkit-column-gap: 1rem;
+	-moz-column-count: 9;
+	-moz-column-gap: 1rem;
+	column-count: 9;
+	column-gap: 1rem;
+	padding: 6rem 8rem;
+	overflow: hidden;
+  }
+  
+  @media screen and (max-width: 1920px) {
+	.images-wrapper {
+	  column-count: 6;
+	  -webkit-column-count: 6;
+	  -moz-column-count: 6;
+	}
+  }
+  
+  @media screen and (max-width: 1600px) {
+	.images-wrapper {
+	  column-count: 5;
+	  -webkit-column-count: 5;
+	  -moz-column-count: 5;
+	  padding: 6rem 6rem;
+	  overflow: hidden;
+	}
+	.image-info {
+	  align-items: flex-start;
+	  justify-content: center;
+	  flex-direction: column;
+	}
+	.image-link {
+		margin: 0;
+	  }
+  }
+  
+  @media screen and (max-width: 1300px) {
+	.images-wrapper {
+	  column-count: 4;
+	  -webkit-column-count: 4;
+	  -moz-column-count: 4;
+	  padding: 6rem 4rem;
+	  overflow: hidden;
+	}
+	.image-info {
+	  align-items: flex-start;
+	  justify-content: center;
+	  flex-direction: column;
+	}
+	.image-link {
+		margin: 0;
+	  }
+  }
+  
+  @media screen and (max-width: 1000px) {
+	.images-wrapper {
+	  column-count: 3;
+	  -webkit-column-count: 3;
+	  -moz-column-count: 3;
+	  padding: 6rem 3rem;
+	  overflow: hidden;
+	}
+	.image-info {
+	  align-items: flex-start;
+	  justify-content: center;
+	  flex-direction: column;
+	}
+	.image-link {
+		margin: 0;
+	  }
+  }
+  
+  @media screen and (max-width: 800px) {
+	.images-wrapper {
+	  column-count: 2;
+	  -webkit-column-count: 2;
+	  -moz-column-count: 2;
+	  padding: 6rem 3rem;
+	  overflow: hidden;
+	}
+	.image-info {
+	  align-items: flex-start;
+	  justify-content: center;
+	  flex-direction: column;
+	}
+	.image-link {
+		margin: 0;
+	  }
+  }
+  
+  @media screen and (max-width: 600px) {
+	.images-wrapper {
+	  column-count: 1;
+	  -webkit-column-count: 1;
+	  -moz-column-count: 1;
+	  padding: 6rem 3rem;
+	  overflow: hidden;
+	}
+	.image-info {
+	  align-items: flex-start;
+	  justify-content: center;
+	  flex-direction: column;
+	}
+	.image-link {
+		margin: 0;
+	  }
+  }
+  
+  .image-wrapper {
+	display: inline-block;
+	margin: 0 0 2rem;
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.15);
+	border: 1px solid rgba(0, 0, 0, 0.05);
+	border-radius: 13px;
+	overflow: hidden;
+	-webkit-column-break-inside: avoid;
+	page-break-inside: avoid;
+	break-inside: avoid;
+	position: relative;
+  }
+  
+  .image-item {
+	-webkit-column-break-inside: avoid;
+	page-break-inside: avoid;
+	break-inside: avoid;
+	width: 100%;
+	min-height: 6rem;
+	object-fit: cover;
+	object-position: center;
+	position: relative;
+  }
+  
+  /* ====================================================================================================================
+  ANDY - MASONARY IMAGES
+  ======================================================================================================================= */
+  

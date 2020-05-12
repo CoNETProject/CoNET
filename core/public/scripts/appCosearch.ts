@@ -1,7 +1,7 @@
 
 
 
-let appScript = {
+const appScript = {
 	info: {
 		totalResults: ['大约有','約','About','大約有'],
 		totalResults1: ['条记录','件','results','條記錄'],
@@ -123,8 +123,11 @@ let appScript = {
 	},
 
 	returnSearchResultItemsInit: ( items ) => {
-			
+		let i = 0
+		const y = []
 		items.Result.forEach ( n => {
+			i++
+			
 			n['showLoading'] = ko.observable ( false )
 			n['conetResponse'] = ko.observable ( false )
 			n['loadingGetResponse'] = ko.observable ( false )
@@ -143,18 +146,28 @@ let appScript = {
 					n.imageInfo['videoTime'] = null
 				}
 			}
-			if ( n.clickUrl ) {
-				const url = new URLSearchParams ( n.clickUrl )
-				n['webUrlHref'] = url.get ( 'imgrefurl' )
-				n['imgUrlHref'] = url.get ( '/imgres?imgurl' )
-			}
 			
+			n['webUrlHref'] = n.clickUrl
+			
+			n['imgUrlHref'] = n.imgSrc
+			
+			/* ====================================================================================================================
+			ANDY - MASONARY IMAGES
+			======================================================================================================================= */
+			n['showOptions'] = ko.observable(false);
+		
+
+			/* ====================================================================================================================
+			
+			======================================================================================================================= */
+
 			n['showImageLoading'] = ko.observable ( false )
 			n['showImageError'] = ko.observable ( false )
 			n['snapshotImageReady'] = ko.observable ( false )
 			n['loadingImageGetResponse'] = ko.observable ( false )
 			n['conetImageResponse'] = ko.observable ( false )
 			n['imageErrorIndex'] = ko.observable (-1)
+			n['imgSrc'] = n['imgSrc'] || ''
 		})
 		
 	},
@@ -238,9 +251,10 @@ let appScript = {
 				const args = com.Args
 				self.searchInputTextShow ( search_text )
 				
-				self.returnSearchResultItemsInit ( args.param )
-				self.searchItemsArray ( args.param )
-				self.showResultItems ( self, args.param )
+				self.returnSearchResultItemsInit ( args )
+				args.totalResults = args.totalResults.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+				self.searchItemsArray ( args )
+				self.showResultItems ( self, args )
 				_view.CanadaBackground ( false )
 				return self.showMainSearchForm ( false )
 			}
@@ -261,7 +275,7 @@ let appScript = {
 					self.showMain ( false )
 					self.showSnapshop ( true )
 					let y = null
-					self.showWebPage ( y = new showWebPageClass ( search_text, buffer, uuid , () => {
+					self.showWebPage ( y = new showWebPageClass ( search_text, data, uuid , () => {
 						self.showWebPage ( y = null )
 						self.showMain ( true )
 						self.showSnapshop ( false )
@@ -438,9 +452,9 @@ let appScript = {
 			self.nextButtonLoadingGetResponse ( false )
 			self.nextButtonConetResponse ( false )
 			const args = com.Args
-			self.returnSearchResultItemsInit ( args.param )
-			currentArray.Result.push ( ...args.param.Result )
-			currentArray.nextPage = args.param.nextPage
+			self.returnSearchResultItemsInit ( args )
+			currentArray.Result.push ( ...args.Result )
+			currentArray.nextPage = args.nextPage
 			return self.showResultItems ( self, currentArray )
 
 		})
@@ -516,7 +530,8 @@ let appScript = {
 				self.newsLoadingGetResponse ( false )
 
 				const args = com.Args
-				self.newsItemsArray ( self.createNewsResult( self, args.param ))
+				args.totalResults = args.totalResults.replace(/\B(?=(\d{3})+(?!\d))/g, ',')
+				self.newsItemsArray ( self.createNewsResult( self, args ))
 				self.returnSearchResultItemsInit ( self.newsItemsArray () )
 	
 			})
@@ -605,95 +620,128 @@ let appScript = {
 		
 	},
 
-	getSnapshotClick: ( self, index ) => {
-		const currentItem = self.searchItemList()[ index ]
-		currentItem.showLoading ( true )
-		const showError = err => {
-			currentItem.showLoading ( false )
-			currentItem.loadingGetResponse ( false )
-			currentItem.conetResponse ( false )
-			currentItem.errorIndex ( _view.connectInformationMessage.getErrorIndex ( err ))
-			currentItem.showError ( true )
-			const currentElm = $(`#${ currentItem.id }`)
-			return currentElm.popup ({
-				on: 'click',
-				inline: true,
-				onHidden: function () {
-					currentItem.showError ( false )
-					currentItem.errorIndex ( null )
-					
+	// CHANGED ============================================
+  // CHANGED ============================================
+  // CHANGED ============================================
+  getSnapshotClick: (self, index, isImage?: boolean) => {
+    let currentItem = null
+    if (isImage) {
+		currentItem = self.searchSimilarImagesList()[index]
+		currentItem.showImageLoading(true)
+    } else {
+		currentItem = self.searchItemList()[index]
+		currentItem.showLoading(true)
+    }
+
+    const showError = err => {
+		isImage
+			? currentItem.showImageLoading(false)
+			: currentItem.showLoading(false)
+		currentItem.loadingGetResponse(false)
+		currentItem.conetResponse(false)
+		currentItem.errorIndex(
+			_view.connectInformationMessage.getErrorIndex(err)
+		)
+		currentItem.showError(true)
+		const currentElm = $(`#${currentItem.id}`)
+		return currentElm.popup({
+			on: 'click',
+			inline: true,
+			onHidden: function() {
+			currentItem.showError(false)
+			currentItem.errorIndex(null)
+			}
+		})
+    }
+
+    const callBack = (err?, com?: QTGateAPIRequestCommand) => {
+		if (err) {
+			return showError(err)
+		}
+		if (!com) {
+			currentItem.loadingGetResponse(true)
+			return currentItem.conetResponse(false)
+		}
+		if (com.error === -1) {
+			currentItem.loadingGetResponse(false)
+			return currentItem.conetResponse(true)
+		}
+		if (com.error) {
+			return showError(com.error)
+		}
+
+		const arg: string = com.Args[0]
+		currentItem.snapshotUuid = arg.split(',')[0].split('.')[0];
+		return _view.connectInformationMessage.sockEmit(
+			'getFilesFromImap',
+			arg,
+			(err, buffer: string) => {
+			if (err) {
+				return showError(err);
+			}
+			return _view.keyPairCalss.decryptMessageToZipStream(
+				buffer,
+				(err, data) => {
+				if (err) {
+					return showError(err);
 				}
-			})
-		}
-
-		const callBack = ( err?, com?: QTGateAPIRequestCommand ) => {
-			if ( err ) {
-				return showError ( err )
-			}
-			if ( !com ) {
-				currentItem.loadingGetResponse ( true )
-				return currentItem.conetResponse ( false )
-			}
-			if ( com.error === -1 ) {
-				currentItem.loadingGetResponse ( false )
-				return currentItem.conetResponse ( true )
-			}
-			if ( com.error ) {
-				return showError ( com.error )
-			}
-			
-			const arg: string = com.Args[0]
-			currentItem.snapshotUuid = arg.split(',')[0].split ('.')[0]
-			return _view.connectInformationMessage.sockEmit ( 'getFilesFromImap', arg, ( err, buffer: string ) => {
-				if ( err ) {
-					return showError ( err )
+				isImage
+					? currentItem.snapshotImageReady(true)
+					: currentItem.snapshotReady(true);
+				isImage
+					? currentItem.showImageLoading(false)
+					: currentItem.showLoading(false);
+				currentItem.loadingGetResponse(false);
+				currentItem.conetResponse(false);
+				return (currentItem.snapshotData = data);
 				}
-				return _view.keyPairCalss.decryptMessageToZipStream ( buffer, ( err, data ) => {
-					if ( err ) {
-						return showError ( err )
-					}
-					currentItem.snapshotReady ( true )
-					currentItem.showLoading ( false )
-					currentItem.loadingGetResponse ( false )
-					currentItem.conetResponse ( false )
-					return currentItem.snapshotData = buffer
-					
-				})
+			);
+			}
+		);
+    };
 
-				
-			})
-			
-			
+    const url = isImage ? currentItem.clickUrl : currentItem.url;
+    const width = $(window).width();
+    const height = $(window).height();
+
+    const com: QTGateAPIRequestCommand = {
+		command: 'CoSearch',
+		Args: [url, width, height],
+		error: null,
+		subCom: 'getSnapshop'
+    };
+
+    return _view.keyPairCalss.emitRequest(com, callBack);
+  },
+
+  	showSnapshotClick: (self, index, isImage?: boolean) => {
+		self.showMain(false);
+		self.showSnapshop(true);
+		let currentItem = null;
+		if (isImage) {
+		currentItem = self.searchSimilarImagesList()[index];
+		} else {
+		currentItem = self.searchItemList()[index];
 		}
+		let y = null;
 
-		const url = currentItem.url
-		const width = $(window).width()
-		const height = $(window).height()
-		
-		const com: QTGateAPIRequestCommand = {
-			command: 'CoSearch',
-			Args: [ url, width, height ],
-			error: null,
-			subCom: 'getSnapshop'
-		}
+		self.showWebPage(
+		(y = new showWebPageClass(
+			isImage ? currentItem.clickUrl : currentItem.url,
+			currentItem.snapshotData,
+			currentItem.snapshotUuid,
+			() => {
+			self.showWebPage((y = null));
+			self.showMain(true);
+			self.showSnapshop(false);
+			}
+		))
+		);
+  },
 
-		return _view.keyPairCalss.emitRequest ( com, callBack )
-	},
-
-	showSnapshotClick: ( self, index ) => {
-		self.showMain ( false )
-		self.showSnapshop ( true )
-		const currentItem = self.searchItemList()[ index ]
-		let y = null
-		
-
-		self.showWebPage ( y = new showWebPageClass ( currentItem.url, currentItem.snapshotData, currentItem.snapshotUuid , () => {
-			self.showWebPage ( y = null )
-			self.showMain ( true )
-			self.showSnapshop ( false )
-			
-		}))
-	},
+  // CHANGED ============================================
+  // CHANGED ============================================
+  // CHANGED ============================================
 
 	searchesRelatedSelect: ( self, index ) => {
 
@@ -1044,7 +1092,7 @@ let appScript = {
 						_img.showLoading ( false )
 						_img.loadingGetResponse ( false )
 						_img.conetResponse ( false )
-						return _img['snapshotData'] = buffer
+						return _img['snapshotData'] = data
 						
 					})
 	
@@ -1138,7 +1186,7 @@ let appScript = {
 						_img.showLoading ( false )
 						_img.loadingGetResponse ( false )
 						_img.conetResponse ( false )
-						return _img['snapshotData'] = buffer
+						return _img['snapshotData'] = data
 						
 					})
 	
@@ -1180,7 +1228,8 @@ let appScript = {
 		
 	}
 
-
+	//*** */
+	/** */
 }
 
 declare const TimelineMax

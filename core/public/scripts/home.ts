@@ -13,8 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-
+declare const mhtml2html
 const InitKeyPair = function () {
 	const keyPair: keypair = {
 		publicKey: null,
@@ -31,27 +30,37 @@ const InitKeyPair = function () {
 	return keyPair
 }
 
+
+
 const makeKeyPairData = function ( view: view_layout.view, keypair: keypair ) {
+    
     const length = keypair.publicKeyID.length
     keypair.publicKeyID = keypair.publicKeyID.substr ( length - 16 )
-        
-    let keyPairPasswordClass = new keyPairPassword ( function ( _imapData: IinputData, passwd: string, sessionHash: string ) {
+    
+    let keyPairPasswordClass = new keyPairPassword ( keypair.privateKey, function ( passwd: string ) {
         //      password OK
 
         keypair.keyPairPassword ( keyPairPasswordClass = null )
 		keypair.passwordOK = true
-		keypair._password = passwd
+		view.password = passwd
         keypair.showLoginPasswordField ( false )
-        view.keyPairCalss = new encryptoClass ( keypair )
-        view.showKeyPair ( false )
-        if ( _imapData && _imapData.imapTestResult ) {
-            return view.imapSetupClassExit ( _imapData, sessionHash )
-        }
-        let uu = null
-        return view.imapSetup ( uu = new imapForm ( keypair.email, _imapData, function ( imapData: IinputData ) {
-            view.imapSetup ( uu = null )
-            view.imapSetupClassExit ( imapData, sessionHash )
-        }))
+        return view.keyPairCalss = new encryptoClass ( keypair, view.password, view.connectInformationMessage, err => {
+            view.showKeyPair ( false )
+
+            if ( view.keyPairCalss.imapData && view.keyPairCalss.imapData.imapTestResult ) {
+                return view.imapSetupClassExit ( view.keyPairCalss.imapData )
+            }
+            let uu = null
+            return view.imapSetup ( uu = new imapForm ( keypair.email, view.keyPairCalss.imapData, function ( imapData: IinputData ) {
+                view.imapSetup ( uu = null )
+                view.keyPairCalss.imapData = imapData
+                return view.keyPairCalss.saveImapIInputData ( err => {
+                    return view.imapSetupClassExit ( imapData )
+                })
+            }))
+        })
+
+        
         
     })
     
@@ -67,17 +76,18 @@ const makeKeyPairData = function ( view: view_layout.view, keypair: keypair ) {
     
     
     keypair.deleteKeyPairNext = function () {
-        
-        view.connectInformationMessage.sockEmit ( 'deleteKeyPairNext', () => {
-            view.showIconBar ( false )
-            view.connectedCoNET ( false )
-            view.connectToCoNET ( false )
-            view.CoNETConnect (view.CoNETConnectClass = null)
-            view.imapSetup ( view.imapFormClass = null )
-            keypair.showDeleteKeyPairNoite ( false )
-            return keypair.delete_btn_view ( false )
-        })
-        
+
+        localStorage.setItem ( "config", JSON.stringify ({}))
+        view.localServerConfig ( null )
+        view.showIconBar ( false )
+        view.connectedCoNET ( false )
+        view.connectToCoNET ( false )
+        view.CoNETConnect ( view.CoNETConnectClass = null )
+        view.imapSetup ( view.imapFormClass = null )
+        keypair.showDeleteKeyPairNoite ( false )
+        keypair.delete_btn_view ( false )
+        localStorage.clear()
+        return view.reFreshLocalServer()
         
         
     }
@@ -97,6 +107,7 @@ const initPopupArea = function () {
 }
 
 class showWebPageClass {
+    
 	public showLoading = ko.observable ( true )
 	public htmlIframe = ko.observable ( null )
 	public showErrorMessage = ko.observable ( false )
@@ -106,12 +117,19 @@ class showWebPageClass {
 		this.showLoading ( false )
 		this.showErrorMessage ( true )
 	}
-	public png = ko.observable ('')
+    public png = ko.observable ('')
+    public mHtml = ko.observable ('')
+    
+    private urlBlobList = []
 	
 	public close () {
 		this.showImgPage ( false )
 		this.showHtmlCodePage ( false )
-		this.png ( null )
+        this.png ( null )
+        this.htmlIframe ( null )
+        this.urlBlobList.forEach ( n => {
+            ( URL || webkitURL ).revokeObjectURL ( n )
+        })
 		this.exit ()
 	}
 
@@ -121,73 +139,161 @@ class showWebPageClass {
 	}
 	
 	public htmlClick () {
+        
 		this.showHtmlCodePage ( true )
-		this.showImgPage ( false )
+        this.showImgPage ( false )
+        const docu = this.mHtml()
+        if ( docu ) {
+            $('iframe').contents().find( "head" ).html ( docu["window"].document.head.outerHTML )
+            $('iframe').contents().find( "body" ).html ( docu["window"].document.body.outerHTML )
+        }
 	}
 
 	constructor ( public showUrl: string, private zipBase64Stream: string, private zipBase64StreamUuid: string, private exit: ()=> void ) {
 		const self = this
 		_view.showIconBar ( false )
 		
-		_view.keyPairCalss.decryptMessageToZipStream ( zipBase64Stream, ( err, data ) => {
-			if ( err ) {
-				return self.showErrorMessageProcess ()
-			}
-			showHTMLComplete ( zipBase64StreamUuid, data, ( err, data: { img: string, html: string, folder: [ { filename: string, data: string }]} ) => {
-				if ( err ) {
-					return self.showErrorMessageProcess ()
-				}
-				_view.bodyBlue ( false )
-				const getData =  ( filename: string, _data: string ) => {
-					
-					const regex = new RegExp (`${ filename }`,'g')
-					
-					const index = html.indexOf ( `${ filename }` )
-					
-					if ( index > -1 ) {
-						if ( /js$/.test ( filename )) {
-							_data = _data.replace ( /^data:text\/plain;/, 'data:application/javascript;')
-						} else if ( /css$/.test ( filename )) {
-							_data = _data.replace ( /^data:text\/plain;/, 'data:text/css;')
-						} else if ( /html$|htm$/.test ( filename )) {
-							_data = _data.replace ( /^data:text\/plain;/, 'data:text/html;')
-						} else if ( /pdf$/.test ( filename )) {
-							_data = _data.replace ( /^data:text\/plain;/, 'data:text/html;')
-						} else {
-							const kkk = _data
-						}
+		showHTMLComplete ( zipBase64StreamUuid, zipBase64Stream, ( err, data: { mhtml: string, img: string, html: string, folder: [ { filename: string, data: string }]} ) => {
+            if ( err ) {
+                return self.showErrorMessageProcess ()
+            }
+            
+            _view.bodyBlue ( false )
+        
 
-						html = html.replace ( regex, _data )
-						
-					}
-					
-					
-				}
+            let html = data.html
+            //      support HTMLComplete
+            if ( html ) {
+                html = html.replace ( / srcset="[^"]+" /ig, ' ').replace ( / srcset='[^']+' /ig, ' ')
+                let det = data.folder.shift()
+                const getData =  ( filename: string, _data: string, CallBack ) => {
+                
+                    const pointStart = html.indexOf ( `${ filename }` )
+                    
 
-				let html = data.html
-				
-				data.folder.forEach ( n => {
-					getData ( n.filename, n.data )
-				})
+                    const doCallBack = () => {
+                        det = data.folder.shift()
+                        if ( ! det ) {
+                            return CallBack ()
+                        }
+                        return getData ( det.filename, det.data, CallBack )
+                    }
+                    
+                    if ( pointStart > -1 ) {
+                        
+                        return getFilenameMime ( filename, ( err, mime ) => {
 
-				
-				
-				self.png ( data.img )
-				
-				const htmlBolb = new Blob ([ html ], { type: 'text/html'})
-				const _url = window.URL.createObjectURL ( htmlBolb )
-				const fileReader = new FileReader()
-				fileReader.onloadend = evt => {
-					return window.URL.revokeObjectURL ( _url )
-				}
-				
-				self.showLoading ( false )
-				self.htmlIframe ( _url )
-				
-			})
-		})
+                            if ( mime && ! /javascript/.test( mime ) ) {
+                                /**
+                                 * 
+                                 *          css link tag format support
+                                 * 
+                                 */
+                                const _filename = filename.replace(/\-/g,'\\-').replace(/\//g,'\\/').replace(/\./g,'\\.').replace(/\(/g,'\\(').replace(/\)/g,'\\)')
+                                const regex = new RegExp (` src=("|')\.\/${ _filename }("|')`, 'g')
+                                const regex1 = new RegExp (` href=("|')\.\/${ _filename }("|')`, 'g')
+                                /*
+                                if ( /^ src/i.test( hrefTest )) {
+                                    
+                                    const data1 = `data:${ mime };base64,` + _data
+                                    html = html.replace ( regex, data1 ).replace ( regex, data1 )
+                                    return doCallBack ()
+                                    
+                                }
+                                */
+                                const blob = new Blob ([ /^image/.test( mime ) ? Buffer.from ( _data,'base64' ) : Buffer.from ( _data,'base64' ).toString()], { type: mime })
+                                const link = ( URL || webkitURL ).createObjectURL( blob )
+                                html = html.replace ( regex, ` src="${ link }"` ).replace ( regex1, ` href="${ link }"` )
+                                this.urlBlobList.push ( link )
+                            }
+                            doCallBack ()
+                        })
+                        
+                        
+                    }
+
+                    doCallBack ()
+                    
+                    
+                }
+
+                return getData ( det.filename, det.data, err => {
+                    
+                    self.png ( data.img )
+                    
+                    const htmlBolb = new Blob ([ html ], { type: 'text/html'})
+                    const _url = ( URL || webkitURL ).createObjectURL ( htmlBolb )
+                    
+                    
+                    self.showLoading ( false )
+                    self.htmlIframe ( _url )
+                    self.urlBlobList.push ( _url )
+
+                })
+            }
+            html = mhtml2html.convert( data.mhtml )
+            self.png ( data.img )
+            self.showLoading ( false )
+            self.mHtml ( html )
+        })
+		
 		
 	}
+}
+
+class workerManager {
+    public workers: Map<string, Worker > = new Map()
+    private callbackPool: Map< string, any > = new Map ()
+
+    private doEvent ( evt: MessageEvent ) {
+        const jsonData = Buffer.from ( Buffer.from ( evt.data ).toString(), 'base64').toString()
+        let data: workerDataEvent = null
+        try {
+            data = JSON.parse ( jsonData )
+        } catch ( ex ) {
+            return new EvalError ( `workerManager JSON.parse error [${ ex.message }]`)
+        }
+        
+        const callBack = this.callbackPool.get ( data.uuid )
+        if ( !callBack ) {
+            return console.log (`workerManager: [${ new Date().toLocaleTimeString()}] have not callback about message from [${ data.workerName }] content = [${ data.data }]`)
+        }
+        return callBack ( null, data )
+    }
+
+	constructor ( list: string[] ) {
+		list.forEach ( n => {
+            const work = new Worker(`scripts/${ n }.js`)
+            work.onmessage = evt => {
+                return this.doEvent ( evt )
+            }
+			return this.workers.set ( n, work )
+		})
+    }
+    /**
+     * 
+     * 
+     */
+
+    public postFun ( workerName: string, data: any, CallBack ) {
+        const worker = this.workers.get ( workerName )
+        if ( !worker ) {
+            return CallBack ( new Error ('no worker'))
+        }
+
+        const callback: workerDataEvent  = {
+            data: data,
+            uuid: uuid_generate (),
+            workerName: workerName
+        }
+
+        const kk = Buffer.from ( Buffer.from ( JSON.stringify( callback )).toString ('base64'))
+
+        
+        this.callbackPool.set ( callback.uuid, CallBack )
+        return worker.postMessage ( kk, [ kk.buffer ] )
+
+    }
 }
 
 module view_layout {
@@ -204,7 +310,7 @@ module view_layout {
         public keyPairGenerateForm: KnockoutObservable< keyPairGenerateForm> = ko.observable ()
         public tLang = ko.observable ( initLanguageCookie ())
         public languageIndex = ko.observable ( lang [ this.tLang() ])
-        public localServerConfig: KnockoutObservable < install_config > = ko.observable ()
+        public localServerConfig = ko.observable ()
         public keyPair: KnockoutObservable < keypair > = ko.observable ( InitKeyPair ())
         public hacked = ko.observable ( false )
         public imapSetup: KnockoutObservable < imapForm > = ko.observable ()
@@ -216,8 +322,13 @@ module view_layout {
         public imapFormClass: imapForm = null
         public CoNETConnect: KnockoutObservable < CoNETConnect > = ko.observable ( null )
 		public bodyBlue = ko.observable ( true )
-		public CanadaBackground = ko.observable ( false )
-		
+        public CanadaBackground = ko.observable ( false )
+        public password = null
+        /*
+        public worker = new workerManager ([
+            'mHtml2Html'
+        ])
+		*/
 		public keyPairCalss: encryptoClass = null
 
         public appsManager: KnockoutObservable< appsManager > = ko.observable ( null )
@@ -225,25 +336,36 @@ module view_layout {
 
         public imapData: IinputData = null
         public newVersion = ko.observable ( null )
-		public sessionHash = ''
 		public showLanguageSelect = ko.observable ( true )
 		private demoTimeout
 		private demoMainElm
-
+        /*************************************
+         * 
+         *          for New York Times
+         */
+        public nytSection = ko.observable ( false )
+        public nytloader = ko.observable ( true )
+        public iframShow = ko.observable ( false )
+        public nyt_news = ko.observable ( false )
+        public nyt_detail = ko.observable ( false )
+        public nyt_menu = ko.observable ( false )
+        /*** */
 		
         private afterInitConfig ( ) {
             
             this.keyPair ( this.localServerConfig ().keypair )
             if ( this.keyPair() && this.keyPair().keyPairPassword() &&  typeof this.keyPair().keyPairPassword().inputFocus ==='function' ) {
-				this.keyPair().keyPairPassword().inputFocus( true )
+				this.keyPair().keyPairPassword().inputFocus ( true )
 				this.sectionLogin ( false )
             }
         }
+
+        
     
-        private initConfig ( config: install_config ) {
+        private initConfig ( config ) {
             const self = this
             this.showKeyPair ( true )
-            if ( config.keypair && config.keypair.publicKeyID ) {
+            if ( config && config.keypair && config.keypair.publicKeyID ) {
                 /**
                  * 
                  *      Key pair ready
@@ -254,70 +376,80 @@ module view_layout {
                 if ( ! config.keypair.passwordOK ) {
                     config.keypair.showLoginPasswordField ( true )
                 }
+                this.localServerConfig ( config )
+                return this.afterInitConfig ()
                 
+                //this.keyPairGenerateForm ( _keyPairGenerateForm )
                 
-            } else {
-                /**
-                 * 
-                 *      No key pair
-                 * 
-                 */
-                this.svgDemo_showLanguage ()
-                this.clearImapData ()
-                config.keypair = null
-                let _keyPairGenerateForm =  new keyPairGenerateForm ( function ( _keyPair: keypair, sessionHash: string ) {
-                    /**
-                     *      key pair ready
-                     */
-                    makeKeyPairData ( self, _keyPair )
-                    _keyPair.passwordOK = true
-                    let keyPairPassword = _keyPair.keyPairPassword ()
-                    _keyPair.keyPairPassword ( keyPairPassword = null )
-                    config.keypair = _keyPair
-                    
-                    self.keyPair ( _keyPair )
-                
-                    self.showKeyPair ( false )
-                    initPopupArea ()
-					let uu = null
-					self.keyPairCalss = new encryptoClass ( self.keyPair () )
-                    self.imapSetup ( uu = new imapForm ( config.account, null, function ( imapData: IinputData ) {
-                        self.imapSetup ( uu = null )
-                        return self.imapSetupClassExit ( imapData, sessionHash )
-                    }))
-                    return self.keyPairGenerateForm ( _keyPairGenerateForm = null )
-
-                })
-                this.keyPairGenerateForm ( _keyPairGenerateForm )
             }
+            
+            /**
+             * 
+             *      No key pair
+             * 
+             */
+            this.svgDemo_showLanguage ()
+            config["account"] = config["keypair"] = null
+            
+            let _keyPairGenerateForm =  new keyPairGenerateForm (( _keyPair: keypair ) => {
+                self.keyPairGenerateForm ( _keyPairGenerateForm = null )
+                /**
+                 *      key pair ready
+                 */
+                self.showKeyPair ( false )
+                self.password = _keyPair._password
+                _keyPair._password = null
+                config.account = _keyPair.email
+                config.keypair = _keyPair
+                localStorage.setItem ( "config", JSON.stringify ( config ))
+                _keyPair.passwordOK = true
+                
+                //self.localServerConfig ( config )
+                self.keyPair ( _keyPair )
+                return self.keyPairCalss = new encryptoClass ( _keyPair, self.password, self.connectInformationMessage, err => {
+                    self.showKeyPair ( false )
+        
+                    
+                    let uu = null
+                    return self.imapSetup ( uu = new imapForm ( _keyPair.email, self.keyPairCalss.imapData, function ( imapData: IinputData ) {
+                        self.imapSetup ( uu = null )
+                        self.keyPairCalss.imapData = imapData
+                        return self.keyPairCalss.saveImapIInputData ( err => {
+                            return self.imapSetupClassExit ( imapData )
+                        })
+                    }))
+                })
+                //initPopupArea ()
+                
+
+            })
             this.localServerConfig ( config )
             this.afterInitConfig ()
+            this.keyPairGenerateForm ( _keyPairGenerateForm )
             
         }
 
-        private clearImapData () {
+
+        private getConfigFromLocalStorage () {
+            const configStr = localStorage.getItem ( "config" )
+            if (!configStr ) {
+                return this.initConfig ( {} )
+            }
+            let config = null
+            try {
+                config = JSON.parse ( configStr )
+            } catch ( ex ) {
+                return this.initConfig ( {} )
+            }
             
-            let imap = this.imapSetup()
-            this.imapSetup( imap = null )
+            return this.initConfig ( config )
+            
         }
     
         private socketListen () {
             let self = this
-
+            return this.getConfigFromLocalStorage ()
             
-            this.connectInformationMessage.sockEmit ( 'init', ( err, config: install_config) => {
-                if ( err ) {
-                    return
-                }
-                return self.initConfig ( config )
-            })
-
-            this.connectInformationMessage.socketIo.on ('init', ( err, config: install_config ) => {
-                if ( err ) {
-                    return
-                }
-                return self.initConfig ( config )
-            })
         }
     
         constructor () {
@@ -369,7 +501,8 @@ module view_layout {
 			if ( this.demoMainElm && typeof this.demoMainElm.remove === 'function' ) {
 				this.demoMainElm.remove()
 				this.demoMainElm = null
-			}
+            }
+            
             if ( !this.connectInformationMessage.socketIoOnline ) {
                 return this.connectInformationMessage.showSystemError ()
             }
@@ -379,9 +512,20 @@ module view_layout {
             if ( this.localServerConfig().firstRun ) {
                 return this.sectionAgreement ( true )
 			}
-			*/
+            */
+            
             this.sectionLogin ( true )
             return initPopupArea ()
+            /*
+            setTimeout (() => {
+                this.nytloader ( false )
+            }, 3000 )
+           
+           
+           new Date().toDateString
+           this.nyt_menu ( true )
+            return this.nytSection ( true )
+            */
             
         }
 
@@ -418,17 +562,15 @@ module view_layout {
             this.appsManager ( null )
         }
 
-        public imapSetupClassExit ( _imapData: IinputData, sessionHash: string ) {
+        public imapSetupClassExit ( _imapData: IinputData ) {
             const self = this
             this.imapData = _imapData
-            this.sessionHash = sessionHash
-            return this.CoNETConnect ( this.CoNETConnectClass = new CoNETConnect ( _imapData.imapUserName, this.keyPair().verified, _imapData.confirmRisk, this.keyPair().email, 
-            function ConnectReady ( err ) {
+            return this.CoNETConnect ( this.CoNETConnectClass = new CoNETConnect ( this, this.keyPair().verified, ( err ) => {
                 if ( typeof err ==='number' && err > -1 ) {
                     self.CoNETConnect ( this.CoNETConnectClass = null )
                     return self.imapSetup ( this.imapFormClass = new imapForm ( _imapData.account, null, function ( imapData: IinputData ) {
                         self.imapSetup ( this.imapFormClass = null )
-                        return self.imapSetupClassExit ( imapData, sessionHash )
+                        return self.imapSetupClassExit ( imapData )
                     }))
                     
                     
@@ -522,4 +664,7 @@ module view_layout {
 const _view = new view_layout.view ()
 
 ko.applyBindings ( _view , document.getElementById ( 'body' ))
-$(`.${ _view.tLang()}`).addClass('active')
+$(`.${ _view.tLang()}`).addClass ('active')
+openpgp.config.indutny_elliptic_path = 'lightweight/elliptic.min.js'
+window[`${ "indexedDB" }`] = window.indexedDB || window["mozIndexedDB"] || window["webkitIndexedDB"] || window["msIndexedDB"]
+const CoNET_version = "0.1.9"

@@ -125,9 +125,16 @@ class connectInformationMessage {
         this.socketIo.on('reconnect', attempt => {
             this.socketIoOnline = true;
             this.hideMessage();
+            if (_view && _view.keyPairCalss && typeof _view.keyPairCalss.getServerPublicKey === "function") {
+                return _view.keyPairCalss.getServerPublicKey(err => {
+                    if (err) {
+                        return self.showErrorMessage('systemError');
+                    }
+                });
+            }
         });
         this.socketIo.on('systemErr', err => {
-            self.showErrorMessage(err);
+            return self.showErrorMessage(err);
         });
     }
     sockEmit(eventName, ...args) {
@@ -140,32 +147,37 @@ class connectInformationMessage {
         if (argLength > -1 && typeof (args[argLength]) === 'function') {
             _CallBack = args.pop();
         }
+        this.socketIo.emit(eventName, ...args, uuid => {
+            clearTimeout(_timeout);
+            if (_CallBack) {
+                return this.socketIo.once(uuid, (err, ...data) => {
+                    if (err) {
+                        self.showErrorMessage(err);
+                    }
+                    if (_CallBack) {
+                        return _CallBack(err, ...data);
+                    }
+                });
+            }
+        });
         const _timeout = setTimeout(() => {
             if (_CallBack) {
-                _CallBack(new Error('systemErr'));
+                _CallBack(new Error('systemError'));
                 return _CallBack = null;
             }
             return this.showSystemError();
-        }, 3000);
-        return this.socketIo.emit(eventName, ...args, uuid => {
-            clearTimeout(_timeout);
-            return this.socketIo.once(uuid, (err, ...data) => {
-                if (err) {
-                    self.showErrorMessage(err);
-                }
-                if (_CallBack) {
-                    return _CallBack(err, ...data);
-                }
-            });
-        });
+        }, 10000);
     }
     showErrorMessage(err) {
         if (!err) {
             return;
         }
-        const errMes = (typeof err === "string") ? messageBoxDefine[err] : messageBoxDefine[err.message] || err.message;
+        let errMes = (typeof err === "string") ? messageBoxDefine[err] : messageBoxDefine[err.message];
         if (!errMes) {
             return;
+        }
+        if (!messageBoxDefine[errMes]) {
+            errMes = 'unKnowError';
         }
         this.hideMessage();
         this.messageArray(errMes);

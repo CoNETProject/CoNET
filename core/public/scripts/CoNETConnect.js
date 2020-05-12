@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 class CoNETConnect {
-    constructor(email, isKeypairBeSign, confirmRisk, account, ready) {
-        this.email = email;
+    constructor(view, isKeypairBeSign, ready) {
+        this.view = view;
         this.isKeypairBeSign = isKeypairBeSign;
-        this.account = account;
         this.ready = ready;
         this.showSendImapDataWarning = ko.observable(false);
         this.showConnectCoNETProcess = ko.observable(true);
@@ -32,26 +31,29 @@ class CoNETConnect {
         this.showNetworkError = ko.observable(false);
         this.infoTextArray = ko.observableArray([]);
         this.keyPairSign = ko.observable(null);
+        this.imapData = this.view.imapData;
+        this.account = this.imapData.account;
+        this.email = this.imapData.imapUserName;
+        this.nodeEmail = "node@Kloak.app";
+        this.inSendMail = false;
         const self = this;
-        if (!confirmRisk) {
+        if (!this.view.imapData.confirmRisk) {
             this.showSendImapDataWarning(true);
         }
         else {
             this.imapConform();
             this.Loading(true);
+            _view.connectInformationMessage.socketIo.on('pingTimeOut', () => {
+                return self.pingTimeOut();
+            });
         }
+    }
+    pingTimeOut() {
+        return this.listingConnectStage(null, 0, null);
     }
     listingConnectStage(err, stage, publicKeyMessage) {
         const self = this;
         this.showConnectCoNETProcess(true);
-        /*
-        if ( typeof err === 'number' && err > -1 ) {
-            this.connectStage ( -1 )
-            this.ready ( err )
-            _view.connectInformationMessage.socketIo.removeListener ( 'tryConnectCoNETStage', this.listenFun )
-            return this.connetcError ( err )
-        }
-        */
         switch (stage) {
             case 1: {
                 const index = this.infoTextArray()[this.infoTextArray().length - 1];
@@ -99,6 +101,7 @@ class CoNETConnect {
                             return this.keyPairSign(u = new keyPairSign((function () {
                                 self.keyPairSign(u = null);
                                 self.ready(null);
+                                return localStorage.setItem("config", JSON.stringify(self.view.localServerConfig()));
                             })));
                         }
                         return;
@@ -135,12 +138,25 @@ class CoNETConnect {
         return this.ready(0);
     }
     sendConnectMail() {
+        const self = this;
         this.Loading(true);
         this.showTryAgain(false);
-        _view.connectInformationMessage.sockEmit('sendRequestMail', err => {
+        this.showSendConnectMail(false);
+        const qtgateCommand = {
+            account: this.imapData.account,
+            QTGateVersion: CoNET_version,
+            imapData: this.imapData,
+            command: 'connect',
+            error: null,
+            callback: null,
+            language: this.imapData.language,
+            publicKey: this.view.keyPair().publicKey
+        };
+        return this.view.keyPairCalss.encrypt(JSON.stringify(qtgateCommand), (err, data) => {
             if (err) {
-                return this.listingConnectStage(null, -1, null);
+                return self.listingConnectStage(null, -1, "");
             }
+            return _view.connectInformationMessage.sockEmit('sendRequestMail', data, self.imapData, this.nodeEmail);
         });
     }
     tryAgain() {
@@ -155,6 +171,11 @@ class CoNETConnect {
         this.showTryAgain(false);
     }
     imapConform() {
+        if (!this.view.imapData.confirmRisk) {
+            this.view.imapData.confirmRisk = true;
+            this.view.keyPairCalss.saveImapIInputData(err => { });
+            return this.sendConnectMail();
+        }
         const self = this;
         this.showSendImapDataWarning(false);
         this.connetcError(-1);
@@ -164,11 +185,7 @@ class CoNETConnect {
             return self.listingConnectStage(err, stage, message);
         };
         _view.connectInformationMessage.socketIo.on('tryConnectCoNETStage', this.listenFun);
-        _view.connectInformationMessage.sockEmit('tryConnectCoNET', err => {
-            if (err) {
-                return this.listingConnectStage(null, -1, null);
-            }
-        });
+        _view.connectInformationMessage.sockEmit('tryConnectCoNET', this.imapData);
     }
     /**
      * 			test unit

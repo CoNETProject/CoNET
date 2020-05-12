@@ -1,4 +1,4 @@
-let appScript = {
+const appScript = {
     info: {
         totalResults: ['大约有', '約', 'About', '大約有'],
         totalResults1: ['条记录', '件', 'results', '條記錄'],
@@ -104,7 +104,10 @@ let appScript = {
         self.errorMessageIndex(null);
     },
     returnSearchResultItemsInit: (items) => {
+        let i = 0;
+        const y = [];
         items.Result.forEach(n => {
+            i++;
             n['showLoading'] = ko.observable(false);
             n['conetResponse'] = ko.observable(false);
             n['loadingGetResponse'] = ko.observable(false);
@@ -123,17 +126,22 @@ let appScript = {
                     n.imageInfo['videoTime'] = null;
                 }
             }
-            if (n.clickUrl) {
-                const url = new URLSearchParams(n.clickUrl);
-                n['webUrlHref'] = url.get('imgrefurl');
-                n['imgUrlHref'] = url.get('/imgres?imgurl');
-            }
+            n['webUrlHref'] = n.clickUrl;
+            n['imgUrlHref'] = n.imgSrc;
+            /* ====================================================================================================================
+            ANDY - MASONARY IMAGES
+            ======================================================================================================================= */
+            n['showOptions'] = ko.observable(false);
+            /* ====================================================================================================================
+            
+            ======================================================================================================================= */
             n['showImageLoading'] = ko.observable(false);
             n['showImageError'] = ko.observable(false);
             n['snapshotImageReady'] = ko.observable(false);
             n['loadingImageGetResponse'] = ko.observable(false);
             n['conetImageResponse'] = ko.observable(false);
             n['imageErrorIndex'] = ko.observable(-1);
+            n['imgSrc'] = n['imgSrc'] || '';
         });
     },
     search_form: (self, event) => {
@@ -195,9 +203,10 @@ let appScript = {
                 self.showInputLoading(false);
                 const args = com.Args;
                 self.searchInputTextShow(search_text);
-                self.returnSearchResultItemsInit(args.param);
-                self.searchItemsArray(args.param);
-                self.showResultItems(self, args.param);
+                self.returnSearchResultItemsInit(args);
+                args.totalResults = args.totalResults.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                self.searchItemsArray(args);
+                self.showResultItems(self, args);
                 _view.CanadaBackground(false);
                 return self.showMainSearchForm(false);
             }
@@ -217,7 +226,7 @@ let appScript = {
                     self.showMain(false);
                     self.showSnapshop(true);
                     let y = null;
-                    self.showWebPage(y = new showWebPageClass(search_text, buffer, uuid, () => {
+                    self.showWebPage(y = new showWebPageClass(search_text, data, uuid, () => {
                         self.showWebPage(y = null);
                         self.showMain(true);
                         self.showSnapshop(false);
@@ -356,9 +365,9 @@ let appScript = {
             self.nextButtonLoadingGetResponse(false);
             self.nextButtonConetResponse(false);
             const args = com.Args;
-            self.returnSearchResultItemsInit(args.param);
-            currentArray.Result.push(...args.param.Result);
-            currentArray.nextPage = args.param.nextPage;
+            self.returnSearchResultItemsInit(args);
+            currentArray.Result.push(...args.Result);
+            currentArray.nextPage = args.nextPage;
             return self.showResultItems(self, currentArray);
         });
     },
@@ -413,7 +422,8 @@ let appScript = {
                 self.newsConetResponse(false);
                 self.newsLoadingGetResponse(false);
                 const args = com.Args;
-                self.newsItemsArray(self.createNewsResult(self, args.param));
+                args.totalResults = args.totalResults.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                self.newsItemsArray(self.createNewsResult(self, args));
                 self.returnSearchResultItemsInit(self.newsItemsArray());
             });
         }
@@ -476,11 +486,23 @@ let appScript = {
         self.showMain(false);
         self.showSearchSimilarImagesResult(true);
     },
-    getSnapshotClick: (self, index) => {
-        const currentItem = self.searchItemList()[index];
-        currentItem.showLoading(true);
+    // CHANGED ============================================
+    // CHANGED ============================================
+    // CHANGED ============================================
+    getSnapshotClick: (self, index, isImage) => {
+        let currentItem = null;
+        if (isImage) {
+            currentItem = self.searchSimilarImagesList()[index];
+            currentItem.showImageLoading(true);
+        }
+        else {
+            currentItem = self.searchItemList()[index];
+            currentItem.showLoading(true);
+        }
         const showError = err => {
-            currentItem.showLoading(false);
+            isImage
+                ? currentItem.showImageLoading(false)
+                : currentItem.showLoading(false);
             currentItem.loadingGetResponse(false);
             currentItem.conetResponse(false);
             currentItem.errorIndex(_view.connectInformationMessage.getErrorIndex(err));
@@ -520,15 +542,19 @@ let appScript = {
                     if (err) {
                         return showError(err);
                     }
-                    currentItem.snapshotReady(true);
-                    currentItem.showLoading(false);
+                    isImage
+                        ? currentItem.snapshotImageReady(true)
+                        : currentItem.snapshotReady(true);
+                    isImage
+                        ? currentItem.showImageLoading(false)
+                        : currentItem.showLoading(false);
                     currentItem.loadingGetResponse(false);
                     currentItem.conetResponse(false);
-                    return currentItem.snapshotData = buffer;
+                    return (currentItem.snapshotData = data);
                 });
             });
         };
-        const url = currentItem.url;
+        const url = isImage ? currentItem.clickUrl : currentItem.url;
         const width = $(window).width();
         const height = $(window).height();
         const com = {
@@ -539,17 +565,26 @@ let appScript = {
         };
         return _view.keyPairCalss.emitRequest(com, callBack);
     },
-    showSnapshotClick: (self, index) => {
+    showSnapshotClick: (self, index, isImage) => {
         self.showMain(false);
         self.showSnapshop(true);
-        const currentItem = self.searchItemList()[index];
+        let currentItem = null;
+        if (isImage) {
+            currentItem = self.searchSimilarImagesList()[index];
+        }
+        else {
+            currentItem = self.searchItemList()[index];
+        }
         let y = null;
-        self.showWebPage(y = new showWebPageClass(currentItem.url, currentItem.snapshotData, currentItem.snapshotUuid, () => {
-            self.showWebPage(y = null);
+        self.showWebPage((y = new showWebPageClass(isImage ? currentItem.clickUrl : currentItem.url, currentItem.snapshotData, currentItem.snapshotUuid, () => {
+            self.showWebPage((y = null));
             self.showMain(true);
             self.showSnapshop(false);
-        }));
+        })));
     },
+    // CHANGED ============================================
+    // CHANGED ============================================
+    // CHANGED ============================================
     searchesRelatedSelect: (self, index) => {
         self.searchInputText(self.searchItem().searchesRelated[index].text);
         self.showSearchesRelated(false);
@@ -812,7 +847,7 @@ let appScript = {
                         _img.showLoading(false);
                         _img.loadingGetResponse(false);
                         _img.conetResponse(false);
-                        return _img['snapshotData'] = buffer;
+                        return _img['snapshotData'] = data;
                     });
                 });
             };
@@ -886,7 +921,7 @@ let appScript = {
                         _img.showLoading(false);
                         _img.loadingGetResponse(false);
                         _img.conetResponse(false);
-                        return _img['snapshotData'] = buffer;
+                        return _img['snapshotData'] = data;
                     });
                 });
             };
@@ -913,4 +948,6 @@ let appScript = {
             _img.showImageLoading(true);
         }
     }
+    //*** */
+    /** */
 };

@@ -21,17 +21,10 @@ import * as SocketIo from 'socket.io'
 import * as Tool from './tools/initSystem'
 import * as Async from 'async'
 import * as Fs from 'fs'
-import * as Util from 'util'
 import * as Uuid from 'node-uuid'
 import * as Imap from './tools/imap'
 import CoNETConnectCalss from './tools/coNETConnect'
-import * as Crypto from 'crypto'
 import * as mime from 'mime-types'
-
-Express.static.mime.define({ 'multipart/related': ['mht'] })
-//Express.static.mime.define({ 'message/rfc822' : ['mhtml','mht'] })
-Express.static.mime.define({ 'application/x-mimearchive' : ['mhtml','mht'] })
-Express.static.mime.define({ 'multipart/related' : ['mhtml','mht'] })
 
 interface localConnect {
 	socket: SocketIO.Socket
@@ -40,7 +33,6 @@ interface localConnect {
 }
 
 let logFileFlag = 'w'
-const conetImapAccount = /^qtgate_test\d\d?@icloud.com$/i
 
 const saveLog = ( err: {} | string ) => {
 	if ( !err ) {
@@ -54,13 +46,13 @@ const saveLog = ( err: {} | string ) => {
 }
 
 const saveServerStartup = ( localIpaddress: string ) => {
-	const info = `\n*************************** CoNET Platform [ ${ Tool.CoNET_version } ] server start up *****************************\n` +
-			`Access url: http://${localIpaddress}:${ Tool.LocalServerPortNumber }\n`
+	const info = `\n*************************** Kloak Platform [ ${ Tool.CoNET_version } ] server start up *****************************\n` +
+			`Access url: http://${ localIpaddress }:${ Tool.LocalServerPortNumber }\n`
 	saveLog ( info )
 }
 
 const saveServerStartupError = ( err: {} ) => {
-	const info = `\n*************************** CoNET Platform [ ${ Tool.CoNET_version } ] server startup falied *****************************\n` +
+	const info = `\n*************************** Kloak Platform [ ${ Tool.CoNET_version } ] server startup falied *****************************\n` +
 			`platform ${ process.platform }\n` +
 			`${ err['message'] }\n`
 	saveLog ( info )
@@ -100,32 +92,18 @@ export default class localServer {
 	private expressServer = Express()
 	private httpServer = HTTP.createServer ( this.expressServer )
 	private socketServer = SocketIo ( this.httpServer )
-	private socketServer_CoSearch = this.socketServer.of ('/CoSearch')
 	public config: install_config  = null
 	public keyPair: keypair = null
 	public savedPasswrod: string = ''
-	public imapConnectData: IinputData = null
 	public localConnected: Map < string, localConnect > = new Map ()
-	private CoNETConnectCalss: CoNETConnectCalss = null
 	private openPgpKeyOption = null
-	private sessionHashPool = []
-	private Pbkdf2Password = null
-	private nodeList = [{
-		email: 'node@Kloak.app',
-		keyID:'',
-		key: ''
-	}]
-
+	private localKeyPair = null
+	private serverKeyPassword = Uuid.v4()
 	private requestPool: Map < string, SocketIO.Socket > = new Map()
-
+	private imapConnectPool: Map <string, CoNETConnectCalss> = new Map()
 
 	private catchCmd ( mail: string, uuid: string ) {
-		if ( !this.imapConnectData.sendToQTGate ) {
-			this.imapConnectData.sendToQTGate = true
-			Tool.saveEncryptoData (  Tool.imapDataFileName1, this.imapConnectData, this.config, this.savedPasswrod, err => {
-
-			})
-		}
+		
 		console.log ( `Get response from CoNET uuid [${ uuid }] length [${ mail.length }]`)
 		const socket = this.requestPool.get ( uuid )
 		if ( !socket ) {
@@ -135,143 +113,94 @@ export default class localServer {
 		socket.emit ( 'doingRequest', mail, uuid )
 	}
 	
-	private tryConnectCoNET ( socket: SocketIO.Socket, sessionHash: string ) {
+	private tryConnectCoNET ( socket: SocketIO.Socket, imapData: IinputData, sendMail: boolean ) {
 		console.log (`doing tryConnectCoNET`)
 		//		have CoGate connect
+		let userConnet: CoNETConnectCalss = socket ["userConnet"] = socket ["userConnet"] || this.imapConnectPool.get ( imapData.account )
 
-		if ( this.CoNETConnectCalss ) {
-			return this.CoNETConnectCalss.Ping()
+		if ( userConnet ) {
+			console.log (`tryConnectCoNET already have room;[${ userConnet.socket.id }]`)
+			socket.join ( userConnet.socket.id )
+			return userConnet.Ping( sendMail )
 		}
 
-		let sendMail = false
+		
 		const _exitFunction = err => {
 			console.trace ( `makeConnect on _exitFunction err this.CoNETConnectCalss destroy!`, err )
-			this.CoNETConnectCalss = null
+
 			
+			if ( err && err.message ) {
+				
+				//		network error
+				if ( / ECONNRESET /i.test) {
+					if ( typeof userConnet.destroy === 'function' ) {
+						userConnet.destroy ()
+					}
+					
+					this.imapConnectPool.set ( imapData.account, userConnet = socket [ "userConnet" ] = makeConnect ())
+					
+					
+				}
+			}
+			return console.log (`_exitFunction doing nathing!`)
 		}
 
 		const makeConnect = () => {
-			
-			return this.CoNETConnectCalss = new CoNETConnectCalss ( this.imapConnectData, this.socketServer, !this.imapConnectData.sendToQTGate, this.nodeList[0].email,
-				this.openPgpKeyOption, this.keyPair.publicKey, ( mail, uuid ) => {
+			 
+			return new CoNETConnectCalss ( imapData, this.socketServer, socket, ( mail, uuid ) => {
 				return this.catchCmd ( mail, uuid )
 			}, _exitFunction )
-			
 		}
 		
-		return makeConnect ()
+		return this.imapConnectPool.set ( imapData.account, userConnet = socket ["userConnet"] = makeConnect ())
 		
 	}
 
-	private listenAfterPassword ( socket: SocketIO.Socket, sessionHash: string ) {
+	
+
+	
+	private listenAfterPassword ( socket: SocketIO.Socket ) {
+		const self = this
+		let keyPair: Kloak_LocalServer_keyInfo = null
+		let sendMail = false
 		
-		socket.on ( 'checkImap', ( emailAddress: string, password: string, timeZone, tLang, CallBack1 ) => {
-			CallBack1()
-			console.log (`localServer on checkImap!`)
-			const imapServer = Tool.getImapSmtpHost( emailAddress )
-			this.imapConnectData = {
-				email: this.config.account,
-				account: this.config.account,
-				smtpServer: imapServer.smtp,
-				smtpUserName: emailAddress,
-				smtpPortNumber: imapServer.SmtpPort,
-				smtpSsl: imapServer.smtpSsl,
-				smtpIgnoreCertificate: false,
-				smtpUserPassword: password,
-				imapServer: imapServer.imap,
-				imapPortNumber: imapServer.ImapPort,
-				imapSsl: imapServer.imapSsl,
-				imapUserName: emailAddress,
-				imapIgnoreCertificate: false,
-				imapUserPassword: password,
-				timeZoneOffset: timeZone,
-				language: tLang,
-				imapTestResult: null,
-				clientFolder: Uuid.v4(),
-				serverFolder: Uuid.v4(),
-				randomPassword: Uuid.v4(),
-				uuid: Uuid.v4(),
-				confirmRisk: false,
-				clientIpAddress: null,
-				ciphers: null,
-				sendToQTGate: false
 
-			}
-
-			return this.doingCheckImap ( socket )
-		})
-
-		socket.on ( 'tryConnectCoNET', CallBack1 => {
+		socket.on ( 'checkImap', ( imapConnectData, CallBack1 ) => {
+			
+			console.log ( `localServer on checkImap!` )
 			const uuid = Uuid.v4()
 			CallBack1( uuid )
 
-			const _callBack = ( ...data ) => {
-				socket.emit ( uuid, ...data )
+			if ( !keyPair ) {
+				return socket.emit ('imapTest', 'system' )
 			}
-			saveLog (`socket on tryConnectCoNET!`)
-			if ( !this.imapConnectData ) {
-				return _callBack ( 'systemError' )
+
+			return Tool.decryptoMessage ( keyPair.publicKeys, self.localKeyPair.privateKey, imapConnectData, ( err, data ) => {
+				if ( err ) {
+					console.log ( 'checkImap Tool.decryptoMessage error\n', err )
+					return socket.emit ('imapTest', 'system' )
+				}
+
+				let imapData: IinputData = null
+
+				try {
+					imapData = JSON.parse ( data )
+
+				} catch ( ex ) {
+					return socket.emit ('imapTest', 'system' )
+				}
 				
-			}
-			if ( !this.imapConnectData.confirmRisk ) {
-				this.imapConnectData.confirmRisk = true
-				
-				return Tool.saveEncryptoData (  Tool.imapDataFileName1, this.imapConnectData, this.config, this.savedPasswrod, err => {
-					return this.tryConnectCoNET ( socket, sessionHash )
-				})
-			}
-			return this.tryConnectCoNET ( socket, sessionHash )
+				return self.doingCheckImap ( socket, imapData, keyPair )
+			})
 			
 		})
 
-		socket.on ( 'sendRequestMail', CallBack1 => {
-
-			
-			CallBack1 ()
-			if ( !this.CoNETConnectCalss ) {
-				return console.log (`localServer on sendRequestMail Error! have no this.CoNETConnectCalss!`)
-			}
-			socket.emit ( 'tryConnectCoNETStage', null, 2, false )
-			if ( this.CoNETConnectCalss ) {
-				console.log (`localWebServer on sendRequestMail !`)
-				return this.CoNETConnectCalss.sendRequestMail ()
-			}
-			console.log (`localWebServer on sendRequestMail have no CoNETConnectCalss create CoNETConnectCalss`)
-			return this.tryConnectCoNET ( socket, sessionHash )
-			
-		})
-
-		socket.on ( 'checkActiveEmailSubmit', ( text, CallBack1 ) => {
+		socket.on ( 'tryConnectCoNET', ( imapData: IinputData, CallBack1 ) => {
 			const uuid = Uuid.v4()
 			CallBack1( uuid )
-			
-			const _callBack = ( ...data ) => {
-				socket.emit ( uuid, ...data )
-			}
+			console.log ( `socket account [${ keyPair.email }]:[${ keyPair.keyID }] on tryConnectCoNET!\n\n` )
 
-			const key = Buffer.from ( text, 'base64' ).toString ()
-			console.log (`checkActiveEmailSubmit`, key )
-			if ( key && key.length ) {
-				console.log ( `active key success! \n[${ key }]`)
-				
-				this.keyPair.publicKey = this.config.keypair.publicKey = key
-				this.keyPair.verified = this.config.keypair.verified = true
-				this.imapConnectData.sendToQTGate = true
-				_callBack ()
-				Tool.saveEncryptoData ( Tool.imapDataFileName1, this.imapConnectData, this.config, this.savedPasswrod, err => {
-					if ( err ) {
-						saveLog (`Tool.saveConfig return Error: [${ err.message }]`)
-					}
-				})
-				return Tool.saveConfig ( this.config, err => {
-					if ( err ) {
-						saveLog (`Tool.saveConfig return Error: [${ err.message }]`)
-					}
-					
-					
-				})
-				
-			}
+			return this.tryConnectCoNET ( socket, imapData, sendMail )
 			
 		})
 
@@ -284,51 +213,68 @@ export default class localServer {
 			}
 			this.requestPool.set ( uuid, socket )
 			
-			console.log (`on doingRequest uuid = [${ uuid }]\n${ request }\n`)
+			console.log ( `on doingRequest uuid = [${ uuid }]\n${ request }\n`)
 
-			if ( this.CoNETConnectCalss ) {
+			const userConnect = socket ["userConnet"] || this.imapConnectPool.get ( keyPair.email )
+			if ( userConnect ) {
 				saveLog (`doingRequest on ${ uuid }`)
-				return this.CoNETConnectCalss.requestCoNET_v1 ( uuid, request, _callBack )
+				return userConnect.requestCoNET_v1 ( uuid, request, _callBack )
 			}
 			saveLog ( `doingRequest on ${ uuid } but have not CoNETConnectCalss need restart! socket.emit ( 'systemErr' )`)
-			socket.emit ( 'systemErr' )
+			return socket.emit ( 'systemErr' )
 		})
 
 		socket.on ( 'getFilesFromImap', ( files: string, CallBack1 ) => {
 			const uuid = Uuid.v4()
 			CallBack1( uuid )
-
-			const _callBack = ( ...data ) => {
-				socket.emit ( uuid, ...data )
+			let ret = ''
+			const _callBack = ( err ) => {
+				socket.emit ( uuid, err, ret  )
 			}
 			
 			if ( typeof files !== 'string' || !files.length ) {
-				return _callBack ( new Error ('invalidRequest'))
+				return _callBack ( new Error ( 'invalidRequest' ))
 			}
 			const _files = files.split (',')
 			console.log (`socket.on ('getFilesFromImap') _files = [${ _files }] _files.length = [${ _files.length }]`  )
 			
-			let ret = ''
+			
+			const userConnect: CoNETConnectCalss = socket ["userConnet"] || this.imapConnectPool.get ( keyPair.email )
+
+			if ( !userConnect ) {
+				console.log (`getFilesFromImap error:![ Have no userConnect ]`)
+				return socket.emit ( 'systemErr' )
+			}
+			
 			return Async.eachSeries ( _files, ( n, next ) => {
-				console.log (`Async.eachSeries _files[${ n }]`)
-				return this.CoNETConnectCalss.getFile ( n, ( err, data ) => {
+				console.log (`Async.eachSeries _files[${ n }] typeof userConnect.getFile = [${ typeof userConnect.getFile }]`)
+				return userConnect.getFile ( n, ( err, data ) => {
+					
 					if ( err ) {
 						return next ( err )
 					}
 					ret += data.toString ()
 					return next ()
 				})
-			}, err => {
-				if ( err ) {
-					return _callBack ( err )
-				}
-				
-				//console.log (`******************** getFilesFromImap success all [${ ret.length }] fies!\n\n${ ret }\n\n`)
-
-				
-				return _callBack ( null, ret )
-			})
+			}, _callBack )
 			
+		})
+
+		socket.on ( 'sendRequestMail', ( message: string, imapData: IinputData, toMail: string, CallBack1 ) => {
+			
+			const _uuid = Uuid.v4()
+			CallBack1 ( _uuid )
+			
+			const _callBack = ( ...data ) => {
+				socket.emit ( _uuid, ...data )
+			}
+			sendMail = true
+			const userConnect: CoNETConnectCalss = socket [ "userConnet" ] || this.imapConnectPool.get ( keyPair.email )
+			if ( userConnect ) {
+				userConnect.Ping ( true )
+			}
+			return Tool.sendCoNETConnectRequestEmail ( imapData, toMail, message, _callBack )
+
 		})
 
 		socket.on ( 'sendMedia', ( uuid, rawData, CallBack1 ) => {
@@ -338,21 +284,47 @@ export default class localServer {
 			const _callBack = ( ...data ) => {
 				socket.emit ( _uuid, ...data )
 			}
-			return this.CoNETConnectCalss.sendDataToANewUuidFolder ( Buffer.from ( rawData ).toString ( 'base64' ), uuid, uuid, _callBack )
+			const userConnect = this.imapConnectPool.get ( keyPair.email )
+			if ( !userConnect ) {
+				return socket.emit ( 'systemErr' )
+			}
+			return userConnect.sendDataToANewUuidFolder ( Buffer.from ( rawData ).toString ( 'base64' ), uuid, uuid, _callBack )
 		})
 
 		socket.on ( 'mime', ( _mime, CallBack1 ) => {
 			const _uuid = Uuid.v4()
 			CallBack1( _uuid )
-
+			console.log ( `socket.on ( 'mime' ) [${ _mime }]`)
 			const _callBack = ( ...data ) => {
 				socket.emit ( _uuid, ...data )
 			}
 			let y = mime.lookup( _mime )
+
+			console.log ( y )
 			if ( !y ) {
 				return _callBack ( new Error ('no mime'))
 			}
 			return _callBack ( null, y )
+		})
+
+		socket.on ( 'keypair', ( publicKey, CallBack ) => {
+			console.log ( `socket.on ( 'keypair') \n`)
+			const _uuid = Uuid.v4()
+			CallBack( _uuid )
+			
+			return Tool.getPublicKeyInfo ( publicKey, ( err, data ) => {
+				if ( err ) {
+					return socket.emit ( _uuid, err )
+				}
+				keyPair = data
+				let connect = false
+				const _connect = this.imapConnectPool.get ( keyPair.email )
+				if ( _connect ) {
+					connect = true
+				}
+				socket.emit ( _uuid, null, this.localKeyPair.public, connect )
+			})
+			
 		})
 /*
 		socket.on ('getUrl', ( url: string, CallBack ) => {
@@ -367,10 +339,10 @@ export default class localServer {
 */
 	}
 
-	private doingCheckImap ( socket: SocketIO.Socket ) {
-		this.imapConnectData.imapTestResult = false
+	private doingCheckImap ( socket: SocketIO.Socket, imapData: IinputData, keyPair:Kloak_LocalServer_keyInfo ) {
+		
 		return Async.series ([
-			next => Imap.imapAccountTest ( this.imapConnectData, err => {
+			next => Imap.imapAccountTest ( imapData, err => {
 				if ( err ) {
 					
 					return next ( err )
@@ -379,23 +351,34 @@ export default class localServer {
 				socket.emit ( 'imapTest' )
 				return next ()
 			}),
-			next => Tool.smtpVerify ( this.imapConnectData, next )
+			next => Tool.smtpVerify ( imapData, next )
 		], ( err: Error ) => {
 			
 			if ( err ) {
 				console.log (`doingCheckImap Async.series Error!`, err )
-				return socket.emit ( 'smtpTest', imapErrorCallBack ( err.message ))
+				return socket.emit ( 'imapTest', err.message || err )
 			}
 
-			this.imapConnectData.imapTestResult = true
-			return Tool.saveEncryptoData ( Tool.imapDataFileName1, this.imapConnectData, this.config, this.savedPasswrod, err => {
-				console.log (`socket.emit ( 'imapTestFinish' )`)
-				socket.emit ( 'imapTestFinish' , this.imapConnectData )
-			})
+			imapData.imapTestResult = true
 			
+			return Tool.encryptMessage ( keyPair.publicKeys, this.localKeyPair.privateKey, JSON.stringify ( imapData ), ( err, data ) => {
+
+				return socket.emit ( 'imapTestFinish' , err, data )
+			})
+
 		})
 			
 		
+	}
+
+	private newKeyPair ( CallBack ) {
+		return Tool.newKeyPair ( "admin@Localhost.local", "admin", this.serverKeyPassword, ( err, data ) => {
+			if ( err ) {
+				return CallBack ( err )
+			}
+			this.localKeyPair = data
+			return CallBack ()
+		})
 	}
 
 	private socketServerConnected ( socket: SocketIO.Socket ) {
@@ -409,201 +392,7 @@ export default class localServer {
 
 		saveLog ( `socketServerConnected ${ clientName } connect ${ this.localConnected.size }`)
 
-
-		socket.once ( 'init', Callback1 => {
-			const uuid = Uuid.v4()
-			Callback1 ( uuid )
-			const ret = Tool.emitConfig ( this.config, false )
-			//console.log ( Util.inspect( ret, false, 3, true  ))
-			//console.log ( `typeof Callback1 [${ typeof Callback1 }]`)
-			return socket.emit ( uuid, null, ret )
-		})
-
-		socket.once ( 'agreeClick', () => {
-			this.config.firstRun = false
-			return Tool.saveConfig ( this.config, saveLog )
-		})
-
-		socket.on ( 'checkPemPassword', ( password: string, CallBack1 ) => {
-			const uuid = Uuid.v4()
-			CallBack1 ( uuid )
-			this.sessionHashPool.push ( sessionHash = Crypto.randomBytes ( 10 ).toString ('hex'))
-
-			const passwordFail = ( imap ) => {
-
-				console.log (`passwordFail this.Pbkdf2Password = [${ this.Pbkdf2Password}]`)
-				return socket.emit ( uuid, null, imap, this.Pbkdf2Password, sessionHash )
-				
-			}
-
-			if ( !this.config.keypair || !this.config.keypair.publicKey ) {
-				console.log ( `checkPemPassword !this.config.keypair` )
-				return passwordFail ( true )
-			}
-			if ( !password || password.length < 5 ) {
-				console.log (`! password `)
-				return passwordFail ( true )
-			}
-			if ( this.savedPasswrod && this.savedPasswrod.length ) {
-				if ( this.savedPasswrod !== password ) {
-					console.log ( `savedPasswrod !== password `)
-					return passwordFail ( true )
-				}
-				
-				return passwordFail ( this.imapConnectData )
-				
-				
-			}
-			
-			return Async.waterfall ([
-				next => Tool.getPbkdf2 ( this.config, password, next ),
-				( Pbkdf2Password: Buffer, next ) => {
-					this.Pbkdf2Password = Pbkdf2Password.toString ( 'hex' )
-					
-					Tool.getKeyPairInfo ( this.config.keypair.publicKey, this.config.keypair.privateKey, this.Pbkdf2Password, next )
-				},
-				( key, next ) => {
-					//console.log ( `checkPemPassword Tool.getKeyPairInfo success!`)
-					if ( ! key.passwordOK ) {
-						this.Pbkdf2Password = null
-						saveLog ( `[${ clientName }] on checkPemPassword had try password! [${ password }]` )
-						return passwordFail ( true )
-					}
-					//console.log (`checkPemPassword this.Pbkdf2Password = [${ this.Pbkdf2Password}]`)
-					this.savedPasswrod = password
-					
-					this.keyPair = key
-					clientObj.listenAfterPasswd = clientObj.login = true
-					this.localConnected.set ( clientName, clientObj )
-					return Tool.makeGpgKeyOption ( this.config, this.savedPasswrod, next )
-				},
-				( option_KeyOption, next ) => {
-					console.log (`checkPemPassword Tool.makeGpgKeyOption success!`)
-					this.openPgpKeyOption = option_KeyOption
-
-					return Tool.readEncryptoFile ( Tool.imapDataFileName1, password, this.config, next )
-			}], ( err: Error, data: string ) => {
-				console.log (`checkPemPassword Async.waterfall success!`)
-				if ( err ) {
-					if ( !( err.message && /no such file/i.test( err.message ))) {
-						passwordFail ( null )
-						return saveLog ( `Tool.makeGpgKeyOption return err [${ err && err.message ? err.message : null }]` )
-					}
-				}
-
-				
-				// console.log (`this.sessionHashPool.push!\n${ this.sessionHashPool }\n${ this.sessionHashPool.length }`)
-				this.listenAfterPassword ( socket, sessionHash )
-
-				try {
-					this.imapConnectData = JSON.parse ( data )
-					
-				} catch ( ex ) {
-					return passwordFail ( null )
-				}
-				this.localConnected.set ( clientName, clientObj )
-					
-				return passwordFail ( this.imapConnectData )
-			})
-			
-		})
-
-		socket.on ( 'deleteKeyPairNext', CallBack1 => {
-			CallBack1()
-			console.log ( `on deleteKeyPairNext` )
-			const thisConnect = this.localConnected.get ( clientName )
-
-			if ( this.localConnected.size > 1 && thisConnect && ! thisConnect.login ) {
-				console.log (`this.localConnected = [${ Util.inspect( this.localConnected, false, 2, true )}], thisConnect.login = [${ thisConnect.login }]`)
-				return this.socketServer.emit ( 'deleteKeyPairNoite' )
-			}
-			const info = `socket on deleteKeyPairNext, delete key pair now.`
-			
-			saveLog ( info )
-			this.config = Tool.InitConfig ()
-			this.config.firstRun = false
-			this.keyPair = null
-			Tool.saveConfig ( this.config, saveLog )
-			if ( this.CoNETConnectCalss ) {
-				this.CoNETConnectCalss.destroy ( 2 )
-				this.CoNETConnectCalss = null
-			}
-			sessionHash = ''
-			Tool.deleteImapFile ()
-			return this.socketServer.emit ( 'init', null, this.config )
-		})
-
-		socket.on ( 'NewKeyPair', ( preData: INewKeyPair, CallBack1 ) => {
-			const uuid = Uuid.v4()
-			CallBack1( uuid )
-
-			const _callBack = ( ...data ) => {
-				socket.emit ( uuid, ...data )
-			}
-			//		already have key pair
-
-			if ( this.config.keypair && this.config.keypair.createDate ) {
-				return saveLog (`[${ clientName }] on NewKeyPair but system already have keypair: ${ this.config.keypair.publicKeyID } stop and return keypair.`)
-			}
-
-			this.savedPasswrod = preData.password
-			return Tool.getPbkdf2 ( this.config, this.savedPasswrod, ( err, Pbkdf2Password: Buffer ) => {
-				if ( err ) {
-					saveLog ( `NewKeyPair getPbkdf2 Error: [${ err.message }]`)
-					return _callBack ('systemError')
-				}
-				
-				preData.password = Pbkdf2Password.toString ( 'hex' )
-				//console.log (`preData.password = [${ preData.password }]`)
-				return Tool.newKeyPair( preData.email, preData.nikeName, preData.password, ( err, retData )=> {
-					if ( err ) {
-						console.log ( err )
-						_callBack ()
-						return saveLog (`CreateKeyPairProcess return err: [${ err.message }]`)
-					}
-					
-				
-					if ( ! retData ) {
-						const info = `newKeyPair return null key!`
-						saveLog ( info )
-						console.log ( info )
-						return _callBack ( )
-					}
-					
-					if ( !clientObj.listenAfterPasswd ) {
-						clientObj.listenAfterPasswd = clientObj.login = true
-						
-						this.localConnected.set ( clientName, clientObj )
-						this.sessionHashPool.push ( sessionHash = Crypto.randomBytes (10).toString ('hex'))
-						//console.log ( `this.sessionHashPool.push!\n${ this.sessionHashPool }\n${ this.sessionHashPool.length }`)
-						this.listenAfterPassword ( socket, sessionHash )
-					}
-					
-					return Tool.getKeyPairInfo ( retData.publicKey, retData.privateKey, preData.password, ( err, key ) => {
-						if ( err ) {
-							const info = `Tool.getKeyPairInfo Error [${ err.message ? err.message : 'null err message '}]`
-							return _callBack ( 'systemError' )
-						}
-						this.keyPair = this.config.keypair = key
-						this.config.account = this.config.keypair.email
-						return Tool.makeGpgKeyOption ( this.config, this.savedPasswrod, ( err, data ) => {
-							if ( err ) {
-								return saveLog ( err.message )
-							}
-							this.openPgpKeyOption = data
-							Tool.saveConfig ( this.config, saveLog )
-							
-							return _callBack ( null, this.config.keypair, sessionHash )
-						})
-						
-					})
-				})
-								
-			})
-			
-		})
-
-
+		return this.listenAfterPassword ( socket )
 	}
 
 	constructor( private cmdResponse: ( cmd: QTGateAPIRequestCommand ) => void, test: boolean ) {
@@ -615,19 +404,25 @@ export default class localServer {
 		this.expressServer.use ( Express.static ( Tool.QTGateFolder ))
 		this.expressServer.use ( Express.static ( Path.join ( __dirname, 'public' )))
 		this.expressServer.use ( Express.static ( Path.join ( __dirname, 'html' )))
-	
-		
 		
 		this.expressServer.get ( '/', ( req, res ) => {
-
             res.render( 'home', { title: 'home', proxyErr: false  })
 		})
+
+		this.expressServer.get ( '/message', ( req, res ) => {
+            res.render( 'home/message', { title: 'message', proxyErr: false  })
+		})
+
+		this.expressServer.get ( '/browserNotSupport', ( req, res ) => {
+            res.render( 'home/browserNotSupport', { title: 'browserNotSupport', proxyErr: false  })
+		})
+
+		
 
 		this.socketServer.on ( 'connection', socker => {
 			return this.socketServerConnected ( socker )
 		})
 		
-
 		this.httpServer.once ( 'error', err => {
 			console.log (`httpServer error`, err )
 			saveServerStartupError ( err )
@@ -635,22 +430,15 @@ export default class localServer {
 		})
 
 		
-
-		Async.series ([
-			next => Tool.checkSystemFolder ( next ),
-			next => Tool.checkConfig ( next )	
-		], ( err, data ) => {
+		this.newKeyPair ( err => {
 			if ( err ) {
 				return saveServerStartupError ( err )
 			}
+			return this.httpServer.listen ( Tool.LocalServerPortNumber, () => {
+				saveServerStartup ( `localhost`)
+			})
 			
-			this.config = data['1']
-			if ( !test ) {
-				this.httpServer.listen ( Tool.LocalServerPortNumber, () => {
-					return saveServerStartup ( `localhost`)
-				})
-			}
 		})
-		
+
 	}
 }

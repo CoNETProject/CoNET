@@ -30,28 +30,33 @@ const showHTMLComplete = ( uuid: string, zipStream: string, CallBack ) => {
 		const ret = {
 			img: null,
 			html: null,
-			folder: []
+			folder: [],
+			mhtml: null
 		}
 		const allFiles = Object.keys ( zip.files )
 		let currentFileName = allFiles.shift()
 		
-		const _CallBack = content => {
+		const _CallBack = ( content: string ) => {
 
 			if ( content && content.length > 20 ) {
 				
 				const processFile = () => {
+					
 					switch ( currentFileName ) {
-							case `temp/${ uuid }.html`: {
-								return ret.html = content
+							case `${ uuid }.html`: {
+								return ret.html = Buffer.from ( content, 'base64').toString()
 								
 							}
-							case `temp/${ uuid }.png`: {
-								return ret.img = content
-								
+							case `${ uuid }.png`: {
+								return ret.img = Buffer.from ( content, 'base64').toString()
+							}
+
+							case `${ uuid }.mhtml`: {
+								return ret.mhtml = Buffer.from ( content, 'base64').toString()
 							}
 							
 							default: {
-								return ret.folder.push ( { filename: currentFileName.replace( 'temp/','./' ), data: content })
+								return ret.folder.push ({ filename: currentFileName, data: content })
 							}
 			
 						}
@@ -61,7 +66,7 @@ const showHTMLComplete = ( uuid: string, zipStream: string, CallBack ) => {
 			}
 			
 			if ( currentFileName = allFiles.shift() ) {
-				return zip.files [ currentFileName ].async ( 'string' ).then ( _CallBack, errCallBack )
+				return zip.files [ currentFileName ].async ( 'base64' ).then ( _CallBack, errCallBack )
 			}
 			
 			return CallBack ( null, ret )
@@ -69,7 +74,7 @@ const showHTMLComplete = ( uuid: string, zipStream: string, CallBack ) => {
 		}
 
 		if ( currentFileName ) {
-			return zip.files [ currentFileName ].async ( 'string' ).then ( _CallBack, errCallBack )
+			return zip.files [ currentFileName ].async ( 'base64' ).then ( _CallBack, errCallBack )
 		}
 		return CallBack ( null, ret )
 		

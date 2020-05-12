@@ -10,7 +10,6 @@
 
 CoNet is a computer network, privacy-enhancing technology that has been designed to network nodes that utilize an email address as the origin/termination of communication. This offers a work-around from the use of an IP address as the origin/termination of communication which is a system that has been compromised on the most fundamental level allowing for censorship and outright blocking of specific communications.
 
-
 ### CoNetはメールアドレスで複数のデバイスを相互接続した情報通信網であります
 
 CoNetは普通のネットワークで送受信IPアドレスをメールアドレスにする、新たに設計された情報通信網であります。匿名、隱身、セキュア、ネット検閲から逃げる能力を持ちます。

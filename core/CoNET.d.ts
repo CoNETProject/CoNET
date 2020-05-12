@@ -709,3 +709,19 @@ interface JQueryStatic<TElement extends Node = HTMLElement> {
     //'langEH', this.tLang(), { expires: 180, path: '/' }
     cookie( ...obj:any): any
 }
+
+interface workerDataEvent {
+    uuid: string
+    data: any
+    workerName: string
+
+}
+
+interface Kloak_LocalServer_keyInfo {
+	nikeName: string
+	email: string
+	keyID: string
+    KloakValid: boolean
+    otherValid: string[]
+	publicKeys: object
+}

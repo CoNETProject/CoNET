@@ -2,10 +2,10 @@ doctype html
 html
 	include header
 	body#body( data-bind = " css: { 'bodyCoNETBlue': bodyBlue }")
-		block jumbotron
-		block jumbotron1
 		script.
 			if ( typeof module === 'object') { window.module = module; module = undefined; }
+		block jumbotron
+		block jumbotron1
 		script( src='/scripts/jquery.min.js', type="text/javascript" )
 		script( src='/scripts/socket.io.js', type="text/javascript" )
 		script( src='/scripts/jcanvas.min.js', type="text/javascript" )
@@ -17,7 +17,8 @@ html
 		script( src='/scripts/knockout.js', type="text/javascript" )
 		script( src='/scripts/knockout.animate.js', type="text/javascript" )
 		script( src='/scripts/Cleave.js', type="text/javascript" )
-		script( src='/scripts/openpgp.min.js', type="text/javascript" )
+		script( src='/scripts/lightweight/openpgp.min.js', type="text/javascript" )
+		script( src='/scripts/mHtml2Html.js', type="text/javascript" )
 		script( src='/scripts/siteShare.js', type="text/javascript" )
 		script( src='/scripts/connectInformationMessage.js', type="text/javascript" )
 		script( src='/scripts/keyPairGenerateForm.js', type="text/javascript" )
@@ -30,4 +31,10 @@ html
 		script( src='/scripts/showHTMLComplete.js', type="text/javascript" )
 		script( src='/scripts/home.js', type="text/javascript" )
 		script( src='/scripts/TweenMax.min.js', type="text/javascript" )
+		
+		script.
+			if ( typeof jQuery == 'undefined' || !jQuery.support.noCloneChecked || !jQuery.support.clearCloneStyle || !jQuery.support.optSelected || !jQuery.support.radioValue ) {
+				window.location.href = "/browserNotSupport";
+			}
+
 		block ScriptBlock

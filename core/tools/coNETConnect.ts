@@ -15,10 +15,8 @@
  */
 
 import * as Imap from './imap'
-import { randomBytes } from 'crypto'
 import * as Tool from './initSystem'
 import * as Fs from 'fs'
-import * as Async from 'async'
 
 
 let logFileFlag = 'w'
@@ -40,10 +38,12 @@ export default class extends Imap.imapPeer {
 	private CoNETConnectReady = false
 	public connectStage = -1
 	public alreadyExit = false
-	private timeoutWaitAfterSentrequestMail:NodeJS.Timeout = null
+	private timeoutWaitAfterSentrequestMail: NodeJS.Timeout = null
+	private roomEmit = this.server.to ( this.socket.id )
 
 	public exit1 ( err ) {
-		this.sockerServer.emit ( 'tryConnectCoNETStage', null, -1 )
+		console.trace (`imapPeer doing exit! this.sockerServer.emit ( 'tryConnectCoNETStage', null, -1 )`)
+		this.roomEmit.emit ( 'tryConnectCoNETStage', null, -1 )
 		if ( !this.alreadyExit ) {
 			this.alreadyExit = true
 			console.log (`CoNETConnect class exit1 doing this._exit() success!`)
@@ -54,30 +54,20 @@ export default class extends Imap.imapPeer {
 
 	public setTimeWaitAfterSentrequestMail () {
 		this.timeoutWaitAfterSentrequestMail = setTimeout (() => {
-			return this.sockerServer.emit ( 'tryConnectCoNETStage', null, 0 )
-		}, 1000 * 60 * 1.5 )
+			return this.roomEmit.emit ( 'tryConnectCoNETStage', null, 0 )
+		}, requestTimeOut * 2 )
 	}
 
-	public sendRequestMail () {
-		return Tool.sendCoNETConnectRequestEmail ( this.imapData, this.openKeyOption, this.publicKey, this.nodeEmailAddress, ( err: Error ) => {
-			if ( err ) {
-				return console.log ( `Imap.imapPeer sentConnectMail got Error!`)
-			}
-			this.setTimeWaitAfterSentrequestMail ()
-		})
-	}
-
-
-
-	constructor ( public imapData: IinputData, private sockerServer, private sentConnectMail,  private nodeEmailAddress, private openKeyOption: any, private publicKey: string, 
+	constructor ( public imapData: IinputData, public server: SocketIO.Server, public socket: SocketIO.Socket, 
 		private cmdResponse: ( mail: string, hashCode: string ) => void, public _exit: ( err ) => void ) {
 		super ( imapData, imapData.clientFolder, imapData.serverFolder, err => {
-			this.sockerServer.emit ( 'tryConnectCoNETStage', null, -2 )
+			console.debug ( `imapPeer doing exit! err =`, err )
+			this.roomEmit.emit ( 'tryConnectCoNETStage', null, -2 )
 			return this.exit1 ( err )
 		})
 
 		saveLog (`=====================================  new CoNET connect()`, true )
-		this.sockerServer.emit ( 'tryConnectCoNETStage', null, 5 )
+		this.roomEmit.emit ( 'tryConnectCoNETStage', null, 5 )
 		this.newMail = ( mail: string, hashCode: string ) => {
 			return this.cmdResponse ( mail, hashCode )
 		}
@@ -85,46 +75,32 @@ export default class extends Imap.imapPeer {
 		this.on ( 'CoNETConnected', publicKey => {
 			
 			this.CoNETConnectReady = true
-			this.sentConnectMail = false
 			saveLog ( 'Connected CoNET!', true )
 			//console.log ( publicKey )
 			clearTimeout ( this.timeoutWaitAfterSentrequestMail )
 			this.connectStage = 4
-			this.sockerServer.emit ( 'tryConnectCoNETStage', null, 4, publicKey )
+			this.roomEmit.emit ( 'tryConnectCoNETStage', null, 4, publicKey )
 			return 
 		})
 
 		this.on ( 'pingTimeOut', () => {
 
 			console.log ( `class CoNETConnect on pingTimeOut` )
-			if ( this.sentConnectMail ) {
-				return 
-			}
-			this.sentConnectMail = true
-			this.sockerServer.emit ( 'tryConnectCoNETStage', null, 3 )
 			
-			return this.sendRequestMail ()
+			return this.roomEmit.emit ( 'pingTimeOut' )
 			
 
 		})
 
 		this.on ( 'ping', () => {
-			this.sockerServer.emit ( 'tryConnectCoNETStage', null, 1 )
-			this.sockerServer.emit ( 'tryConnectCoNETStage', null, 2 )
-					
-			if ( sentConnectMail ) {
-				console.log (`CoNETConnect class sentConnectMail = true`)
-				this.sockerServer.emit ( 'tryConnectCoNETStage', null, 3 )
-				return this.sendRequestMail ()
-				
-			}
+			this.roomEmit.emit ( 'tryConnectCoNETStage', null, 2 )
+			//this.sockerServer.emit ( 'tryConnectCoNETStage', null, 2 )
 		})
 		
 	}
 
 	public requestCoNET_v1 ( uuid: string, text: string, CallBack ) {
 		return this.sendDataToANewUuidFolder ( Buffer.from ( text).toString ( 'base64' ), this.imapData.serverFolder, uuid, CallBack )
-
 	}
 
 	public getFile ( fileName: string, CallBack ) {
@@ -132,25 +108,34 @@ export default class extends Imap.imapPeer {
 		if ( this.alreadyExit ) {
 			return CallBack ( new Error ('alreadyExit'))
 		}
-
+		console.log (`requestCoNET_v1 get file:[${ fileName }]`)
 		const rImap: Imap.qtGateImapRead = new Imap.qtGateImapRead ( this.imapData, fileName, true, mail => {
 			
-			
 			const attr = Imap.getMailAttached ( mail )
-			
-			CallBack ( null, attr )
-			callback = true
-			return rImap.logout ()
+			console.log (`=========>   getFile mail.length = [${ mail.length }] attr.length = [${ attr.length }]`)
+			if ( !callback ) {
+				callback = true
+				CallBack ( null, attr )
+			}
+			return rImap.destroyAll( null )
 		})
 
 		rImap.once ( 'error', err => {
-			rImap.destroyAll( null )
-			return this.getFile ( fileName, CallBack )
+		
+			return rImap.destroyAll( null )
 		})
 
-		rImap.once( 'end', () => {
-			return console.log (`Connect Class GetFile_rImap on end!`)
+		rImap.once( 'end', err => {
+			if ( err ) {
+				if ( !callback ) {
+					saveLog (`getFile got error [${ err }]\nDoing getFile again!\n`)
+					return this.getFile ( fileName, CallBack  )
+				}
+				
+			}
+			return saveLog (`getFile [${ fileName }] success!`)
 		})
 
 	}
+
 }

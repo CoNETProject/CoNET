@@ -23,8 +23,8 @@ block jumbotron1
 	section#welcome.content
 		.welcome-bg
 			.welcome( style="color: white;")
-				h1( data-bind = " text: infoDefine [ languageIndex() ].cover.firstTitle1, animate:{ animation: ['slideInUp','slideOutUp'], state: languageIndex() + 1, delay: 0 }" )
-				h1( style="padding-right:1em;padding-left:1em;" data-bind = " text: infoDefine [ languageIndex() ].cover.firstTitle2, animate: { animation: ['slideInUp','slideOutUp'], state: languageIndex() + 1, delay: 70 }")
+				h1.shadowText1( data-bind = " text: infoDefine [ languageIndex() ].cover.firstTitle1, animate:{ animation: ['slideInUp','slideOutUp'], state: languageIndex() + 1, delay: 0 }" )
+				h3.shadowText1( style="padding-right:1em;padding-left:1em;" data-bind = " text: infoDefine [ languageIndex() ].cover.firstTitle2, animate: { animation: ['slideInUp','slideOutUp'], state: languageIndex() + 1, delay: 70 }")
 				//-.ui.primary.basic.big.button( data-bind="click: openClick, text: infoDefine [ languageIndex() ].cover.start" style="margin-top: 2em;" )
 				.button(style="position: relative;width: 4em;height: 4em;")
 					a.play-btn(data-bind="click: openClick" href="#")
@@ -34,7 +34,7 @@ block jumbotron1
 	<!-- /ko -->
 	
 	<!-- ko if: CanadaBackground -->
-	section#CanadaBackground( style = "position: absolute;width: 100%;")
+	section#CanadaBackground( style = "position: absolute;width: 100%;top: 5em;")
 		include coSearchImage.html
 	<!-- /ko -->
 
@@ -285,7 +285,7 @@ block jumbotron1
 							.ui.grid.equal.width.right.aligned.container( style="margin-top: 0.1em; margin-bottom: 0.1em;")
 								.row( style = "background-color: #D94235; padding-bottom: 0px;")
 									.column.left.aligned
-										img( src = "/images/512x512.png" style = "margin-left: 1em; height: 50px;")
+										img( src = "/images/512.png" style = "margin-left: 1em; height: 50px;")
 									.column
 										<!-- ko ifnot: showRequestActivEmailButtonError -->
 											.ui.purple.button( style = "position: absolute; right: 2em; top: 0em;" data-bind="css:{ loading: activeing }, text: infoDefine [ $root.languageIndex() ].emailConform.conformButtom, click: checkActiveEmailSubmit, visible: conformButtom ()" )
@@ -405,7 +405,6 @@ block jumbotron1
 	<!-- /ko -->
 
 	<!-- /ko -->
-	
 
 
 
@@ -418,8 +417,6 @@ block jumbotron1
 		<!----------- end tempAppHtml DEBUG ----------------->
 	<!-- /ko -->
 
-	
+	<!-- /ko -->
+	<!-- /ko -->
 
-	<!-- /ko -->
-	<!-- /ko -->
-	

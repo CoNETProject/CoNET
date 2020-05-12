@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 class keyPairPassword {
-    constructor(exit) {
+    constructor(privateKey, exit) {
+        this.privateKey = privateKey;
         this.exit = exit;
         this.showPasswordErrorMessage = ko.observable(false);
         this.systemSetup_systemPassword = ko.observable('');
@@ -40,12 +41,19 @@ class keyPairPassword {
             return this.showPasswordError();
         }
         this.passwordChecking(true);
-        return _view.connectInformationMessage.sockEmit('checkPemPassword', this.systemSetup_systemPassword(), function (err, _imapData, passwd, sessionHash) {
-            self.passwordChecking(false);
-            if (err || typeof _imapData === 'boolean' && _imapData) {
+        const passwd = this.systemSetup_systemPassword();
+        return openpgp.key.readArmored(this.privateKey).then(data => {
+            const keys = data.keys[0];
+            return keys.decrypt(passwd).then(data => {
+                self.passwordChecking(false);
+                return self.exit(passwd);
+            }).catch(ex => {
+                self.passwordChecking(false);
                 return self.showPasswordError();
-            }
-            return self.exit(_imapData, passwd, sessionHash);
+            });
+        }).catch(ex => {
+            self.passwordChecking(false);
+            return self.showPasswordError();
         });
     }
 }

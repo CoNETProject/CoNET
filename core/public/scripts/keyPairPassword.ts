@@ -14,12 +14,13 @@
  * limitations under the License.
  */
 
+
 class keyPairPassword {
 	public showPasswordErrorMessage = ko.observable ( false )
 	public systemSetup_systemPassword = ko.observable ('')
 	public passwordChecking = ko.observable ( false )
 	public inputFocus = ko.observable ( false )
-	constructor ( private exit: ( imapDat: imapData, passwd: string, sessionHash: string ) => void ) {
+	constructor ( private privateKey: string,  private exit: ( passwd: string ) => void ) {
 		const self = this
 		this.systemSetup_systemPassword.subscribe ( function ( newValue ) {
 			if ( !newValue || !newValue.length ) {
@@ -43,12 +44,22 @@ class keyPairPassword {
 			return this.showPasswordError ()
 		}
 		this.passwordChecking ( true )
-		return _view.connectInformationMessage.sockEmit ( 'checkPemPassword', this.systemSetup_systemPassword(), function ( err: boolean, _imapData: imapData, passwd: string, sessionHash: string ) {
-			self.passwordChecking ( false )
-			if ( err || typeof _imapData === 'boolean' && _imapData ) {
+		const passwd = this.systemSetup_systemPassword()
+		
+		return openpgp.key.readArmored ( this.privateKey ).then ( data => {
+			const keys = data.keys[0]
+			return keys.decrypt ( passwd ).then ( data => {
+				self.passwordChecking ( false )
+				return self.exit ( passwd )
+			}).catch ( ex => {
+				self.passwordChecking ( false )
 				return self.showPasswordError()
-			}
-			return self.exit ( _imapData, passwd, sessionHash )
+			})
+
+		}).catch ( ex => {
+			self.passwordChecking ( false )
+			return self.showPasswordError()
 		})
+		
 	}
 }

@@ -35,7 +35,7 @@ const getImapSmtpHost = function (_email) {
     const emailSplit = email.split('@');
     if (emailSplit.length !== 2)
         return null;
-    const domain = yahoo(emailSplit[1]);
+    const domain = yahoo(emailSplit[1].toLowerCase());
     const ret = {
         imap: 'imap.' + domain,
         smtp: 'smtp.' + domain,
@@ -49,98 +49,91 @@ const getImapSmtpHost = function (_email) {
     switch (domain) {
         //		yahoo domain have two different 
         //		the yahoo.co.jp is different other yahoo.*
-        case 'yahoo.co.jp':
-            {
-                ret.imap = 'imap.mail.yahoo.co.jp';
-                ret.smtp = 'smtp.mail.yahoo.co.jp';
-            }
+        case 'yahoo.co.jp': {
+            ret.imap = 'imap.mail.yahoo.co.jp';
+            ret.smtp = 'smtp.mail.yahoo.co.jp';
             break;
+        }
         //			gmail
         case 'google.com':
         case 'googlemail.com':
-        case 'gmail':
-            {
-                ret.haveAppPassword = true;
-                ret.ApplicationPasswordInformationUrl = [
-                    'https://support.google.com/accounts/answer/185833?hl=zh-Hans',
-                    'https://support.google.com/accounts/answer/185833?hl=ja',
-                    'https://support.google.com/accounts/answer/185833?hl=en'
-                ];
-            }
+        case 'gmail': {
+            ret.haveAppPassword = true;
+            ret.ApplicationPasswordInformationUrl = [
+                'https://support.google.com/accounts/answer/185833?hl=zh-Hans',
+                'https://support.google.com/accounts/answer/185833?hl=ja',
+                'https://support.google.com/accounts/answer/185833?hl=en'
+            ];
             break;
-        case 'gandi.net':
+        }
+        case 'gandi.net': {
             ret.imap = ret.smtp = 'mail.gandi.net';
             break;
+        }
         //				yahoo.com
         case 'rocketmail.com':
         case 'y7mail.com':
         case 'ymail.com':
-        case 'yahoo.com':
-            {
-                ret.imap = 'imap.mail.yahoo.com';
-                ret.smtp = (/^bizmail.yahoo.com$/.test(emailSplit[1]))
-                    ? 'smtp.bizmail.yahoo.com'
-                    : 'smtp.mail.yahoo.com';
-                ret.haveAppPassword = true;
-                ret.ApplicationPasswordInformationUrl = [
-                    'https://help.yahoo.com/kb/SLN15241.html',
-                    'https://help.yahoo.com/kb/SLN15241.html',
-                    'https://help.yahoo.com/kb/SLN15241.html'
-                ];
-            }
+        case 'yahoo.com': {
+            ret.imap = 'imap.mail.yahoo.com';
+            ret.smtp = (/^bizmail.yahoo.com$/.test(emailSplit[1]))
+                ? 'smtp.bizmail.yahoo.com'
+                : 'smtp.mail.yahoo.com';
+            ret.haveAppPassword = true;
+            ret.ApplicationPasswordInformationUrl = [
+                'https://help.yahoo.com/kb/SLN15241.html',
+                'https://help.yahoo.com/kb/SLN15241.html',
+                'https://help.yahoo.com/kb/SLN15241.html'
+            ];
             break;
-        case 'mail.ee':
+        }
+        case 'mail.ee': {
             ret.smtp = 'mail.ee';
             ret.imap = 'mail.inbox.ee';
             break;
+        }
         //		gmx.com
         case 'gmx.co.uk':
         case 'gmx.de':
         case 'gmx.us':
-        case 'gmx.com':
-            {
-                ret.smtp = 'mail.gmx.com';
-                ret.imap = 'imap.gmx.com';
-            }
+        case 'gmx.com': {
+            ret.smtp = 'mail.gmx.com';
+            ret.imap = 'imap.gmx.com';
             break;
+        }
         //		aim.com
-        case 'aim.com':
-            {
-                ret.imap = 'imap.aol.com';
-            }
+        case 'aim.com': {
+            ret.imap = 'imap.aol.com';
             break;
+        }
         //	outlook.com
         case 'windowslive.com':
         case 'hotmail.com':
-        case 'outlook.com':
-            {
-                ret.imap = 'imap-mail.outlook.com';
-                ret.smtp = 'smtp-mail.outlook.com';
-            }
+        case 'outlook.com': {
+            ret.imap = 'imap-mail.outlook.com';
+            ret.smtp = 'smtp-mail.outlook.com';
             break;
+        }
         //			apple mail
         case 'icloud.com':
         case 'mac.com':
-        case 'me.com':
-            {
-                ret.imap = 'imap.mail.me.com';
-                ret.smtp = 'smtp.mail.me.com';
-            }
+        case 'me.com': {
+            ret.imap = 'imap.mail.me.com';
+            ret.smtp = 'smtp.mail.me.com';
             break;
+        }
         //			163.com
         case '126.com':
-        case '163.com':
-            {
-                ret.imap = 'appleimap.' + domain;
-                ret.smtp = 'applesmtp.' + domain;
-            }
+        case '163.com': {
+            ret.imap = 'appleimap.' + domain;
+            ret.smtp = 'applesmtp.' + domain;
             break;
+        }
         case 'sina.com':
-        case 'yeah.net':
-            {
-                ret.smtpSsl = false;
-            }
+        case 'yeah.net': {
+            ret.smtpSsl = false;
             break;
+        }
     }
     return ret;
 };
@@ -211,13 +204,12 @@ class keyPairSign {
                     if (com.error) {
                         return showFromatError(com.error);
                     }
-                    return _view.connectInformationMessage.sockEmit('checkActiveEmailSubmit', com.Args[0], (err, data) => {
-                        const config = _view.localServerConfig();
-                        config.keypair.verified = true;
-                        _view.keyPair(config.keypair);
-                        _view.sectionLogin(false);
-                        self.exit();
-                    });
+                    const keyPair = _view.localServerConfig().keypair;
+                    keyPair.verified = true;
+                    keyPair.publicKey = Buffer.from(com.Args[0], 'base64').toString();
+                    _view.keyPair(keyPair);
+                    _view.sectionLogin(false);
+                    self.exit();
                 }
             });
         });
@@ -275,6 +267,7 @@ class keyPairSign {
                     config.keypair.verified = true;
                     _view.keyPair(config.keypair);
                     _view.sectionLogin(false);
+                    localStorage.setItem("config", JSON.stringify(config));
                     self.exit();
                 });
             }
@@ -326,25 +319,44 @@ class imapForm {
         this.EmailAddressErrorType(0);
         this.passwordShowError(false);
     }
+    errorProcess(err) {
+        //		Invalid login
+        if (/Authentication|login/i.test(err)) {
+            return this.checkImapError(1);
+        }
+        //		Cannot connect to email server!
+        if (/ENOTFOUND/i.test(err)) {
+            return this.checkImapError(0);
+        }
+        this.checkImapError(5);
+    }
     checkImapSetup() {
         let self = this;
         this.checkProcessing(true);
         this.checkImapStep(0);
         const imapTest = function (err) {
-            if (err !== null && err > -1) {
+            if (err && typeof err === "string" || err !== null && err > -1) {
                 return errorProcess(err);
             }
             self.checkImapStep(5);
         };
         const smtpTest = function (err) {
-            if (err !== null && err > -1) {
+            if (err && typeof err === "string" || err !== null && err > -1) {
                 return errorProcess(err);
             }
             self.checkImapStep(2);
         };
-        const imapTestFinish = function (IinputData) {
+        const imapTestFinish = function (err, IinputData) {
             removeAllListen();
-            return self.exit(IinputData);
+            if (err) {
+                return errorProcess(err);
+            }
+            _view.keyPairCalss.decrypt_withLocalServerKey(IinputData, (err, data) => {
+                if (err) {
+                    return errorProcess(err);
+                }
+                return self.exit(data);
+            });
         };
         const removeAllListen = function () {
             _view.connectInformationMessage.socketIo.removeEventListener('smtpTest', smtpTest);
@@ -353,12 +365,44 @@ class imapForm {
         };
         const errorProcess = function (err) {
             removeAllListen();
-            return self.checkImapError(err);
+            if (typeof err === "number") {
+                return self.checkImapError(err);
+            }
+            return self.errorProcess(err);
         };
-        _view.connectInformationMessage.socketIo.once('smtpTest', smtpTest);
-        _view.connectInformationMessage.socketIo.once('imapTest', imapTest);
-        _view.connectInformationMessage.socketIo.once('imapTestFinish', imapTestFinish);
-        _view.connectInformationMessage.sockEmit('checkImap', self.emailAddress(), self.password(), new Date().getTimezoneOffset(), _view.tLang());
+        _view.connectInformationMessage.socketIo.on('smtpTest', smtpTest);
+        _view.connectInformationMessage.socketIo.on('imapTest', imapTest);
+        _view.connectInformationMessage.socketIo.on('imapTestFinish', imapTestFinish);
+        const imapServer = getImapSmtpHost(self.emailAddress());
+        const imapConnectData = {
+            email: self.account,
+            account: self.account,
+            smtpServer: imapServer.smtp,
+            smtpUserName: self.emailAddress(),
+            smtpPortNumber: imapServer.SmtpPort,
+            smtpSsl: imapServer.smtpSsl,
+            smtpIgnoreCertificate: false,
+            smtpUserPassword: self.password(),
+            imapServer: imapServer.imap,
+            imapPortNumber: imapServer.ImapPort,
+            imapSsl: imapServer.imapSsl,
+            imapUserName: self.emailAddress(),
+            imapIgnoreCertificate: false,
+            imapUserPassword: self.password(),
+            timeZoneOffset: new Date().getTimezoneOffset(),
+            language: _view.tLang(),
+            imapTestResult: null,
+            clientFolder: uuid_generate(),
+            serverFolder: uuid_generate(),
+            randomPassword: uuid_generate(),
+            uuid: uuid_generate(),
+            confirmRisk: false,
+            clientIpAddress: null,
+            ciphers: null,
+            sendToQTGate: false
+        };
+        _view.keyPairCalss.emitLocalCommand('checkImap', imapConnectData, err => {
+        });
     }
     checkEmailAddress(email) {
         this.clearError();
