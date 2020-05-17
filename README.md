@@ -4,7 +4,7 @@
 [![npm version](https://badge.fury.io/js/conet.svg)](https://badge.fury.io/js/conet)
 [![Build Status](https://travis-ci.org/QTGate/CoNET.svg?branch=master)](https://travis-ci.org/QTGate/CoNET)
 
-![http protocol](/resources/CoNet_vs_Internet.gif?raw=true)
+![http protocol](/resources/CoNet1.gif?raw=true)
 
 ### CoNet is global network that allow devices connected each other with email address
 
