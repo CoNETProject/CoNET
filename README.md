@@ -20,6 +20,8 @@ CoNet項目旨在創建一個全新的，基於郵箱地址來相互連結的計
 
 ![http protocol](/resources/conet2.png?raw=true)
 
+### How does CoNet work / CoNetの仕組み / CoNet工作原理
+![http protocol](/resources/CoNet_working.gif?raw=true)
 ### Node
 The CoNet node is an AP (access point) that provides the ability for users to connect to the CoNet network via a public email server like iCloud, Yahoo or Outlook. The node also maintains a routing table that helps the client and node find each other. All nodes connect to each other thereby building the core of the CoNet network in a similar fashion to an intronet. The CoNet node is an open source technology that will be open to development by any person or organization. They are then able to build their own node and to service their client via their private node. Additionally the CoNet node also makes possible the mining of CoNet cryptocurrency similar to how a traditional node in a blockchain operates.
 
