@@ -344,7 +344,6 @@ export default class localServer {
 		return Async.series ([
 			next => Imap.imapAccountTest ( imapData, err => {
 				if ( err ) {
-					
 					return next ( err )
 				}
 				console.log (`imapAccountTest success!`, typeof next )
@@ -355,7 +354,7 @@ export default class localServer {
 		], ( err: Error ) => {
 			
 			if ( err ) {
-				console.log (`doingCheckImap Async.series Error!`, err )
+				console.log ( `doingCheckImap Async.series Error!`, err )
 				return socket.emit ( 'imapTest', err.message || err )
 			}
 

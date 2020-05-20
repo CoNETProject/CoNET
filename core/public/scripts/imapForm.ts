@@ -360,7 +360,7 @@ class imapForm {
 	public EmailAddressErrorType = ko.observable ( 0 )
 	public showForm = ko.observable ( true )
 	public checkProcessing = ko.observable ( false )
-	public checkImapError = ko.observable (-1)
+	public checkImapError = ko.observable ( -1 )
 	public showCheckProcess = ko.observable ( false )
 	public checkImapStep = ko.observable (0)
 	
@@ -373,6 +373,7 @@ class imapForm {
 
 	private errorProcess ( err ) {
 
+		
 		//		Invalid login
 		if ( /Authentication|login/i.test ( err )) {
 			return this.checkImapError ( 1 )
@@ -382,6 +383,13 @@ class imapForm {
 		if ( /ENOTFOUND/i.test ( err )) {
 			return this.checkImapError ( 0 )
 		}
+
+		//		https://github.com/KloakIT/Kloak_platform/issues/2
+		if ( /certificate/i.test ( err )) {
+			return this.checkImapError ( 0 )
+		}
+
+
 
 		this.checkImapError ( 5 )
 	}
@@ -435,6 +443,7 @@ class imapForm {
 			if ( typeof err === "number") {
 				return self.checkImapError ( err )
 			}
+
 			return self.errorProcess ( err )
 		}
 

@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-exports.CoNET_version = '0.1.8';
+exports.CoNET_version = '0.1.10';
 const Fs = require("fs");
 const Path = require("path");
 const Os = require("os");
@@ -431,7 +431,6 @@ const _smtpVerify = (imapData, CallBack) => {
 exports.smtpVerify = (imapData, CallBack) => {
     console.log(`doing smtpVerify!`);
     let testArray = null;
-    let _ret = false;
     let err1 = null;
     if (typeof imapData.smtpPortNumber === 'object') {
         testArray = imapData.smtpPortNumber.map(n => {
@@ -459,22 +458,24 @@ exports.smtpVerify = (imapData, CallBack) => {
                 return next();
             }
             console.log(success);
-            if (!_ret) {
-                _ret = true;
+            if (typeof CallBack === 'function') {
                 imapData.smtpPortNumber = n.smtpPortNumber;
                 imapData.smtpSsl = n.smtpSsl;
                 imapData.ciphers = n.ciphers;
-                return CallBack();
+                CallBack();
+                CallBack = null;
             }
+            return next();
         });
     }, (err) => {
         if (err) {
             console.log(`smtpVerify ERROR = [${err.message}]`);
             return CallBack(err);
         }
-        if (!_ret) {
+        if (typeof CallBack === 'function') {
             console.log(`smtpVerify success Async!`);
-            return CallBack();
+            CallBack();
+            return CallBack = null;
         }
         console.log(`smtpVerify already did CallBack!`);
     });

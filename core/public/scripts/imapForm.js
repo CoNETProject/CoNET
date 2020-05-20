@@ -328,6 +328,10 @@ class imapForm {
         if (/ENOTFOUND/i.test(err)) {
             return this.checkImapError(0);
         }
+        //		https://github.com/KloakIT/Kloak_platform/issues/2
+        if (/certificate/i.test(err)) {
+            return this.checkImapError(0);
+        }
         this.checkImapError(5);
     }
     checkImapSetup() {

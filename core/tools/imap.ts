@@ -22,26 +22,18 @@ import * as Event from 'events'
 import * as Uuid from 'node-uuid'
 import * as Async from 'async'
 import * as Crypto from 'crypto'
-import * as Util from 'util'
 import { join } from 'path'
-import { homedir }from 'os'
 import { setTimeout, clearTimeout } from 'timers';
-import { start } from 'repl'
 import { Buffer } from 'buffer'
-import * as Fs from 'fs'
 import * as Tool from './initSystem'
 
 const MAX_INT = 9007199254740992
 const debug = true
-const pingFailureTime = 1000 * 60
+
 const NoopLoopWaitingTime = 1000 * 1
 
-const ErrorLogFile = join ( Tool.QTGateFolder, 'imap.log' )
-const ErrorLogFileStream = join ( Tool.QTGateFolder, 'imapStream.log' )
-let flag = 'w'
-const saveLog = ( log: string, _console: boolean = true ) => {
+export const saveLog = ( log: string, _console: boolean = true ) => {
 
-    const Fs = require ('fs')
     const data = `${ new Date().toUTCString () }: ${ log }\r\n`
     _console ? console.log ( data ) : null
 }
@@ -51,12 +43,8 @@ const debugOut = ( text: string, isIn: boolean, serialID: string ) => {
 
 }
 
-interface qtGateImapwriteAppendPool {
-    callback: (err?: Error) => void
-    text: string
-}
 const idleInterval = 1000 * 30      // 3 mins
-const socketTimeOut = 1000 * 60
+
 
 class ImapServerSwitchStream extends Stream.Transform {
     public commandProcess ( text: string, cmdArray: string[], next, callback ) {}
@@ -118,7 +106,6 @@ class ImapServerSwitchStream extends Stream.Transform {
         this.imapServer.literalPlus = /LITERAL\+/i.test ( capability )
         const ii = /X\-GM\-EXT\-1/i.test ( capability )
         const ii1 = /CONDSTORE/i.test ( capability )
-        const listenFolder = this.imapServer.listenFolder
         return this.imapServer.fetchAddCom = `(${ ii ? 'X-GM-THRID X-GM-MSGID X-GM-LABELS ': '' }${ ii1 ? 'MODSEQ ' : ''}BODY[])`
     }
 
@@ -354,13 +341,13 @@ class ImapServerSwitchStream extends Stream.Transform {
 
                 const uids = newMailIds.split(',')
                 //console.log (`doNewMail newMailIds = 【${ newMailIds }】`)
-				return Async.eachSeries ( uids, ( n ,next ) => {
+				return Async.eachSeries ( uids, ( n: string ,next ) => {
 					const _uid = parseInt( n )
 					if ( _uid > 0 ) {
 						return getNewMail ( _uid, next )
 					}
 					return next ()
-				}, ( err, newM ) => {
+				}, err => {
 					this.runningCommand = null
 					if ( err ) {
 						debug ? saveLog ( `ImapServerSwitchStream [${ this.imapServer.listenFolder || this.imapServer.imapSerialID }] doNewMail ERROR! [${ err.message }]`) : null
@@ -704,7 +691,7 @@ class ImapServerSwitchStream extends Stream.Transform {
         this.Tag = `A${ this.imapServer.TagCount1() }`
         this.cmd = `APPEND "${ this.imapServer.writeFolder }" {${ out.length }${ this.imapServer.literalPlus ? '+' : ''}}`
         this.cmd = `${ this.Tag } ${ this.cmd }`
-        const time = out.length / 1000 + 20000
+        const time = out.length + 15000
         this.debug ? debugOut ( this.cmd, false, this.imapServer.listenFolder || this.imapServer.imapSerialID ) : null
         if ( !this.writable ) {
             //console.log (`[${ this.imapServer.imapSerialID }] ImapServerSwitchStream append !this.writable doing imapServer.socket.end ()`)
@@ -902,14 +889,14 @@ class ImapServerSwitchStream extends Stream.Transform {
         this.appendWaitResponsrTimeOut = setTimeout (() => {
             //this.imapServer.emit ( 'error', new Error (`${ this.cmd } timeout!`))
             return this.doCommandCallback ( new Error (`${ this.cmd } timeout!`))
-        }, this.imapServer.fetching / 1000 + 30000 )
+        }, this.imapServer.fetching + 15000 )
 
         if ( this.writable ) {
 			
             return this.push ( this.cmd + '\r\n' )
         }
             
-        return this.imapServer.logout ()
+        return this.imapServer.destroyAll ( null )
     }
 
     private deleteBox ( CallBack ) {
@@ -1196,8 +1183,8 @@ export class qtGateImap extends Event.EventEmitter {
 export const seneMessageToFolder = ( IMapConnect: imapConnect, writeFolder: string, message: string, subject: string, CallBack ) => {
 	const wImap = new qtGateImap ( IMapConnect, null, false, writeFolder, debug, null )
 	let _callback = false 
-	console.log (`seneMessageToFolder !!!`)
-	wImap.once ('error', err => {
+	console.log ( `seneMessageToFolder !!!`)
+	wImap.once ( 'error', err => {
 		wImap.destroyAll ( err )
 		if ( !_callback ) {
 			CallBack ( err )

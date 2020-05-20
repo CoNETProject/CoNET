@@ -734,7 +734,7 @@ const infoDefine = [
             imapCheckError: [
                 '不能连接到邮件服务器，有可能您没有互联网，或所在网络不支持邮件IMAP通讯，请检查您的网络，或刷新页面重试一次。',
                 '邮件服务器提示用户名或密码错误，请仔细检查您的用户名和密码！ ',
-                '邮件服务器证书错误！您所在网络可能存在网络中间人攻击，请换网络环境后再尝试。 ',
+                '邮件伺服器证书错误！您所在网络可能存在网络中间人攻击。如果您使用某些防毒软件如Kaspersky，您设定了让它检测邮件，它会使用中间人拦截技术拦截任何邮件通讯，您需要关闭此项功能。',
                 '邮件服务器发送邮件错误，这通常是您使用的密码是普通密码所致，请换用APP密码后再次尝试',
                 '未连结互联网，请检查网络',
                 '未知错误，请退出CoNET后再试。',
@@ -1553,7 +1553,7 @@ const infoDefine = [
             imapCheckError: [
                 'Emailサーバーに接続ができませんでした。ネットワークがオフラインか、所在しているネットワークはメール通信プロトコルがサポートしておりません。ネット環境をチェンジし、ページを更新してからもう一回してみてください。',
                 'Emailサーバはログインエラーが提示しました。ユーザー名とパスワードを再チェックしてください。',
-                'Emailサーバーに提示したセキュリティ証明書は信頼できないものです。中間者攻撃があるネット環境にいるあもしれないです。ネット環境をチェンジしてもう一回してみてください。',
+                'Emailサーバーに提示したセキュリティ証明書は信頼できないものです。中間者攻撃があるネット環境にいるあもしれないです。このようなエラーの発生は多くのケースでは、Kasperskyのようなウイルス防止ソフトウェアは、メールウイルスをチェックする設定をしてしまうと、中間者検閲サーバーをローカルで作って通信するメールをチェック仕込みですが、それをオーフすればエラーが無くなるはずです。',
                 'メール送信の際にエラーが発生しました。そのようなエラーは多分パスワードをAPPパスワードではなく、普通のパースワードを使った模様です。APPパスワードをチェックしてもう一回してみてください。',
                 'ネットはインターネットに接続していない模様です。',
                 'エラーが発生しました。CoNETを一回退出してからもう一回してみてください。',
@@ -2217,7 +2217,7 @@ const infoDefine = [
             refresh: 'Refresh page.'
         },
         imapInformation: {
-            title: 'Email account to use by OPN.',
+            title: 'IMAP account settings.',
             tempImapAccount: `Have problem with your IMAP enabled email account? <a href="#" style = "margin-left: 0.5em;" class="ui label teal" onclick="return linkClick ('https://github.com/QTGate/QTGate-Desktop-Client/wiki/IMAP-temporary-account')"> Get temporary account.</a>`,
             infomation: `Please provide an IMAP enabled email account to be used to communication with CoNET network. The account name and password will be required. For your personal privacy, please consider registering a new email account to use. CoNET currently supports <a class="ui label teal small" href="#" style="margin-left: 0.4em;" onclick="return linkClick('https://www.icloud.com/')">Apple iCloud</a><a href="#" class="ui label teal small" onclick="return linkClick ('https://mail.yahoo.com')">Yahoo</a><a href="#" class="ui label teal small" onclick="return linkClick ('https://www.google.com/intl/en-GB/gmail/about/')">Gmail</a><a href="#" class="ui label teal small" onclick="return linkClick('https://outlook.live.com/owa/')">Outlook Mail</a><a href="#" class="ui label teal small" onclick="return linkClick('https://www.gmx.com/')">GMX</a><a href="#" class="ui label teal small" onclick="return linkClick('https://www.zoho.com/mail/')">ZOHO</a>. For passwords, it is recommended use a <a href="#" onclick="return linkClick('https://help.yahoo.com/kb/SLN15241.html')">generated app-specific password.</a> If using <a href="#" onclick="return linkClick('https://help.yahoo.com/kb/two-step-verification-sln5013.html')">2-step verification</a>, we recommend using a free anonymous SMS receiving site to receive SMS codes, ( such as <a href="#" onclick="return linkClick('http://receive-sms-online.com/')">receive-sms-online.com</a>, <a href="#" onclick="return linkClick('https://sms-online.co/receive-free-sms')" >sms-online.co</a>, <a href="#" onclick="return linkClick('https://receive-a-sms.com/')" >receive-a-sms.com</a>, or <a href="#" onclick="return linkClick('https://www.google.com/search?q=free+anonymous+SMS+receiving+site&oq=free+anonymous+SMS+receiving+site&aqs=chrome..69i57.268j0j4&sourceid=chrome&ie=UTF-8')" >others</a> ).`,
             serverDetail: 'settings:',
@@ -2261,7 +2261,7 @@ const infoDefine = [
             imapCheckError: [
                 /* 0 */ 'Cannot connect to email server! Your network may offline or do not support IMAP protocol. Please check your network and try again after reflash page.',
                 /* 1 */ 'Invalid login username or password! Please check username and password.',
-                /* 2 */ 'Certificate for this email server is not trusted. You may have Man-in-the-middle attack in your network. Try again when chenged network.',
+                /* 2 */ `Certificate for this email server is not trusted. You may have Man-in-the-middle attack in your network. This error is happening maybe your anti-virus software's firewall is blocking imap and smtp connections to the mail exchange server. Please add mail server to the encrypted connection scanning exclusion's list if you are using Kaspersky or similar for other anti-virus software. This should resolve this issue`,
                 /* 3 */ 'Sent mail error. It may happened when you use normail password. Check your mail APP password.',
                 /* 4 */ 'Your network have not internet.',
                 /* 5 */ 'Unknow error. Please exit CoNET and try it again.',
@@ -2934,7 +2934,7 @@ const infoDefine = [
             imapCheckError: [
                 '不能连接到郵件伺服器，有可能您沒有互聯網，或所在網絡不支持郵件IMAP通訊，請檢查您的網絡，或刷新頁面重試一次',
                 '郵件伺服器提示用户名或密码错误，请仔细检查您的用户名和密码！',
-                '郵件伺服器證書錯誤！您所在網絡可能存在網絡中間人攻擊，請換網絡環境後再嘗試。',
+                '郵件伺服器證書錯誤！您所在網絡可能存在網絡中間人攻擊。如果您使用某些防毒軟件如Kaspersky，您設定了讓它檢測郵件，它會使用中間人攔截技術攔截任何郵件通訊，您需要關閉此項功能。',
                 '郵件伺服器發送郵件錯誤，這通常是您使用的密碼是普通密碼所致，請換用APP密碼後再次嘗試',
                 '未連結互聯網，請檢查網絡',
                 '未知錯誤，請退出CoNET後再試。',
