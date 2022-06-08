@@ -21,7 +21,7 @@
 		"cookie-parser": "^1.4.5",
 		"core-js": "^3.6.5",
 		"express": "^4.17.1",
-		"jimp": "^0.10.3",
+		"jimp": "^0.12.0",
 		"jquery": "^3.5.1",
 		"jszip": "^3.4.0",
 		"knockout": "^3.5.1",
