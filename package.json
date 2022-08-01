@@ -28,7 +28,7 @@
 		"mime-types": "^2.1.27",
 		"node-uuid": "^1.4.8",
 		"nodemailer": "^6.4.6",
-		"openpgp": "^4.10.4",
+		"openpgp": "^5.0.0",
 		"pug": "^2.0.4",
 		"snapsvg": "^0.5.1",
 		"snyk": "^1.320.2",
