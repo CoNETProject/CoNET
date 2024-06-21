@@ -7,7 +7,7 @@
 ### This is the beginning of CoNET project, use email address rather than IP address
 ### now migrate to
 ## The new era of CoNET
-### The new is use wallet rather than IP address & Email address
+### Use wallet rather than Email address
 ![http protocol](/resources/CoNet1.gif?raw=true)
 
 
