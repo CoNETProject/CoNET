@@ -8,11 +8,14 @@
 ### now migrate to
 ## The new era of CoNET
 ### Use wallet rather than Email address
+
+### New Link here:
+https://github.com/CoNET-project/CONET-Platform
+
 ![http protocol](/resources/CoNet1.gif?raw=true)
 
 
-New Link here:
-https://github.com/CoNET-project/CONET-Platform
+
 
 ### Donate us
 Email: info@conet.network
