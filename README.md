@@ -10,43 +10,5 @@
 New Link here:
 https://github.com/CoNET-project/CONET-Platform
 
-### CoNet is global network that allow devices connected each other with email address
-
-CoNet is a computer network, privacy-enhancing technology that has been designed to network nodes that utilize an email address as the origin/termination of communication. This offers a work-around from the use of an IP address as the origin/termination of communication which is a system that has been compromised on the most fundamental level allowing for censorship and outright blocking of specific communications.
-
-### CoNetはメールアドレスで複数のデバイスを相互接続した情報通信網であります
-
-CoNetは普通のネットワークで送受信IPアドレスをメールアドレスにする、新たに設計された情報通信網であります。匿名、隱身、セキュア、ネット検閲から逃げる能力を持ちます。
-
-### CoNet是使用郵箱地址讓設備相互連結的新互聯網
-
-CoNet項目旨在創建一個全新的，基於郵箱地址來相互連結的計算機通訊網絡，它與傳統的以IP地址連結的計算機互聯網相比，天然具有匿名，隱身，安全和對抗網絡審查的能力。
-
-![http protocol](/resources/conet2.png?raw=true)
-
-### How does CoNet work / CoNetの仕組み / CoNet工作原理
-![http protocol](/resources/CoNet_working.gif?raw=true)
-### Node
-The CoNet node is an AP (access point) that provides the ability for users to connect to the CoNet network via a public email server like iCloud, Yahoo or Outlook. The node also maintains a routing table that helps the client and node find each other. All nodes connect to each other thereby building the core of the CoNet network in a similar fashion to an intronet. The CoNet node is an open source technology that will be open to development by any person or organization. They are then able to build their own node and to service their client via their private node. Additionally the CoNet node also makes possible the mining of CoNet cryptocurrency similar to how a traditional node in a blockchain operates.
-
-### ノード
-
-CoNetアクセスポイントはエンドユーザーにCoNetへ接続サービスとCoNetの中継機能、エンドポイントの発見、インターネットのゲットウェイのサービスをするサーバーです。お互い接続しているCoNetノート同士やエンドポイントは、公衆メールサーバよって仮想的なトンネルを構築します。
-
-### 節點
-
-CoNet節點它提供設備接入到CoNet服務，同時節點之間提供網絡數據交換和路由信息。所有CoNet設備和節點都通過第三方公眾郵件服務器，建立虛擬通訊管道來連結並構成CoNet網絡。
-
-
-### CoNet user case / CoNet導入事例　/ CoNet用戶案例
-
-#### [Kloak Platform / Kloakプラットフォーム / Kloak平台](https://github.com/KloakIT/Kloak_platform)
-
-![http protocol](/resources/CoPlatform4.png?raw=true)
-
-### White paper / ホワイトペーパー / 白皮書
-
-[CoNET project](https://medium.com/@CoNET/conet-project-b54d33f82720)
-
 ### Donate us
-Email: info@CoNETTech.ca
+Email: info@conet.network
