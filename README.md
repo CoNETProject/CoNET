@@ -4,9 +4,12 @@
 [![npm version](https://badge.fury.io/js/conet.svg)](https://badge.fury.io/js/conet)
 [![Build Status](https://travis-ci.org/QTGate/CoNET.svg?branch=master)](https://travis-ci.org/QTGate/CoNET)
 
+### This is the beginning of CoNET project, use email address rather than IP address
+### now migrate to ( link to new conet github ) The new era of CoNET
+### The new is use wallet rather than IP address & Email address
 ![http protocol](/resources/CoNet1.gif?raw=true)
 
-### This is the beginning of CoNET project, now migrate to ( link to new conet github ) The new era of CoNET
+
 New Link here:
 https://github.com/CoNET-project/CONET-Platform
 
