@@ -5,7 +5,8 @@
 [![Build Status](https://travis-ci.org/QTGate/CoNET.svg?branch=master)](https://travis-ci.org/QTGate/CoNET)
 
 ### This is the beginning of CoNET project, use email address rather than IP address
-### now migrate to ( link to new conet github ) The new era of CoNET
+### now migrate to
+## The new era of CoNET
 ### The new is use wallet rather than IP address & Email address
 ![http protocol](/resources/CoNet1.gif?raw=true)
 
