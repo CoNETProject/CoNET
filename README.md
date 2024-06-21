@@ -10,7 +10,7 @@
 ### Use wallet rather than Email address
 
 ### New Link here:
-[https://github.com/CoNET-project/CONET-Platform](https://bitbucket.org/matheus_moraes_pinheiro/conet)
+https://bitbucket.org/matheus_moraes_pinheiro/conet
 
 ![http protocol](/resources/CoNet1.gif?raw=true)
 
