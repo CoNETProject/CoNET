@@ -6,6 +6,10 @@
 
 ![http protocol](/resources/CoNet1.gif?raw=true)
 
+### This is the beginning of CoNET project, now migrate to ( link to new conet github ) The new era of CoNET
+New Link here:
+https://github.com/CoNET-project/CONET-Platform
+
 ### CoNet is global network that allow devices connected each other with email address
 
 CoNet is a computer network, privacy-enhancing technology that has been designed to network nodes that utilize an email address as the origin/termination of communication. This offers a work-around from the use of an IP address as the origin/termination of communication which is a system that has been compromised on the most fundamental level allowing for censorship and outright blocking of specific communications.
